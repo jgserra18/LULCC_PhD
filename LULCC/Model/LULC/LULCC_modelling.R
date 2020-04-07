@@ -1,5 +1,5 @@
-source('./Model/PreProcessing/Organize_ObsLulccRasterStack.R')
-source('./Model/PreProcessing/Organize_ExpVarRasterList.R')
+source('./LULCC/Model/PreProcessing/Organize_ObsLulccRasterStack.R')
+source('./LULCC/Model/PreProcessing/Organize_ExpVarRasterList.R')
 
 
 require(caTools)
@@ -86,7 +86,7 @@ create_model_formula <- function(st_clc) {
 
 create_setSeed_folder <- function(admin='PT', admin_id, spatial_res) {
   
-  file_path <- create_new_directory('./Activity_data/', 'Set_seed')
+  file_path <- create_new_directory('.LULCC/Activity_data/', 'Set_seed')
   file_path <- create_new_directory(file_path, admin)
   if (missing(admin_id)==TRUE) {
     file_path <- create_new_directory(file_path, ifelse(spatial_res=='Native', 'Native', paste0(spatial_res, 'm')))
@@ -270,13 +270,13 @@ compute_LULCC_demand <- function(param) {
 
 get_LULCC_elasticity <- function() {
   
-  elas <- get_activity_data(folder = 'CLUES_params', pattern = 'LULCC_elasticity')[, 'elasticity']
+  elas <- get_activity_data(module = 'LULCC',folder = 'CLUES_params', pattern = 'LULCC_elasticity')[, 'elasticity']
   return(elas)
 }
 
 get_LULCC_rules <- function() {
   
-  rules <- get_activity_data('CLUES_params', subfolder = 'Rules', pattern = 'LULCC_rules')
+  rules <- get_activity_data(module = 'LULCC','CLUES_params', subfolder = 'Rules', pattern = 'LULCC_rules')
   rules <- as.matrix(rules)#[,-1]
   return(rules)
 }

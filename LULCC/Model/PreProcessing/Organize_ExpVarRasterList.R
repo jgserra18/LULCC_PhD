@@ -1,5 +1,5 @@
-source('./Model/Main/Main_functions.R')
-source('./Model/GIS/General_GIS.R')
+source('./Main/Global_functions.R')
+source('./Main/General_GIS.R')
 
 ## ----------------------- LIBRARIES --------------------- ##
 ## --------------------------------------------------------##
@@ -27,7 +27,7 @@ general_rstack_func <- function(folder_path) {
   rs_func <- function(x) {
     r_file <- raster(x)
     if (res(r_file)[1] != 100) {
-      r_file <- resample_to_CLC(r_file, TRUE, spatial_res)
+      r_file <- resample_to_CLC(module = 'LULCC',r_file, TRUE, spatial_res)
     }
     return(r_file)
   }
@@ -41,14 +41,13 @@ general_rstack_func <- function(folder_path) {
 
 
 
-
 ## ----------------------- Exploratory Variables Organization --------------------- ##
 ## ---------------------------------------------------------------------------------##
 
 get_output_statistical_data <- function(spatial_res) {
   # creates a RasterStack from all statistical data from Statistics Portugal at subregional level
   
-  out_stat <- get_folderpath('Output', 'Exploratory_variables', 'Statistical_data')
+  out_stat <- get_folderpath(module = 'LULCC', 'Output', 'Exploratory_variables', 'Statistical_data')
   stat_files <- list.files(path = out_stat, pattern = as.character(spatial_res), full.names = TRUE)
   stat_files <- list.files(path = stat_files, full.names = TRUE)
   store_list <- vector('list', length = length(stat_files))
@@ -74,12 +73,12 @@ correct_Params_Resolution <- function(param, spatial_res) {
   
   spatial_res <-  ifelse(spatial_res=='Native', 'Native', paste0(spatial_res, 'm'))
   
-  climatic_native <- get_dir_files(folder = 'Activity_data', param_pattern = param, subfolder = spatial_res)
+  climatic_native <- get_dir_files(module = 'LULCC',folder = 'Activity_data', param_pattern = param, subfolder = spatial_res)
   
   for (i in climatic_native) {
     
     r_file <- raster(i)
-    clc <- get_activity_data(folder = 'CLC', pattern = '1990', subfolder =spatial_res)
+    clc <- get_activity_data(module = 'LULCC',folder = 'CLC', pattern = '1990', subfolder =spatial_res)
     r_file <- resample(r_file, clc)
   # r_file <- resample_to_CLC(raster_file = r_file, spatial_res ='1000m')
     tifoptions=c('COMPRESS=DEFLATE', 'PREDICTOR=2', 'ZLEVEL=6')
@@ -104,12 +103,8 @@ stack_environmental_data <- function(spatial_res) {
   
   for (i in folders) {
     
+    d <- get_dir_files(module = 'LULCC', folder = 'Activity_data', subfolder = i, mainfolder = as.character(paste0(spatial_res,'m')))
 
-    folder_path <- file.path('./Activity_data/', i)
-    folder_path <- list.files(path = folder_path, pattern = as.character(spatial_res), full.names = TRUE)
-    
-    l_files <- list.files(folder_path, full.names = TRUE)
-    
     for (j in l_files) {
       
       print(paste0('Working with ', j))
@@ -171,11 +166,12 @@ export_MRB_data <- function(spatial_res) {
   
   for (i in 1:nlayers(r_stack)) {
     r_file <- r_stack[[i]]
-    export_file(file = r_file, folder = 'Exploratory_variables', filename = names(r_stack)[[i]], 
+    export_file(module = 'LULCC',file = r_file, folder = 'Exploratory_variables', filename = names(r_stack)[[i]], 
                 subfolder = 'MRB', subfolderX2 = spatial_res)
     
   }
 }
+
 
 aggregate_stack_ExpVarRaster <- function(spatial_res) {
   
@@ -198,7 +194,7 @@ feed_ExpVarRasterList <- function(admin, admin_id, spatial_res) {
       st_expVar <- ExpVarRasterList(x = st_expVar, pattern = 'ef')
   }
   else {
-    st_expVar <- general_RasterCrop_admin(r_file = st_expVar, admin = admin, admin_id = admin_id)
+    st_expVar <- general_RasterCrop_admin(module = 'LULCC',r_file = st_expVar, admin = admin, admin_id = admin_id)
     st_expVar <- ExpVarRasterList(x = st_expVar, pattern = 'ef')
   
   }

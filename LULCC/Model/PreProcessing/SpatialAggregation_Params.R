@@ -15,7 +15,8 @@ export_aggregatedParams <- function(folder, spatial_res, names, r_file) {
                          convert = c('500m', '200m', 'Native'))
     id <- which(res_df$spatial_res==spatial_res)
     
-    export_file(file = r_file, 
+    export_file(module = 'LULCC', 
+                file = r_file, 
                 folder = 'Activity_data', 
                 filename = names, 
                 subfolder = folder, 
@@ -23,7 +24,8 @@ export_aggregatedParams <- function(folder, spatial_res, names, r_file) {
   } 
   
   else {
-    export_file(file = r_file, 
+    export_file(module = 'LULCC',
+                file = r_file, 
                 folder = 'Activity_data', 
                 filename = names, 
                 subfolder = folder, 
@@ -31,14 +33,15 @@ export_aggregatedParams <- function(folder, spatial_res, names, r_file) {
   }
 }
 
+
 aggregate_ActivityData_params <- function(folder, spatial_res) {
     
   if (folder == 'Climatic_params') {
-    files <- get_dir_files(folder = 'Activity_data', param_pattern = folder, subfolder = '1000m')
-    names <- get_dir_files(folder = 'Activity_data', param_pattern = folder, subfolder = '1000m', file_names = TRUE)
+    files <- get_dir_files(module = 'LULCC',folder = 'Activity_data', param_pattern = folder, subfolder = '1000m')
+    names <- get_dir_files(module = 'LULCC',folder = 'Activity_data', param_pattern = folder, subfolder = '1000m', file_names = TRUE)
   } else {
-    files <- get_dir_files(folder = 'Activity_data', param_pattern = folder, subfolder = 'Native')
-    names <- get_dir_files(folder = 'Activity_data', param_pattern = folder, subfolder = 'Native', file_names = TRUE)  }
+    files <- get_dir_files(module = 'LULCC',folder = 'Activity_data', param_pattern = folder, subfolder = 'Native')
+    names <- get_dir_files(module = 'LULCC',folder = 'Activity_data', param_pattern = folder, subfolder = 'Native', file_names = TRUE)  }
 
   for (i in seq_along(files)) {
     
@@ -90,14 +93,14 @@ loop_aggregate_ActivityData_params <- function() {
 
 general_aggregate_output_params <- function(param_name, spatial_res) {
   
-  files <- get_dir_files('Output', 'Exploratory_variables', param_name, 'Native')
-  names <- get_dir_files('Output', 'Exploratory_variables', param_name, 'Native', file_names = TRUE)
+  files <- get_dir_files(module = 'LULCC','Output', 'Exploratory_variables', param_name, 'Native')
+  names <- get_dir_files(module = 'LULCC','Output', 'Exploratory_variables', param_name, 'Native', file_names = TRUE)
   
   for (i in seq_along(files)) {
     
     r_file <- raster(files[i])
     r_file <- aggregate(r_file, spatial_res)
-    export_file(file = r_file, folder = 'Exploratory_variables', filename = names[i], 
+    export_file(module = 'LULCC',file = r_file, folder = 'Exploratory_variables', filename = names[i], 
                 subfolder = param_name, subfolderX2 =  paste0(spatial_res, '00m'))
   }
   rm(list=c('files', 'names', 'r_file'))

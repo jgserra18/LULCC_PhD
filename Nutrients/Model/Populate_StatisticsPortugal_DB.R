@@ -1,4 +1,4 @@
-source('./Model/Main/Main_functions.R')
+source('./Main/Global_functions.R')
 
 
 library(rjson)
@@ -85,7 +85,7 @@ forage_horticulture_populate_modifier <- function(var_id,
 populate_perma_pastures_DB <- function(muni_id = as.character(seq(11,17))) {
   
     crop_df <- get_agrarian_region_INE(INE_param_id = '0003485', var_id = 'T', year = as.character(c(1989,1993,1995,1997,1999,2003,2005,2007,2009,2013)), muni_id = muni_id)
-    export_file(file = crop_df, folder = 'Activity_data', filename = 'extensive_pasture', subfolder = 'Raw_data_Agrarian', 
+    export_file(module = 'Nutrients',file = crop_df, folder = 'Activity_data', filename = 'extensive_pasture', subfolder = 'Raw_data_Agrarian', 
                 subfolderX2 = 'Areas', subfolderX3 = 'Pastures')
 }
 
@@ -116,11 +116,13 @@ main_populate_crop_param_DB <- function() {
       crop_df <- get_agrarian_region_INE(INE_param_id = INE_param_id, var_id = var_id)
       
       # create directory for params
-      path <- create_activityData_folders(folder = 'Activity_data', subfolder = 'Raw_data_Agrarian', subfolderX2 = params[i,1])
+      path <- create_activityData_folders(module = 'LULCC', folder = 'Activity_data', subfolder = 'Raw_data_Agrarian', subfolderX2 = params[i,1])
       crop_name <- params_df[j, 'Crop']
       
       print('========== Exporting ....')
-      export_file(file = crop_df, folder = 'Activity_data', filename = crop_name, subfolder = 'Raw_data_Agrarian', subfolderX2 = params[i,1], subfolderX3 = main_crop)
+      export_file(module = 'Nutrients',
+                   file = crop_df, folder = 'Activity_data', 
+                   filename = crop_name, subfolder = 'Raw_data_Agrarian', subfolderX2 = params[i,1], subfolderX3 = main_crop)
     }
   }
   # clean the work environment
@@ -141,7 +143,7 @@ populate_other_crops_param_DB <- function() {
     crop_df <- forage_horticulture_populate_modifier(var_id = var_id)
     
     print('========== Exporting ....')
-    export_file(file = crop_df, folder = 'Activity_data', filename = crop_name, subfolder = 'Raw_data_Agrarian', subfolderX2 = 'Areas', subfolderX3 = params_df[i,2])
+    export_file(module = 'Nutrients', file = crop_df, folder = 'Activity_data', filename = crop_name, subfolder = 'Raw_data_Agrarian', subfolderX2 = 'Areas', subfolderX3 = params_df[i,2])
   }
 }
 
@@ -156,7 +158,7 @@ correct_missing_values_vars <- function(param, main_var) {
   # param is Areas, Yields
   # main_var is e.g., Cereals
   
-  var_path <- get_mainfolder_sub(main_folder = 'Activity_data', pattern = 'Raw_data_Agrarian')
+  var_path <- get_mainfolder_sub(module = 'Nutrients',main_folder = 'Activity_data', pattern = 'Raw_data_Agrarian')
   var_path <- file.path(var_path,param,main_var)
   
   files <- list.files(path = var_path, full.names = TRUE)
@@ -198,7 +200,7 @@ correct_all_missing_values <- function() {
   for (i in params) {
     
     # find the main vars
-    var_path <- get_mainfolder_sub(main_folder = 'Activity_data', pattern = 'Raw_data_Agrarian')
+    var_path <- get_mainfolder_sub(module = 'Nutrients',main_folder = 'Activity_data', pattern = 'Raw_data_Agrarian')
     var_path <- file.path(var_path,i)
     main_vars <- list.files(path = var_path)
     
@@ -220,7 +222,7 @@ interpolate_other_crops_timeseries <- function(param, main_crop, crop) {
   # linear extrapolation
   
   print('========= Reading')
-  crop_df <- get_activity_data(folder = 'Raw_data_Agrarian', pattern = crop, subfolder = param, subfolderX2 = main_crop)
+  crop_df <- get_activity_data(module = 'Nutrients',folder = 'Raw_data_Agrarian', pattern = crop, subfolder = param, subfolderX2 = main_crop)
   names(crop_df) <- gsub('X','',names(crop_df))
   
   print('==== Creating template df.')
@@ -277,7 +279,7 @@ interpolate_other_crops_timeseries <- function(param, main_crop, crop) {
 
 loop_interpolate_other_crops_timeseries <- function() {
   
-  params_df <-  get_activity_data(folder = 'Raw_data_Agrarian', pattern = 'Other_crops_ids')
+  params_df <-  get_activity_data(module = 'Nutrients',folder = 'Raw_data_Agrarian', pattern = 'Other_crops_ids')
   
   for (i in 1:nrow(params_df)) {
     
@@ -287,7 +289,7 @@ loop_interpolate_other_crops_timeseries <- function() {
     crop_df <- interpolate_other_crops_timeseries(param = 'Areas', main_crop = main, crop =crops)
     
     print('========== Exporting ....')
-    export_file(file = crop_df, folder = 'Activity_data', filename = crops, subfolder = 'Raw_data_Agrarian', subfolderX2 = 'Areas', subfolderX3 = main)
+    export_file(module = 'Nutrients',file = crop_df, folder = 'Activity_data', filename = crops, subfolder = 'Raw_data_Agrarian', subfolderX2 = 'Areas', subfolderX3 = main)
   }
 }
 
@@ -306,6 +308,87 @@ convert_forage_crop_categories <- function() {
 ## ----------------------- SCRAP AND POPULATE ANIIMAL DATA ------------------- ##
 ## ---------------------------------------------------------------------------##
 
+get_agrarian_bovine <- function(var_id, 
+                                year = seq(1987,2017), 
+                                muni_id = as.character(seq(1,7))) {
+  # modifies get_agrarian_region_INE to account for the different dataset parameters related to cattle
+  
+  df <- data.frame()
+  print(muni_id)
+  for (i in seq_along(muni_id)) {
+    
+    print(paste0('Agrarian region: ', i))
+    df[i, 'id'] <- i
+    
+    for (j in year) {
+      
+      print(paste0('Year: ', j))
+      js_year <- paste0('S6A', j, '2')
+      df[i, as.character(j)] <- get_INE_data(INE_param_id = '0000543', js_year, muni_id[i], var_id)
+    }
+  }
+  return(df)
+}
+
+main_populate_animals_pop_DB <- function() {
+  # EXCEPTIONS: FORAGE, HORTICULTURE, POULTRY, RABBITS
+  
+  # this populates the activity data for crop parameters (yields, acreage) based on the "Crop_ids" file
+  # parses Statistics Portugal
+  # units: YIELDS (kg FM yr-1)
+  # units: AREAS (ha yr-1)
+  
+  params_df <-  get_activity_data(module = 'Nutrients',folder = 'Raw_data_Agrarian', pattern = 'Animals_id')
+  
+  for (i in 20:nrow(params_df)) {
+    
+    INE_param_id <- substr(x = params_df[i,1], start = 2, stop = 8)
+    var_id <- params_df[i, 'Animals_id']
+    main_cat <- params_df[i,'Main_animals']
+
+    if (main_cat == 'Bovine') {
+      
+      animals_df <- get_agrarian_bovine(var_id = var_id)
+    }
+    else if (main_cat == 'Equides') {
+      
+      animals_df <- get_agrarian_region_INE(INE_param_id = INE_param_id, var_id = var_id, year = seq(1987,2016))
+    }
+    else if (main_cat == 'Rabbits' | main_cat == 'Poultry') {
+      animals_df <- get_agrarian_region_INE(INE_param_id = INE_param_id, var_id = var_id, year = c(1989,1993,1995,1997,1999,2003,2005,2007,2009,2013,2016),muni_id = as.character(seq(11,17)))
+    }
+    else {
+      
+      animals_df <- get_agrarian_region_INE(INE_param_id = INE_param_id, var_id = var_id)
+    }
+    
+    # create directory for params
+    path <- create_activityData_folders(module = 'Nutrients', folder = 'Activity_data', subfolder = 'Raw_data_Agrarian', subfolderX2 = 'Animals')
+    animal_name <- params_df[i, 'Animals']
+    
+    print('========== Exporting ....')
+    export_file(module = 'Nutrients',
+                file = animals_df, folder = 'Activity_data', 
+                filename = animal_name, subfolder = 'Raw_data_Agrarian', subfolderX2 = 'Animals', subfolderX3 = main_cat)
+    # clean the work environment
+    rm(list=c('params_df', 'params', 'var_id', 'animals_df', 'path', 'animal_name'))
+  }
+}
+main_populate_animals_pop_DB()
+
+
+
+correct_animal_population_DB <- function() {
+  # fix   "o" "*"
+  # add + "000" because units are given in thousands (except rabbits, poultry)
+  # forecast if needed (e.g., ewes, horses)
+  # interpolate rabbits and poultry population
+  
+}
+
+
+
+main_populate_animals_pop_DB()
 
 ## ----------------------- RUN ME ------------------- ##
 ## ---------------------------------------------------##
@@ -323,3 +406,4 @@ correct_all_missing_values()
 
 #linearly interpolate the acreage of horticulture, forage and pastures
 loop_interpolate_other_crops_timeseries()
+

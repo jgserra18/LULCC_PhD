@@ -1,0 +1,10 @@
+Main_crop_id,Main_crop,Crop,Crop_id
+4,Forage,forage_roots,41
+4,Forage,Annual_mixtures,42
+4,Forage,forage_sorghum,43
+4,Forage,forage_oat,44
+4,Forage,forage_maize,45
+4,Forage,other_forage,49
+8,Horticulture,Horticulture_intensive,82
+8,Horticulture,Horticulture_extensive,81
+3,Pastures,Intensive_pasture,3

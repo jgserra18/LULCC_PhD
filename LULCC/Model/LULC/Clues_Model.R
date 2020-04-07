@@ -1,4 +1,4 @@
-source('./Model/LULC/LULCC_modelling.R')
+source('./LULCC/Model/LULC/LULCC_modelling.R')
 
 
 

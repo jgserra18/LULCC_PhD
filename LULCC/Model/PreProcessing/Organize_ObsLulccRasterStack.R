@@ -1,5 +1,5 @@
-source('./Model/Main/Main_functions.R')
-source('./Model/GIS/General_GIS.R')
+source('./Main/Global_functions.R')
+source('./Main/General_GIS.R')
 
 ## ----------------------- LIBRARIES --------------------- ##
 ## --------------------------------------------------------##
@@ -16,9 +16,10 @@ reclassify_CLC <- function() {
   # reclassifies (specified) non-agricultural land uses from CLC
   # note: waterbodies, except for inland waterbodies, were set to NA
   
-  clc_rcl <- get_activity_data('CLC', 'specified')
+  clc_rcl <- get_activity_data(module = 'LULCC', 'CLC', 'specified')
   return(clc_rcl)
 }
+
 
 stack_all_CLC <- function(spatial_res, write) {
   # creates a stack with the properly reclassified CLC versions for all years
@@ -33,24 +34,25 @@ stack_all_CLC <- function(spatial_res, write) {
     print(paste0('Stacking CLC from ', i))
     
   #  spatial_res <- ifelse(spatial_res=='Native', 'Native', paste0(spatial_res, 'm'))
-    clc <- get_activity_data(folder = 'CLC', pattern = i, subfolder = spatial_res)
+    clc <- get_activity_data(module = 'LULCC', folder = 'CLC', pattern = i, subfolder = spatial_res)
     clc <- reclassify(clc, rcl = as.matrix(clc_rcl[, -4]))
     clc_stack <- append(clc_stack, clc)
   }
   clc_stack <- stack(clc_stack)
   
   if (write==TRUE) {
-    export_file(file = clc_stack, folder = 'Stacked_CLC', filename = 'Stacked_CLC_LU')
+    export_file(module = 'LULCC',file = clc_stack, folder = 'Stacked_CLC', filename = 'Stacked_CLC_LU')
   }
   return(clc_stack)
   rm(list=c('clc_rcl', 'clc_yr', 'clc'))
 }
 
+
 get_CLC_info <- function(label_or_cat) {
   # get CLC categories for further application within the LULCC framework
   # label_or_cat can be either label or category
   
-  clc_cat <- get_activity_data('CLC', 'CLC_LULCC_label')
+  clc_cat <- get_activity_data(module = 'LULCC','CLC', 'CLC_LULCC_label')
   ifelse(label_or_cat=='label',
          clc_cat <- clc_cat[, 3],
          clc_cat <- clc_cat[, 1])
@@ -97,7 +99,7 @@ feed_ObsLulcRasterStack <- function(admin, admin_id, spatial_res) {
                              t=c(0, 10, 16, 22, 28))
   }
   else {
-    st_clc <- general_RasterCrop_admin(r_file = st_clc, admin = admin, admin_id = admin_id)
+    st_clc <- general_RasterCrop_admin(module = 'LULCC',r_file = st_clc, admin = admin, admin_id = admin_id)
     #clc_df <- CLC_df(st_clc)
     clc_df <- CLC_df()
     lu <- ObsLulcRasterStack(x=st_clc,

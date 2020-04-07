@@ -1,5 +1,4 @@
-source('./Main/Set_directory.R')
-load_dir(module = 'LULCC')
+source('./Main/Set_ProjectDirectory.R')
 
 ## ----------------------- LIBRARIES --------------------- ##
 ## --------------------------------------------------------##
@@ -24,7 +23,7 @@ identify_read_fileclass <- function(file_path) {
     r_file <- raster(file_path)
   }
   else if (grepl('.csv', file_path)==TRUE) {
-    r_file <- read.csv(file_path)
+    r_file <- read.csv(file_path, stringsAsFactors = F)
   }
   else if (grepl('.shp', file_path)==TRUE) {
     r_file <- sf::read_sf(file_path)
@@ -81,11 +80,11 @@ correct_filename_iter <- function(path, filename) {
 ## ----------------------- GETTERS ----------------------- ##
 ## --------------------------------------------------------##
 
-get_mainfolder_sub <- function(main_folder, pattern) {
+get_mainfolder_sub <- function(module, main_folder, pattern) {
   # gets the mainfolder for the model (e.g., Activity-data)
   # pattern can be specified for any subfolder
   
-  sel_folder <- list.files(path = './', pattern = main_folder, full.names = TRUE)
+  sel_folder <- list.files(path = paste0('./', module), pattern = main_folder, full.names = TRUE)
   
   if (missing(pattern)==TRUE) {
     return(sel_folder)
@@ -95,16 +94,17 @@ get_mainfolder_sub <- function(main_folder, pattern) {
   }
 }
 
-get_activity_data <- function(folder, pattern, subfolder, mainfolder, subfolderX2) {
+
+get_activity_data <- function(module, folder, pattern, subfolder, mainfolder, subfolderX2) {
   # gets the path of a given file within folders/subfolders of activity data
   # this can also be used to get output data
   
   # get activity data path and read and select a file based on the specified pattern
   if (missing(mainfolder)==TRUE) {
-    act_data <- get_mainfolder_sub(main_folder = 'Activity_data', pattern = folder)
+    act_data <- get_mainfolder_sub(module, main_folder = 'Activity_data', pattern = folder)
   }
   else {
-    act_data <- get_mainfolder_sub(main_folder = mainfolder, pattern = folder)
+    act_data <- get_mainfolder_sub(module, main_folder = mainfolder, pattern = folder)
   }
 
   if (missing(subfolder)==TRUE & missing(subfolderX2)==TRUE) {
@@ -128,10 +128,11 @@ get_activity_data <- function(folder, pattern, subfolder, mainfolder, subfolderX
   rm(list=c('act_data', 'sel_file'))
 }
 
-get_dir_files <- function(folder, param_pattern, subfolder, mainfolder, file_pattern, file_names) {
+
+get_dir_files <- function(module, folder, param_pattern, subfolder, mainfolder, file_pattern, file_names) {
   # list the files fullpath
   
-  main <- get_mainfolder_sub(folder, param_pattern)
+  main <- get_mainfolder_sub(module, folder, param_pattern)
   folder <- file.path(main, subfolder)
   
   if (missing(mainfolder)==FALSE) {
@@ -156,11 +157,11 @@ get_dir_files <- function(folder, param_pattern, subfolder, mainfolder, file_pat
 
 
 
-get_folderpath <- function(main_folder, folder, subfolder) {
+get_folderpath <- function(module, main_folder, folder, subfolder) {
   # used to return the path of a given folder/subfolder
   # NOTE: this is useful when exporting data as it gives the directory
   
-  main_path <- get_mainfolder_sub(main_folder, folder)
+  main_path <- get_mainfolder_sub(module, main_folder, folder)
   
   if (missing(subfolder)==TRUE) {
     return(main_path)
@@ -171,14 +172,12 @@ get_folderpath <- function(main_folder, folder, subfolder) {
   }
 }
 
-
-
 ## ----------------------- EXPORTERS ----------------------- ##
 ## ----------------------------------------------------------##
 
-create_output_folders <- function(folder, subfolder, subfolderX2) {
+create_output_folders <- function(module, folder, subfolder, subfolderX2) {
   
-  out <- './Output'
+  out <-  get_mainfolder_sub(module, 'Output')
   
   if (missing(subfolder)==TRUE && missing(subfolderX2)==TRUE) {
     folderpath <- file.path(out, folder)
@@ -194,19 +193,19 @@ create_output_folders <- function(folder, subfolder, subfolderX2) {
   return(folderpath)
 }
 
-create_activityData_folders <- function(folder, subfolder, subfolderX2) {
+create_activityData_folders <- function(module, folder, subfolder, subfolderX2) {
   
-  file_path <- get_mainfolder_sub(main_folder = folder, pattern = subfolder)
+  file_path <- get_mainfolder_sub(module, main_folder = folder, pattern = subfolder)
   file_path <- file.path(file_path, subfolderX2)
   dir.create(path = file_path, showWarnings = FALSE, recursive = TRUE)
   return(file_path)
 }
 
-export_file <- function(file, folder, filename, subfolder, subfolderX2, subfolderX3) {
+export_file <- function(module, file, folder, filename, subfolder, subfolderX2, subfolderX3) {
   ## NOTE: CURRENTLY ONLY APPLIED TO RASTERS, STACKS/BRICKS AND DATAFRAMES
   
   if (folder=='Activity_data') {
-    file_path <- create_activityData_folders(folder, subfolder, subfolderX2)
+    file_path <- create_activityData_folders(module, folder, subfolder, subfolderX2)
     
     if (missing(subfolderX3)==FALSE) {
       file_path <- file.path(file_path, subfolderX3)
@@ -215,7 +214,7 @@ export_file <- function(file, folder, filename, subfolder, subfolderX2, subfolde
     file_path <- file.path(file_path, filename)
   }
   else {
-    file_path <- create_output_folders(folder, subfolder, subfolderX2)
+    file_path <- create_output_folders(module, folder, subfolder, subfolderX2)
     
     if (missing(subfolderX3)==FALSE) {
       file_path <- file.path(file_path, subfolderX3)

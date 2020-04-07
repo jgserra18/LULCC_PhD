@@ -1,4 +1,4 @@
-source('./Model/Main/Main_functions.R')
+source('./Main/Global_functions.R')
 
 
 ## ----------------------- LIBRARIES --------------------- ##
@@ -15,10 +15,10 @@ library(dplyr)
 remove_muni_ids <- function() {
   # used in order to facilitate crash errors in the MRB roads computation
   
-  muni <- read_sf('./Activity_data/Admin/Municipality.shp')
+  muni <- get_activity_data(module = 'LULCC', mainfolder = 'Activity_data', folder = 'Admin', pattern = 'Municipality')
   ids <- muni$Admin_id
   
-  roads_path <- get_folderpath(main_folder = 'Output', folder = 'Exploratory_variables', subfolder = 'Roads')
+  roads_path <- get_folderpath(module = 'LULCC', main_folder = 'Output', folder = 'Exploratory_variables', subfolder = 'Roads')
   muni_ids <- gsub(pattern = 'Muni_', replacement = '', x = list.files(roads_path))
   muni_ids <- gsub('.tif', '', muni_ids)
   
@@ -32,8 +32,8 @@ remove_muni_ids <- function() {
 MRB_roads <- function() {
   # creates a multiple ring buffer for roads for mainland Portugal
     
-  roads <- st_read('./Activity_data/Physical_constraints/Roads_OSM.shp')
-  muni <- read_sf('./Activity_data/Admin/Municipality.shp')
+  roads <- get_activity_data(module = 'LULCC', mainfolder = 'Activity_data', folder = 'Physical_constraints', pattern = 'Roads_OSM.shp')
+  muni <- get_activity_data(module = 'LULCC', mainfolder = 'Activity_data', folder = 'Admin', pattern = 'Municipality')
   
   id <- remove_muni_ids()
 
@@ -74,7 +74,7 @@ MRB_roads <- function() {
     r_mrb <- rasterize(x = join_mrb, y = r, field='idx', fun='first', background=-999)
     
     # export the rasterized MRB of a municipality
-    export_file(file = r_mrb, folder = 'Exploratory_variables', filename = paste0('Muni_', i), subfolder = 'Roads')
+    export_file(module = 'LULCC', file = r_mrb, folder = 'Exploratory_variables', filename = paste0('Muni_', i), subfolder = 'Roads')
     rm(list=c('r', 'r_mrb', 'join_mrb'))
   }
 }
