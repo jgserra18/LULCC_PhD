@@ -1,0 +1,46 @@
+lc_id,clc_id,clc_name
+1,111,Continuous urban fabric
+1,112,Discontinuous urban fabric
+1,121,Industrial or commercial units
+1,122,Road and rail networks and associated land
+1,123,Port areas
+1,124,Airports
+1,131,Mineral extraction sites
+1,132,Dump sites
+1,133,Construction sites
+1,141,Green urban areas
+1,142,Sport and leisure facilities
+2,211,Non-irrigated arable land
+2,212,Permanently irrigated land
+2,213,Rice fields
+2,221,Vineyards
+2,222,Fruit trees and berry plantations
+2,223,Olive groves
+2,231,Pastures
+2,241,Annual crops associated with permanent crops
+2,242,Complex cultivation patterns
+2,243,Land principally occupied by agriculture with significant areas of natural vegetation
+2,244,Agro-forestry areas
+3,311,Broad-leaved forest
+3,312,Coniferous forest
+3,313,Mixed forest
+3,321,Natural grasslands
+3,322,Moors and heathland
+3,323,Sclerophyllous vegetation
+3,324,Transitional woodland-shrub
+3,331,Beaches dunes sands
+3,332,Bare rocks
+3,333,Sparsely vegetated areas
+3,334,Burnt areas
+3,335,Glaciers and perpetual snow
+4,411,Inland marshes
+4,412,Peat bogs
+4,421,Salt marshes
+4,422,Salines
+4,423,Intertidal flats
+5,511,Water courses
+5,512,Water bodies
+5,521,Coastal lagoons
+5,522,Estuaries
+5,523,Sea and ocean
+999,999,NODATA
