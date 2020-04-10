@@ -96,15 +96,15 @@ stack_environmental_data <- function(spatial_res) {
   # creates a rasterstack with climatic and environmental parameters
   # resamples those data to a 100x100m grid using the ngb algorithm
   
-  
   store <- list()
   folders <- c('Environmental_params', 'Climatic_params')
   ctr <- 0
   
   for (i in folders) {
     
-    d <- get_dir_files(module = 'LULCC', folder = 'Activity_data', subfolder = i, mainfolder = as.character(paste0(spatial_res,'m')))
-
+    l_files <- get_dir_files(module = 'LULCC', folder = 'Activity_data', subfolder = i, mainfolder = as.character(paste0(spatial_res,'m')))
+    folder_path <- get_folderpath(module = 'LULCC', 'Activity_data', i)
+    
     for (j in l_files) {
       
       print(paste0('Working with ', j))
@@ -129,6 +129,7 @@ stack_environmental_data <- function(spatial_res) {
 }
 
 
+
 stack_MRB_data <- function(spatial_res) {
   # stacks MRB data (e.g., distance to roads, distance to rivers)
   # resamples to CLC spatial res and extent
@@ -137,12 +138,12 @@ stack_MRB_data <- function(spatial_res) {
   store <- list()
   ctr_store <- 0
   
-  folder_path <- file.path('./Output/Exploratory_variables//MRB/')
-  folder_path <- list.files(path = folder_path, pattern = as.character(spatial_res), full.names = TRUE)
+  folder_path <- get_folderpath(module = 'LULCC', main_folder = 'Output', folder = 'Exploratory_variables', subfolder = 'MRB')
+  folder_path <- list.files(path = folder_path, pattern = spatial_res, full.names = TRUE)
   l_files <- list.files(folder_path,  full.names=TRUE)
-  filename <- list.files(folder_path)
+  filename <- gsub('.tif','',list.files(folder_path))
     
-    ctr <- 0
+  ctr <- 0
     
     for (j in l_files) {
       
@@ -183,7 +184,6 @@ aggregate_stack_ExpVarRaster <- function(spatial_res) {
   return(st)
   rm(list=c('mrb', 'environ', 'stat'))
 }
-
 
 feed_ExpVarRasterList <- function(admin, admin_id, spatial_res) {
   

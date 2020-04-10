@@ -86,21 +86,29 @@ create_model_formula <- function(st_clc) {
 
 create_setSeed_folder <- function(admin='PT', admin_id, spatial_res) {
   
-  file_path <- create_new_directory('.LULCC/Activity_data/', 'Set_seed')
-  file_path <- create_new_directory(file_path, admin)
+  file_path <- create_new_directory('./LULCC/Activity_data/', 'Set_seed')
+
   if (missing(admin_id)==TRUE) {
+    file_path <- create_new_directory(file_path, admin)
     file_path <- create_new_directory(file_path, ifelse(spatial_res=='Native', 'Native', paste0(spatial_res, 'm')))
-  } else {
+  } 
+  else {
+    file_path <- create_new_directory(file_path, admin)
     file_path <- create_new_directory(file_path, admin_id)
     file_path <- create_new_directory(file_path, ifelse(spatial_res=='Native', 'Native', paste0(spatial_res, 'm')))
   }
   return(file_path)
 }
 
-
 export_setSeed_func <- function(admin='PT', admin_id, spatial_res, filename, file) {
   
-  file_path <- create_setSeed_folder(admin = admin, admin_id = admin_id, spatial_res = spatial_res)
+  if (missing(admin)==TRUE && missing(admin_id)==TRUE) {
+    file_path <- create_setSeed_folder(spatial_res = spatial_res)
+  }
+  else {
+    file_path <- create_setSeed_folder(admin = admin, admin_id = admin_id, spatial_res = spatial_res)
+  }
+  
   file_path <- file.path(file_path, paste0(filename, '.csv'))
   write.csv(x = file, file_path, row.names = FALSE)
   return(file_path)
@@ -113,7 +121,11 @@ export_partition_RNG_index <- function(x, size, admin='PT', admin_id, spatial_re
   # the seeds vhange the data partitions and thus all the model simulations run henceforth
   # IMPORTANT: THIS MUST BE RUN FOR EVERY SUBSET (E.G., TAGUS) AND SPATIAL RESOLUTION
   
-  test_path <- create_setSeed_folder(admin = admin, admin_id = admin_id, spatial_res = spatial_res)
+  if (missing(admin)==TRUE && missing(admin_id)==TRUE) {
+    test_path <- create_setSeed_folder(spatial_res = spatial_res)
+  } else {
+    test_path <- create_setSeed_folder(admin = admin, admin_id = admin_id, spatial_res = spatial_res)
+  }
   condition <- list.files(test_path)
   
   #check if set.seed file already exists
@@ -144,7 +156,12 @@ updated_partition <- function(x, size, admin='PT', admin_id, spatial_res, spatia
  # train_ids <- sample.split(points@data[,1] , SplitRatio = size)
  # train_ids <- which(train_ids==TRUE)
   
-  export_partition_RNG_index(x = x, size = size, admin = admin, admin_id = admin_id, spatial_res = spatial_res)
+  if (missing(admin)==TRUE & missing(admin_id)==TRUE) {
+    export_partition_RNG_index(x = x, size = size, spatial_res = spatial_res)
+  } else {
+    export_partition_RNG_index(x = x, size = size, admin = admin, admin_id = admin_id, spatial_res = spatial_res)
+  }
+         
   points <- raster::rasterToPoints(x, spatial=TRUE)
   cells <- raster::cellFromXY(x, points)
   
@@ -171,7 +188,11 @@ create_CLC_partition <- function(st_clc, admin='PT', admin_id, spatial_res) {
   # creates the train and test partitions from the observed CLC_LULCC
   
  # part <- partition(x=st_clc[[1]], size=0.3, spatial=T)
-  part <- updated_partition(x = st_clc[[1]], size = 0.3, admin, admin_id, spatial_res)
+  if(missing(admin)==TRUE && missing(admin_id)==TRUE) {
+    part <- updated_partition(x = st_clc[[1]], size = 0.3, spatial_res = spatial_res)
+  } else {
+    part <- updated_partition(x = st_clc[[1]], size = 0.3, admin = admin, admin_id = admin_id, spatial_res = spatial_res)
+  }
   return(part)
 }
 
@@ -180,7 +201,12 @@ feed_getPredictiveModelInputData <- function(expVar, st_clc, admin='PT', admin_i
   # i.e., obs LULCC, Exploratory Vars and the train partition
   # output: a list where index1 is the partition data and index 2 is the train data
   
-  part <- create_CLC_partition(st_clc, admin, admin_id, spatial_res)
+  if (missing(admin)==TRUE && missing(admin_id)==TRUE) {
+    part <- create_CLC_partition(st_clc,spatial_res = spatial_res)
+  } else {
+    part <- create_CLC_partition(st_clc, admin, admin_id, spatial_res)
+  }
+  print('1')       
   train_data <- getPredictiveModelInputData(obs=st_clc, ef=expVar, cells=part[['train']])
   
   return(list(part, train_data))
@@ -245,6 +271,9 @@ compute_LULCC_prediction <- function(param, glm_model) {
   # output: list where
   # index 1 - predicted model (ie, to assess annual output @output)
   # index 2 - model performance
+  
+  # how to plot: 
+  # plot(list(pred_model))
   
   test_data <- getPredictiveModelInputData(obs=param[[2]], ef=param[[1]], cells=param[[4]][["test"]])
   

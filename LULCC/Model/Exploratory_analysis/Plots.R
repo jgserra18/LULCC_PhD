@@ -3,7 +3,7 @@ require('ggplot2')
 require('ggthemr')
 
 
-plot_params_over_time <- function(param, main_var, var_name) {
+plot_params_over_time <- function(module, param, main_var, var_name) {
   # param is either (Area, Yield)
   # main_var is the main category of a var (e.g., Cereals, Bovine)
   # var_name is the crop_name 
@@ -14,7 +14,7 @@ plot_params_over_time <- function(param, main_var, var_name) {
     title <- expression(Yield~(kg~FM~ha^{-1}))
   }
   
-  var_path <- get_mainfolder_sub(main_folder = 'Activity_data', pattern = 'Regional_crop')
+  var_path <- get_mainfolder_sub(module = main_folder = 'Activity_data', pattern = 'Regional_crop')
   var_path <- file.path(var_path,param,main_var,paste0(var_name, '.csv'))
   r_file <- read.csv(var_path)
   names(r_file) <- gsub('X','', names(r_file))
@@ -32,7 +32,6 @@ plot_params_over_time <- function(param, main_var, var_name) {
   rm(list=c('var_path', 'r_file','title'))
 }
 
-plot_params_over_time('Areas', 'Horticulture', 'Horticulture_intensive')
 
 
 lulcc_plot <- function(stack_file) {

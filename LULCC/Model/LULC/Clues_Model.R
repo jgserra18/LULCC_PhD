@@ -8,7 +8,7 @@ export_LULC_elasticity <- function(unrestricted, file, admin_reg, admin_id, mode
   # EXAMPLE: fine_tune_orderedModel(spatial_res ='1000', iter = 1, model_lc = 'glm', param = param)
   
   print('Exporting ....')
-  order_path <- create_activityData_folders('Activity_data', 'CLUES_params', 'Elasticity')
+  order_path <- create_activityData_folders(module = 'LULCC', 'Activity_data', 'CLUES_params', 'Elasticity')
   
   # does the model include any LU restriction?
   ifelse(unrestricted == TRUE,
@@ -31,12 +31,17 @@ export_LULC_elasticity <- function(unrestricted, file, admin_reg, admin_id, mode
   rm(list=c('order_path', 'file_name'))
 }
 
+d <- compute_LULCC_prediction(param = param, glm_model = glm_model)
 
-param <- set_LULCC_params('NVZ','Tejo','500')
-glm_model <- compute_LULCC_models(params = param, model = 'glm')
+param <- set_LULCC_params(spatial_res = '1000')
+glm_model <- compute_LULCC_models(params = param, model = 'rf')
+names(param[[1]])
+predict_eval <- compute_LULCC_prediction(param = param, glm_model = glm_model)
+plot(list(predict_eval[[2]]))
 dmd <- compute_LULCC_demand(param = param)
 rules <- get_LULCC_rules()
 elas <- c(0.43,0.16,0.93,0.62,0.18,0.73,0.21,0.37,0.65,0.56,0.18,0,0.2,0.24,0.43,0.98)
+elas <- c(0.19,0.18,0.19,0.12,0.94,0.18,0.2,0.57,0.07,0.02,0.03,0.29,0.13,0.23,0.92,0.98)
 clues_info <- get_CLUES_info(param)
 
 clues_model <- CluesModel(obs = param[[2]], 
@@ -51,7 +56,10 @@ clues_model <- allocate(clues_model)
 clues.tabs <- ThreeMapComparison(x=clues_model,factors=2^(1:8),timestep=28)
 clues.fom <- FigureOfMerit(x=clues.tabs)
 clues.fom@overall[[1]]
+plot(clues.fom)
 plot(AgreementBudget(clues.tabs))
+clues_info <- get_CLUES_info(param)
+plot(clues.tabs)
 
 fine_tune_LULC_admin <- function(admin, admin_id, spatial_res, iter, model_lc, param) {
   
@@ -107,4 +115,4 @@ fine_tune_LULC_admin <- function(admin, admin_id, spatial_res, iter, model_lc, p
   rm(list=c('elas','clues_model','clues.tabs','clues.fom','glm_model', 'dmd','param'))
   doParallel::stopImplicitCluster()
 }
-fine_tune_LULC_admin(admin = 'NVZ', admin_id = 'Tejo', spatial_res = '500', iter = 15, model_lc = 'rf')
+fine_tune_LULC_admin(admin = 'NVZ', admin_id = 'Tejo', spatial_res = '500', iter = 50, model_lc = 'rpart')

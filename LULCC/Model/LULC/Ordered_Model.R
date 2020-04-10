@@ -14,6 +14,7 @@ order <- c(212,223,243,221,222,321,231,213,512,211,242,1,3,244,241,2)
 order <- c(241,321,512,213,231,212,244,1,221,223,222,242,3,211,243,2)
 order <- c(222,244,512,212,223,242,243,3,211,231,221,241,1,213,321,2)
 order <- c(243,3,321,221,242,212,223,244,211,213,231,2,241,222,1,512)
+fom <- find_best_fom(unrestricted = T,admin = 'NVZ', admin_id = 'Tejo', spatial_res = '500',model_lc = 'rf')
 order <- fom[[1]]
 
 ordered_model <- OrderedModel(obs=param[[2]],ef=param[[1]],models=glm_model,time=0:28, demand=dmd, 
@@ -23,9 +24,7 @@ clues.tabs <- ThreeMapComparison(x=clues_model,factors=2^(1:8),timestep=28)
 clues.agr <- AgreementBudget(clues.tabs)
 clues.fom <- FigureOfMerit(x=clues.tabs)
 
-fom <- find_best_fom(unrestricted = T,admin = 'NVZ', admin_id = 'Tejo', spatial_res = '500',model_lc = 'glm')
-
-fom[[2]]
+plot(clues.tabs)
 
 
 export_LULC_OrderHierarchy <- function(unrestricted, file, admin_reg, admin_id, model_lc, spatial_res) {
@@ -134,7 +133,7 @@ find_best_fom <- function(unrestricted, admin='PT', admin_id, spatial_res, model
   
   
     param_finder <- c(admin, admin_id, paste0(spatial_res,'m'))
-    path <- create_activityData_folders('Activity_data', 'CLUES_params', 'Order')
+    path <- create_activityData_folders(module = 'LULCC', 'Activity_data', 'CLUES_params', 'Order')
     # does the model include any LU restriction?
       ifelse(unrestricted == TRUE,
              path <- create_new_directory(path, 'Unrestricted'),

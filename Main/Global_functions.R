@@ -128,7 +128,6 @@ get_activity_data <- function(module, folder, pattern, subfolder, mainfolder, su
   rm(list=c('act_data', 'sel_file'))
 }
 
-
 get_dir_files <- function(module, folder, param_pattern, subfolder, mainfolder, file_pattern, file_names) {
   # list the files fullpath
   
@@ -150,11 +149,10 @@ get_dir_files <- function(module, folder, param_pattern, subfolder, mainfolder, 
            files <- list.files(folder))
     files <- gsub('.tif', '', files)
   }
-
+  
   return(files)
   rm(list=c('main', 'folder'))
 }
-
 
 
 get_folderpath <- function(module, main_folder, folder, subfolder) {
@@ -170,6 +168,27 @@ get_folderpath <- function(module, main_folder, folder, subfolder) {
     sub_path <- list.files(path = main_path, pattern = subfolder, full.names = TRUE)
     return(sub_path)
   }
+}
+
+list_dir_files <- function(module, main_folder, folder, subfolder, subfolderX2, pattern) {
+  
+  path <- get_folderpath(module, main_folder, folder, subfolder)
+  
+  if (missing(subfolderX2)==TRUE) {
+    files <- list.files(path = path, pattern = pattern)
+  }
+  else {
+    if (missing(pattern)==TRUE) {
+      files <- list.files(path = path, pattern = subfolderX2, full.names = TRUE)
+      files <- list.files(path = files)
+    }
+    else {
+      files <- list.files(path = path, pattern = pattern)
+      files <- list.files(path = files)
+    }
+  }
+  files <- gsub('.csv','',files)
+  return(files)
 }
 
 ## ----------------------- EXPORTERS ----------------------- ##
