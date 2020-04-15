@@ -173,7 +173,6 @@ export_MRB_data <- function(spatial_res) {
   }
 }
 
-
 aggregate_stack_ExpVarRaster <- function(spatial_res) {
   
   mrb <- stack_MRB_data(spatial_res)

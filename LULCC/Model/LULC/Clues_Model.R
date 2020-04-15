@@ -35,7 +35,7 @@ d <- compute_LULCC_prediction(param = param, glm_model = glm_model)
 
 param <- set_LULCC_params(spatial_res = '1000')
 glm_model <- compute_LULCC_models(params = param, model = 'rf')
-names(param[[1]])
+
 predict_eval <- compute_LULCC_prediction(param = param, glm_model = glm_model)
 plot(list(predict_eval[[2]]))
 dmd <- compute_LULCC_demand(param = param)

@@ -300,16 +300,6 @@ loop_interpolate_other_crops_timeseries <- function() {
 }
 
 
-## ----------------------- SCRAP AND POPULATE ?IMAL DATA ------------------- ##
-## ---------------------------------------------------------------------------##
-
-
-convert_forage_crop_categories <- function() {
-  # forage - forage maize, forage oat, annual mixtures, other_forage
-  
-  
-   
-}
 
 ## ----------------------- SCRAP AND POPULATE ANIIMAL DATA ------------------- ##
 ## ---------------------------------------------------------------------------##
@@ -347,7 +337,7 @@ main_populate_animals_pop_DB <- function() {
   
   params_df <-  get_activity_data(module = 'Nutrients',folder = 'Raw_data_Agrarian', pattern = 'Animals_id')
   
-  for (i in 12:nrow(params_df)) {
+  for (i in 1:nrow(params_df)) {
     
     INE_param_id <- substr(x = params_df[i,1], start = 2, stop = 8)
     var_id <- params_df[i, 'Animals_id']

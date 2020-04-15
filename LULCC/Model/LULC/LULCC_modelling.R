@@ -25,21 +25,21 @@ lulcc_x_predictors <- function() {
   
   x_predictor <- data.frame(x=c(
     x_predict_arg(1,7),
-    x_predict_arg(1,32),
-    x_predict_arg(2,32),
-    x_predict_arg(1,32),
-    x_predict_arg(1,32),
-    x_predict_arg(1,32),
-    x_predict_arg(1,32),
-    x_predict_arg(1,32),
-    x_predict_arg(1,32),
-    x_predict_arg(1,32),
-    x_predict_arg(1,32),
-    x_predict_arg(1,32),
-    x_predict_arg(1,32),
-    x_predict_arg(1,32),
-    x_predict_arg(1,32),
-    x_predict_arg(1,32)
+    x_predict_arg(1,27),
+    x_predict_arg(2,27),
+    x_predict_arg(1,27),
+    x_predict_arg(1,27),
+    x_predict_arg(1,27),
+    x_predict_arg(1,27),
+    x_predict_arg(1,27),
+    x_predict_arg(1,27),
+    x_predict_arg(1,27),
+    x_predict_arg(1,27),
+    x_predict_arg(1,27),
+    x_predict_arg(1,27),
+    x_predict_arg(1,27),
+    x_predict_arg(1,27),
+    x_predict_arg(1,27)
     ))
   colnames(x_predictor) <- 'lu_x'
   return(x_predictor)
