@@ -4,11 +4,11 @@ source('./Main/Global_functions.R')
 library(rjson)
 
 
-## ----------------------- WEB SCRAPING FUNCTIONS --------------------- ##
-## ---------------------------------------------------------------------##
-
+## WEB SCRAPING FUNCTIONS ------------------------------------------------------------------------------------------
 
 get_INE_data <- function(INE_param_id, year, muni_id, var_id, other_params) {
+  # gets INE data
+  # other_params specifies whether it is agrarian region data (if missing), Muni data from the Census or muni data from "outside" the census
   
   print('Exporting INE DB ...... ')
   # convert to json file
@@ -17,20 +17,47 @@ get_INE_data <- function(INE_param_id, year, muni_id, var_id, other_params) {
                  muni_id, '&Dim3=', 
                  var_id, '&lang=PT')
   url <- gsub('/', '//', url)
-  # test <- getURL(URLencode(test))
   json_df <- jsonlite::fromJSON(url)
 
-  if (missing(other_params)==TRUE) {
+  if (missing(other_params)==TRUE ) {
     
     json_df <- json_df[[7]][[1]][[1]][5]
-    return(json_df)
   } 
-  else {
+  
+  else if (other_params == 'Def') {
     
     json_df <- json_df[[7]][[1]][[1]]
-    json_df <- subset(json_df, dim_4=='T' & dim_5 =='T')[ncol(json_df)]
-    return(json_df)
+    
+    if ("valor" %in% colnames(json_df)) {
+      
+      json_df <- json_df[which(json_df$dim_3==var_id), "valor"]
+    }
+    else {
+      print('Value here is set to 0.')
+      json_df <- "0"
+    }
   }
+  
+  else if (other_params == 'Muni') {
+    
+      json_df <- json_df[[7]][[1]][[1]]
+      
+      if ("valor" %in% colnames(json_df)) {
+        
+        json_df <- json_df[which(json_df$dim_4=='T'), "valor"]
+      }
+      else {
+        print('Value here is set to 0.')
+        json_df <- "0"
+      }
+  }
+  
+  else {
+    json_df <- json_df[[7]][[1]][[1]]
+    json_df <- subset(json_df, dim_4=='T' & dim_5 =='T')[ncol(json_df)]
+  }
+  
+  return(json_df)
 }
 
 
@@ -63,8 +90,8 @@ get_agrarian_region_INE <- function(INE_param_id, var_id,
 }
 
 
-## ----------------------- SCRAP AND POPULATE CROP DATA --------------------- ##
-## ---------------------------------------------------------------------------##
+##  SCRAP AND POPULATE CROP DATA --------------------------------------------------------------------------
+
 
 forage_horticulture_populate_modifier <- function(var_id,
                                                   muni_id = as.character(seq(11,17))) {
@@ -149,8 +176,8 @@ populate_other_crops_param_DB <- function() {
 
 
 
-## ----------------------- CORRECT VALUES --------------------- ##
-## -------------------------------------------------------------##
+##  CORRECT VALUES --------------------------------------------------------------------------------------------------
+
 
 correct_missing_values_vars <- function(param, main_var) {
   # SELF-EXPLANATORY, CORRECTS "-"
@@ -212,8 +239,8 @@ correct_all_missing_values <- function() {
 }
 
 
-## ----------------------- TIMSERIES LINEAR EXTRAPOLATION --------------------- ##
-## -----------------------------------------------------------------------------##
+##  TIMSERIES LINEAR EXTRAPOLATION ---------------------------------------------------------------------------------
+
 
 interpolate_other_crops_timeseries <- function(param, main_crop, crop) {
   # param is either Areas or Yields
@@ -301,8 +328,8 @@ loop_interpolate_other_crops_timeseries <- function() {
 
 
 
-## ----------------------- SCRAP AND POPULATE ANIIMAL DATA ------------------- ##
-## ---------------------------------------------------------------------------##
+## SCRAP AND POPULATE ANIIMAL DATA -------------------------------------------------------------------------
+
 
 get_agrarian_bovine <- function(var_id, 
                                 year = seq(1987,2017), 

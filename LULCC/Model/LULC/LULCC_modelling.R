@@ -5,8 +5,8 @@ source('./LULCC/Model/PreProcessing/Organize_ExpVarRasterList.R')
 require(caTools)
 
 
-## ----------------------- LULCC MODELLING EQUATIONS --------------------- ##
-## -----------------------------------------------------------------------##
+## LULCC MODELLING EQUATIONS --------------------------------------------------------------------------------------
+
 
 
 x_predict_arg <- function(x_ini, x_end, vector_numbers) {
@@ -75,8 +75,8 @@ create_model_formula <- function(st_clc) {
 }
 
 
-## ----------------------- PREPARE LULCC PREDICTION --------------------- ##
-## -----------------------------------------------------------------------##
+##  PREPARE LULCC PREDICTION ----------------------------------------------------------------------------------
+
 
 
 # ALL PREDICTIONS ARE BASED ON ONLY ONE SET OF TRAINING IDS (FROM CLC_1990)
@@ -233,8 +233,10 @@ set_LULCC_params <- function(admin='PT', admin_id, spatial_res) {
   rm(list=c('expVar', 'st_clc', 'partition', 'train_data'))
 }
 
-## ----------------------- LULCC MODELS PREDICTION --------------------- ##
-## ----------------------------------------------------------------------##
+
+
+##  LULCC MODELS PREDICTION ----------------------------------------------------------------------------------
+
 
 compute_LULCC_models <- function(params, model) {
   # predict LULCC based on the select models (glm, rpart, rf)
@@ -286,8 +288,8 @@ compute_LULCC_prediction <- function(param, glm_model) {
 }
 
 
-## ----------------------- LULCC HISTORICAL DEMAND --------------------- ##
-## ----------------------------------------------------------------------##
+##  LULCC HISTORICAL DEMAND -------------------------------------------------------------------------------------------
+
 
 
 compute_LULCC_demand <- function(param) {

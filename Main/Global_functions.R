@@ -177,6 +177,9 @@ list_dir_files <- function(module, main_folder, folder, subfolder, subfolderX2, 
   if (missing(subfolderX2)==TRUE) {
     files <- list.files(path = path, pattern = pattern)
   }
+  else if (missing(subfolderX2)==TRUE & missing(pattern)==TRUE) {
+    files <- list.files(path = path)
+  }
   else {
     if (missing(pattern)==TRUE) {
       files <- list.files(path = path, pattern = subfolderX2, full.names = TRUE)
@@ -190,6 +193,23 @@ list_dir_files <- function(module, main_folder, folder, subfolder, subfolderX2, 
   files <- gsub('.csv','',files)
   return(files)
 }
+
+list_main_params <- function(folder, INE_param, main_param) {
+  # folder is e.g., Raw_data_Agrarian
+  # INE_param
+  data <- get_folderpath(module = 'Nutrients',main_folder = 'Activity_data',folder = folder,subfolder = INE_param)
+  
+  if (missing(main_param)==TRUE) {
+    data <- list.files(path = data)
+  }
+  else {
+    data <- list.files(path = data, pattern = main_param, full.names = T)
+    data <- list.files(path = data)
+    data <- gsub('.csv','',data)
+  }
+  return(data)
+}
+
 
 ## ----------------------- EXPORTERS ----------------------- ##
 ## ----------------------------------------------------------##
