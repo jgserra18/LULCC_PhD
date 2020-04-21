@@ -1,15 +1,14 @@
 source('./Main/Set_ProjectDirectory.R')
 
-## ----------------------- LIBRARIES --------------------- ##
-## --------------------------------------------------------##
+## LIBRARIES --------------------------------------------------------------------------------
+
 
 library(sf)
 library(raster)
 
 
 
-## ----------------------- GENERAL PURPOSE ----------------------- ##
-## ----------------------------------------------------------------##
+## GENERAL PURPOSE ---------------------------------------------------------------------------
 
 
 identify_read_fileclass <- function(file_path) {
@@ -77,8 +76,7 @@ correct_filename_iter <- function(path, filename) {
 }
 
 
-## ----------------------- GETTERS ----------------------- ##
-## --------------------------------------------------------##
+## GETTERS --------------------------------------------------------------------------------------------
 
 get_mainfolder_sub <- function(module, main_folder, pattern) {
   # gets the mainfolder for the model (e.g., Activity-data)
@@ -155,6 +153,7 @@ get_dir_files <- function(module, folder, param_pattern, subfolder, mainfolder, 
 }
 
 
+
 get_folderpath <- function(module, main_folder, folder, subfolder) {
   # used to return the path of a given folder/subfolder
   # NOTE: this is useful when exporting data as it gives the directory
@@ -169,6 +168,7 @@ get_folderpath <- function(module, main_folder, folder, subfolder) {
     return(sub_path)
   }
 }
+
 
 list_dir_files <- function(module, main_folder, folder, subfolder, subfolderX2, pattern) {
   
@@ -194,6 +194,7 @@ list_dir_files <- function(module, main_folder, folder, subfolder, subfolderX2, 
   return(files)
 }
 
+
 list_main_params <- function(folder, INE_param, main_param) {
   # folder is e.g., Raw_data_Agrarian
   # INE_param
@@ -211,8 +212,8 @@ list_main_params <- function(folder, INE_param, main_param) {
 }
 
 
-## ----------------------- EXPORTERS ----------------------- ##
-## ----------------------------------------------------------##
+##  EXPORTERS ---------------------------------------------------------------------------
+
 
 create_output_folders <- function(module, folder, subfolder, subfolderX2) {
   
@@ -283,4 +284,23 @@ export_file <- function(module, file, folder, filename, subfolder, subfolderX2, 
     file_path <- paste0(file_path, '.shp')
     write_sf(file, file_path)
   }
+}
+
+
+## DATA CLEANING ----------------------------------------------------------------------------------------
+
+data_cleaning <- function(dataset) {
+  #this cleans up the data
+  #Inf, NA or NaN
+  
+  options(warn=-1)
+  dataset <- do.call(data.frame, 
+                     lapply(dataset, function(x) {
+                       replace(x, is.infinite(x) | is.na(x), 0)
+                       }
+                       )
+                     )
+  options(warn=0)
+  # colnames(dataset) <- gsub('X', '', names(dataset))
+  return(dataset)
 }

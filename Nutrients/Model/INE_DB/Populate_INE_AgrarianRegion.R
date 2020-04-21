@@ -108,14 +108,12 @@ forage_horticulture_populate_modifier <- function(var_id,
 }
 
 
-
 populate_perma_pastures_DB <- function(muni_id = as.character(seq(11,17))) {
   
     crop_df <- get_agrarian_region_INE(INE_param_id = '0003485', var_id = 'T', year = as.character(c(1989,1993,1995,1997,1999,2003,2005,2007,2009,2013)), muni_id = muni_id)
-    export_file(module = 'Nutrients',file = crop_df, folder = 'Activity_data', filename = 'extensive_pasture', subfolder = 'Raw_data_Agrarian', 
+    export_file(module = 'Nutrients',file = crop_df, folder = 'Activity_data', filename = 'Extensive_pasture', subfolder = 'Raw_data_Agrarian', 
                 subfolderX2 = 'Areas', subfolderX3 = 'Pastures')
 }
-
 
 main_populate_crop_param_DB <- function() {
   # EXCEPTIONS: FORAGE, HORTICULTURE, POULTRY, RABBITS

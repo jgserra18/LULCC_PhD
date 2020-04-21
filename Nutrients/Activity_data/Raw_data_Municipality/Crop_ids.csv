@@ -34,4 +34,4 @@ Param_id,Main_crop,Crop,Crop_id,other_params
 """0004361""",Horticulture,Horticulture_intensive,82,Muni
 """0004361""",Horticulture,Horticulture_extensive,81,Muni
 """0004361""",Pastures,Intensive_pasture,3,Muni
-"""0004337""",Pastures,Extensive_pastures,T,Def
+"""0004337""",Pastures,Extensive_pasture,T,Def

@@ -14,7 +14,6 @@ create_AR_template <- function() {
 }
 
 
-
 aggregate_INE_muni_agrarian <- function(AR_id, df_merge, year_sum) {
   # AR_id is the agrarian region id
   # year_sum is the column name to sum
@@ -67,6 +66,11 @@ compute_INE_muni_agrarian <- function(INE_param, main_param, param, folder) {
       param_df[, 1] <- seq(1,7)
       rm(list=c('rainfed','irrig'))
     } 
+    else {
+      param_df <- get_activity_data(module = 'Nutrients', folder = folder, subfolder = INE_param, subfolderX2 = main_param, pattern = param)
+      param_df <- loop_INE_muni_agrarian(param_df)
+      names(param_df) <- c('id','X1989','X1999','X2009')
+    }
   }
   else {
     folder <- 'Raw_data_Municipality'
@@ -126,6 +130,7 @@ correct_crop_exceptions <- function() {
 }
 
 
+
 general_data_correction_function <- function(INE_param, main_param, param) {
   # general function to correct AG_census_muni data absed on annual AR_data
   
@@ -137,9 +142,10 @@ general_data_correction_function <- function(INE_param, main_param, param) {
   
   # 2 - AG_census / AR
   adj_data <- AR_census
-  adj_data <- AR_census / AR
+  adj_data <- AR / AR_census
   adj_data[, 'id'] <- seq(1,7)
   names(adj_data)[1] <- 'agrarian_region_id'
+  adj_data <- data_cleaning(adj_data)
   
   # 3 - correct AG_census_muni based on #2
   muni_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', subfolder = INE_param, subfolderX2 = main_param, pattern = param)
@@ -150,20 +156,16 @@ general_data_correction_function <- function(INE_param, main_param, param) {
   yrs <- c('X1989','X1999','X2009')
   muni_df[, yrs] <- sapply(yrs, function(x) round(disagg_df[, x] * muni_df[, x], 0))
   
-  export_file(module = 'Nutrients',
-              file = muni_df, folder = 'Activity_data', 
-              filename = param, subfolder = 'Correct_data_Municipality', subfolderX2 = INE_param, subfolderX3 = main_param)
- # rm(list=c('AR','AR_census','adj_data','muni_df','disagg_df','yrs','muni_df'))
+  return(muni_df)
+  rm(list=c('AR','AR_census','adj_data','muni_df','disagg_df','yrs'))
 }
 
 
-
-
-correct_irrigated_rainfed_crops <- function(INE_param = 'Areas',
+correct_irrigated_rainfed_crops_INE_muni <- function(INE_param = 'Areas',
                                             main_param = 'Cereals',
                                             param = 'Maize') {
   # corrects crops where data outside AG_census yrs is disaggregated into Rainfed_ and Irrigated
-  # Potato, Maize
+  # corrects AG_census municipality for the total acreage of potato and maize
   
 
   # 1 - sum irrigated and rainfed maize/potato
@@ -178,10 +180,11 @@ correct_irrigated_rainfed_crops <- function(INE_param = 'Areas',
 
   # 3 - Ag_census_muni / AR_maize /potato
   adj_maize <- AR_census_maize
-  adj_maize <- AR_census_maize / AR_maize
+  adj_maize <- AR_maize / AR_census_maize
   adj_maize[, 'id'] <- seq(1,7)
   names(adj_maize)[1] <- 'agrarian_region_id'
-
+  adj_maize <- data_cleaning(adj_maize)
+  
   # 4 - correct Ag_census_muni maize/potato based on #3 
   muni_maize <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', subfolder = INE_param, subfolderX2 = main_param, pattern = param)
   disagg_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Spatial_disaggregation')
@@ -191,10 +194,42 @@ correct_irrigated_rainfed_crops <- function(INE_param = 'Areas',
   muni_maize[, yrs] <- sapply(yrs, function(x) round(disagg_df[, x] * muni_maize[, x], 1))
   
   return(muni_maize)
-  export_file(module = 'Nutrients',
-              file = muni_maize, folder = 'Activity_data', 
-              filename = param, subfolder = 'Correct_data_Municipality', subfolderX2 = 'Areas', subfolderX3 = main_param)
   rm(list=c('rainfed_maize','irrig_maize', 'adj_maize','muni_maize','disagg_df','yrs'))
+}
+
+
+
+compute_disaggregated_irrigated_rainfed_crops_INE_muni <- function(management,
+                                                                   INE_param = 'Areas',
+                                                                   main_param = 'Cereals',
+                                                                   param = 'Maize'
+                                                                   ) {
+  # management is either Rainfed or Irrigated
+  # while correct_irrigated_rainfed_crops_INE_muni corrects the municipality data for the AG_census based on the sum of rainfed and irrigated in the other years
+  # this function disaggregates the new_muni into its rainfed and irrigated fraction  
+  
+  new_muni <- correct_irrigated_rainfed_crops_INE_muni(INE_param, main_param, param)
+  AR_new_muni <-loop_INE_muni_agrarian(new_muni)
+  names(AR_new_muni) <- c('id','X1989','X1999','X2009')
+  
+  manag_maize <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Agrarian', subfolder = 'Areas', subfolderX2 = main_param , pattern = paste0(management,'_', tolower(param)))
+  manag_maize <- manag_maize[, c('id','X1989','X1999','X2009')]
+  
+  # calculate FRAC of a given management practice (rainfed, irrigated) at the AR
+  FRAC_AR_manag_maize <- manag_maize / AR_new_muni
+  FRAC_AR_manag_maize[, 'id'] <- seq(1,7)
+  names(FRAC_AR_manag_maize) <- c('agrarian_region_id','X1989','X1999','X2009')
+  FRAC_AR_manag_maize <- data_cleaning(FRAC_AR_manag_maize)
+  
+  # disaggregate to the municipality
+  disagg_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Spatial_disaggregation')
+  disagg_df <- merge(disagg_df, FRAC_AR_manag_maize, 'agrarian_region_id')
+  
+  yrs <- c('X1989','X1999','X2009')
+  new_muni[, yrs] <- sapply(yrs, function(x) round(disagg_df[, x] * new_muni[, x], 1))
+  
+  return(new_muni)
+  rm(list=c('new_muni','AR_new_muni','manag_maize','FRAC_AR_manag_maize','disagg_df'))
 }
 
 
@@ -205,7 +240,7 @@ correct_other_fresh_fruits <- function(INE_param = 'Areas',
   plum <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Agrarian', subfolder = INE_param, subfolderX2 = main_param , pattern = 'Plum')
   fig <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Agrarian', subfolder = INE_param, subfolderX2 = main_param , pattern = 'Fig')
   AR_other <- fig + plum
-  AR_maize[, 'id'] <- seq(1,7)
+  AR_other[, 'id'] <- seq(1,7)
   AR_other <- AR_other[, c('id','X1989','X1999','X2009')]
   
   # 2 - sum AG_census_muni other fresh fruits
@@ -213,9 +248,10 @@ correct_other_fresh_fruits <- function(INE_param = 'Areas',
   
   # 3 - Ag_census_muni / AR
   adj_other <- AR_census_other_fresh
-  adj_other <- AR_census_other_fresh / AR_other
+  adj_other <- AR_other / AR_census_other_fresh
   adj_other[, 'id'] <- seq(1,7)
   names(adj_other)[1] <- 'agrarian_region_id'
+  adj_other <- data_cleaning(adj_other)
   
   # 4 - correct Ag_census_muni  based on #3
   muni_other <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', subfolder = INE_param, subfolderX2 = main_param, pattern = 'other_fresh')
@@ -225,16 +261,16 @@ correct_other_fresh_fruits <- function(INE_param = 'Areas',
   yrs <- c('X1989','X1999','X2009')
   muni_other[, yrs] <- sapply(yrs, function(x) round(disagg_df[, x] * muni_other[, x], 1))
   
-  export_file(module = 'Nutrients',
-              file = muni_other, folder = 'Activity_data', 
-              filename = 'other_fresh', subfolder = 'Correct_data_Municipality', subfolderX2 = 'Areas', subfolderX3 = main_param)
+  return(muni_other)
+  rm(list=c('plum','fig','AR_other','AR_other','AR_census_other_fresh','adj_other','disagg_df','yrs'))
 }
 
 
 
 correct_other_pulses <- function(INE_param = 'Areas',
                                  main_param = 'Pulses',
-                                 param = 'Other_dried_pulses') {
+                                 param = 'Other_dried_pulses'
+                                 ) {
   # other pulses were linearly interpolated from the years outside of the AG_census
   # interpolation followed the rule where min and max estimated values can't be lower or higher than the min and max registered in the
   # AG_census year
@@ -249,22 +285,18 @@ correct_other_pulses <- function(INE_param = 'Areas',
   names(crop_df) <- c('Muni_ID','ID','Muni','1989','1999','2009')
   
   new_yrs <- c(1989,1999,2009)
-  df[, as.character(new_yrs)] <- sapply(new_yrs, function(x) df[, as.character(x)] <- crop_df[, as.character(x)])
-  dff <- df[, -c(1,2,3)] 
-  
-  
+  df[, as.character(new_yrs)] <- sapply(new_yrs, function(x) round(df[, as.character(x)] <- crop_df[, as.character(x)], 1))
+ # dff <- df[, -c(1,2,3)] 
+  df <- df[, c('Muni_ID','Muni','ID','1989','1999','2009')]
+  names(df) <- c('Muni_ID','Muni','ID','X1989','X1999','X2009')
   # linear interpolation 
-  xout <- c(1987,1988,seq(1990,1998), seq(2000,2008), seq(2010,2017))
-  df <- linear_interpolation(muni_df = dff)
-  template <- cbind(template, df)
+ # xout <- c(1987,1988,seq(1990,1998), seq(2000,2008), seq(2010,2017))
+ # df <- linear_interpolation(muni_df = dff)
+ # template <- cbind(template, df)
   
-  return(template)
-  export_file(module = 'Nutrients',
-              file = template, folder = 'Activity_data', 
-              filename = param, subfolder = 'Correct_data_Municipality', subfolderX2 = 'Areas', subfolderX3 = main_param)
- rm(list=c('df','yrs','new_yrs','crop_df','xout','dff','inter_years','inter_values','ctr','template'))
+  return(df)
+ # rm(list=c('df','yrs','new_yrs','crop_df','xout','dff','inter_years','inter_values','ctr','template'))
 }
-
 
 
 correct_tomatoes <- function(INE_param = 'Areas',
@@ -285,6 +317,7 @@ correct_tomatoes <- function(INE_param = 'Areas',
   FRAC_AR <- AR_tomato / AR_AG_muni_other
   FRAC_AR[, 'id'] <- seq(1,7)
   names(FRAC_AR)[1] <- 'agrarian_region_id'
+  FRAC_AR <- data_cleaning(FRAC_AR)
   
   # 3 - correct AG_census_muni based on #2
   disagg_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Spatial_disaggregation')
@@ -292,23 +325,78 @@ correct_tomatoes <- function(INE_param = 'Areas',
   
   print('Correcting data --------')
   yrs <- c('X1989','X1999','X2009')
-  AG_muni_other_industry[, yrs] <- sapply(yrs, function(x) round(disagg_df[, x] * AG_muni_other_industry[, x], 0))
+  AG_muni_other_industry[, yrs] <- sapply(yrs, function(x) round(disagg_df[, x] * AG_muni_other_industry[, x], 1))
   
-  export_file(module = 'Nutrients',
-              file = AG_muni_other_industry, folder = 'Activity_data', 
-              filename = param, subfolder = 'Correct_data_Municipality', subfolderX2 = INE_param, subfolderX3 = main_param)
+  return(AG_muni_other_industry)
   rm(list=c('AR_tomato','AG_muni_other_industry','AR_AG_muni_other','FRAC_AR','disagg_df','yrs'))
 }
 
 
 
 
-compute_corrected_INE_param <- function(INE_param) {
+call_specific_param_correction <- function(INE_param='',main_param='', param, management='') {
+  # when param is spcieified, this function calls the required correct_XXX 
   
-  
+  if (param == 'Maize' | param == 'Potato') {
+    
+    df <- compute_disaggregated_irrigated_rainfed_crops_INE_muni(management = management, INE_param = 'Areas', main_param = main_param, param = param)
+  }
+  else if (param == 'other_fresh') {
+    
+    df <- correct_other_fresh_fruits()
+  }
+  else if (param == 'Other_dried_pulses') {
+    
+    df <- correct_other_pulses()
+  }
+  else if (param == 'Tomato') {
+    
+    df <- correct_tomatoes()
+  }
+  else {
+    df <- general_data_correction_function(INE_param, main_param, param)
+  }
+  return(df)
 }
 
 
+
+compute_corrected_INE_param_AG_census <- function(INE_param) {
+  # loops around each main_param and param of the specified INE_param (Animals, Areas)
+  # writes each file to Correct_data_Municipality
+  # downscales and corrects each param based on the AR aggregation
+  # ONLY FOR THE AG_CENSUS_YEARS (1989,1999,2009)
+  
+  standard_params <- get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', pattern = 'Standard_params')
+  
+  param_col <- ifelse(INE_param == 'Areas', 'Crop', 'Animals')
+  main_param_col <- ifelse(INE_param == 'Areas', 'Main_crop', 'Main_animals')
+  
+  for (i in 1:nrow(standard_params)) {
+    
+    main_param <- standard_params[i, main_param_col]
+    param <- standard_params[i, param_col]
+    
+    print(paste0('Correcting and downscaling ', param))
+    # specify irrigated and rainfed Maize and Potato
+    if (param == 'Maize' | main_param == 'Potato') {
+      
+      manag <- c('Rainfed','Irrigated')
+      
+      for (j in manag) {
+        
+        df <- call_specific_param_correction(INE_param = INE_param, main_param = main_param, param = param, management = j)
+        f_name <- paste0(j,'_', tolower(param))
+        export_file(module = 'Nutrients', file = df, filename = f_name, folder = 'Activity_data', subfolder = 'Correct_data_Municipality', subfolderX2 = INE_param, subfolderX3 = main_param)
+      }
+    }
+    else {
+      df <- call_specific_param_correction(INE_param = INE_param, main_param = main_param, param = param)
+      export_file(module = 'Nutrients', file = df, filename = param, folder = 'Activity_data', subfolder = 'Correct_data_Municipality', subfolderX2 = INE_param, subfolderX3 = main_param)
+    }
+  }
+  rm(list=c('standard_params','param_col','main_param_col','main_param','param','manag','df','f_name'))
+}
 
 
 ## INTERPOLATED NON-CENSUS YEARS  -----------------------------------------------------------------------------
@@ -343,14 +431,14 @@ compute_AVG_AG_census <- function(df, period, AG_yr1, AG_yr2) {
 }
 
 
-
 average_AG_census_interpolation_period <- function(INE_param, main_param, param,
                                                    period_1 = as.character(seq(1987,1992)), #AG1
                                                    period_2 = as.character(seq(1993,1995)), #AVG1
                                                    period_3 = as.character(seq(1996,2002)), #AG2
                                                    period_4 = as.character(seq(2003,2005)), #AVG2
                                                    period_5 = as.character(seq(2006, 2017)) #AG3
-) {
+                                                   ) {
+  # TO BE USED ONLY AFTER compute_corrected_INE_param_AG_census
   # selects the appropriate year for AG_census (AG1,AG2,AG3) or averages the years in-between AG_census (AVG1,AVG2)
   # populates a data.frame with the different new_muni templates according to the year 
   
@@ -382,7 +470,7 @@ average_AG_census_interpolation_period <- function(INE_param, main_param, param,
 }
 
 
-compute_annual_interpolated_param <- function(INE_param, main_param, param) {
+compute_annual_interpolated_param_func <- function(INE_param, main_param, param) {
   # calculates corrected new_muni for a given param 
   # time rules: expressed in average_AG_census_interpolation_period()
   
@@ -390,19 +478,20 @@ compute_annual_interpolated_param <- function(INE_param, main_param, param) {
   # 1 - compile new_muni data based on the time-rules established in average_AG_census_interpolation_period
   AG_muni <- average_AG_census_interpolation_period(INE_param, main_param, param)
   # 2 - call the AR data for a given param 
-  AR <- compute_INE_muni_agrarian(INE_param, main_param, param, 'Raw_data_Agrarian')
+  AR <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Agrarian', subfolder = INE_param, subfolderX2 = main_param, pattern = param)
   # 3 - compute the new_muni at the AR level
-  AG_AR <- compute_INE_muni_agrarian(INE_param, main_param, param, 'Raw_data_Agrarian')
-  names(AG_AR) <- c('id', paste0('X',seq(1987,2017)))
+  AG_AR <- loop_INE_muni_agrarian(df_merge = AG_muni, yrs = as.character(seq(1987,2017)))
   
-  calc_yrs <- paste0('X',seq(1987,2017))x
+  calc_yrs <- paste0('X',seq(1987,2017))
+  
+  names(AG_AR) <- c('id', paste0('X',seq(1987,2017)))
   
   for (i in calc_yrs) {
     
     # 1 - calculate FRAC of AR_yr / AR_AG_census
     FRAC_AR <- data.frame(agrarian_region_id = seq(1,7))
-    FRAC_AR[, 'FRAC_AR'] <- AG_AR_maize[, i] / AR_maize[, i]
-    
+    FRAC_AR[, 'FRAC_AR'] <- AR[, i] / AG_AR[, i]
+    FRAC_AR <- data_cleaning(FRAC_AR)
     # 2 - call spatial disaggregation and create a template calculation
     disagg_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Spatial_disaggregation')
     disagg_df <- merge(disagg_df, FRAC_AR, 'agrarian_region_id')
@@ -416,4 +505,72 @@ compute_annual_interpolated_param <- function(INE_param, main_param, param) {
 
 
 
+linear_interpolation_other_params_func <- function(INE_param, main_param, param) {
+  # support function to linear interpolate other_dried_pulses and other_fresh
+  # this is used since there are no data outside the AG_census years
+  
+  template <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  
+  param_interpol <-  get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', subfolder = INE_param, subfolderX2 = main_param , pattern = param)
+  names(param_interpol) <- gsub('X','',names(param_interpol))
+  
+  # create empty dataframe where calculations will proceed
+  yrs <- seq(1987,2017)
+  df[, as.character(yrs)] <- NA
+  
+  # collated AG_census dataa to the empty data.frame
+  new_yrs <- c(1989,1999,2009)
+  df[, as.character(new_yrs)] <- sapply(new_yrs, function(x) round(df[, as.character(x)] <- param_interpol[, as.character(x)], 1))
+  df <- df[, -c(1,2,3)]
+  
+  # interpolate the data to the other years
+  df <- linear_interpolation(muni_df = df)
+  template <- cbind(template, df)
+
+  return(template)
+  rm(list=c('param_interpol','yrs','df','new_yrs','xout'))
+}
+
+
+loop_annual_interpolated_param <- function(INE_param) {
+  
+  standard_params <- get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', pattern = 'Standard_params')
+  
+  param_col <- ifelse(INE_param == 'Areas', 'Crop', 'Animals')
+  main_param_col <- ifelse(INE_param == 'Areas', 'Main_crop', 'Main_animals')
+  
+  for (i in 1:nrow(standard_params)) {
+    
+    main_param <- standard_params[i, main_param_col]
+    param <- standard_params[i, param_col]
+    
+    print(paste0('================= Downscaling and interpolating in-between AG_census municipality data for ', param))
+    
+    if (param == 'Maize' | param == 'Potato') {
+      
+      manag <- c('Rainfed','Irrigated')
+      
+      for (j in manag) {
+        f_param <- paste0(j, '_', tolower(param))
+        param_interpol <- compute_annual_interpolated_param_func(INE_param, main_param, f_param)
+        export_file(module = 'Nutrients', file = param_interpol, filename = f_param, folder = 'Activity_data', subfolder = 'Correct_data_Municipality', subfolderX2 = INE_param, subfolderX3 = main_param)
+      }
+    }
+    
+    # other_dried_pulses and other_fresh must be linealry interpolated between 1989, 1999 and 2009 as no AR data is available
+    else if (param == 'Other_dried_pulses' | param == 'other_fresh') {
+      
+      param_interpol <- linear_interpolation_other_params_func(INE_param, main_param, param)
+      export_file(module = 'Nutrients', file = param_interpol, filename = param, folder = 'Activity_data', subfolder = 'Correct_data_Municipality', subfolderX2 = INE_param, subfolderX3 = main_param)
+    }
+    
+    else {
+      
+      param_interpol <- compute_annual_interpolated_param_func(INE_param, main_param, param)
+      export_file(module = 'Nutrients', file = param_interpol, filename = param, folder = 'Activity_data', subfolder = 'Correct_data_Municipality', subfolderX2 = INE_param, subfolderX3 = main_param)
+    }
+  }
+  rm(list=c('standard_params','param_col','main_param_col'))
+}
 
