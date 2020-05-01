@@ -60,7 +60,6 @@ get_INE_data <- function(INE_param_id, year, muni_id, var_id, other_params) {
   return(json_df)
 }
 
-
 get_agrarian_region_INE <- function(INE_param_id, var_id, 
                                     year = seq(1987,2017), 
                                     muni_id = as.character(seq(1,7)),
@@ -153,6 +152,63 @@ main_populate_crop_param_DB <- function() {
   # clean the work environment
   rm(list=c('params_df', 'params', 'var_id', 'crop_df', 'path', 'crop_name'))
 }
+
+
+# This can be incorporated into Crop_ids or other_crop_ids -----------------
+get_incomplete_crop_yields <- function(main_param) {
+  # gets forage yields from Statistics Portugal
+  # Assumptions ------
+  # 1 - Total forage crop yields --> other_forage, forage_sorghum, forage_roots, annual_mixtures
+  # 2 - yields before 2011 are assumed that of 2011
+  
+  if (main_param == 'Forage') {
+    params <- data.frame(crops = c('forage_maize','forage_oat','Annual_mixtures','forage_sorghum','other_forage','forage_roots'),
+                         var_id = c('10601','10602','106','106','106','106'))
+    for (i in 1:nrow(params)) {
+      
+      param <- params[i,1]
+      var_id <- params[i,2]
+      crop_df <- get_agrarian_region_INE(INE_param_id = '0000023', var_id = var_id, year = seq(2011,2017))
+      
+      AR <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Agrarian', subfolder = 'Yields', subfolderX2 = 'Cereals' , pattern = 'Wheat') #template
+      
+      data_yrs <- paste0('X',seq(2011,2017))
+      AR[, data_yrs] <- sapply(data_yrs, function(x) crop_df[, gsub('X','',x)])
+      
+      fill_yrs <- paste0('X',seq(1987,2010))
+      AR[, fill_yrs] <- sapply(fill_yrs, function(x) AR[, x] <- AR[, 'X2011'])
+      
+      export_file(module = 'Nutrients', file = AR, folder = 'Activity_data', filename = param, subfolder = 'Raw_data_Agrarian', subfolderX2 = 'Yields', subfolderX3 = main_param)
+    }
+  } 
+  else {
+    params <- data.frame(crops = c('Horticulture_intensive', 'Horticulture_extensive'),
+                         var_id = c('105','105'))
+    
+    for (i in 1:nrow(params)) {
+      
+      param <- params[i,1]
+      var_id <- params[i,2]
+      crop_df <- get_agrarian_region_INE(INE_param_id = '0000023', var_id = var_id, year = seq(2011,2017), muni_id = 'PT')
+      
+      # fill the dataframe with only the national values
+      crop_df[2:7, ] <- crop_df[1,]
+      crop_df[, 1] <- as.character(seq(1,7))
+
+      AR <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Agrarian', subfolder = 'Yields', subfolderX2 = 'Cereals' , pattern = 'Wheat') #template
+      
+      data_yrs <- paste0('X',seq(2011,2017))
+      AR[, data_yrs] <- sapply(data_yrs, function(x) crop_df[, gsub('X','',x)])
+      
+      fill_yrs <- paste0('X',seq(1987,2010))
+      AR[, fill_yrs] <- sapply(fill_yrs, function(x) AR[, x] <- AR[, 'X2011'])
+      
+      export_file(module = 'Nutrients', file = AR, folder = 'Activity_data', filename = param, subfolder = 'Raw_data_Agrarian', subfolderX2 = 'Yields', subfolderX3 = main_param)
+    }
+  }
+  correct_missing_values_vars(param = 'Yields', main_var = main_param)
+}
+
 
 
 populate_other_crops_param_DB <- function() {
@@ -273,9 +329,9 @@ interpolate_other_crops_timeseries <- function(param, main_crop, crop) {
   for (i in 1:nrow(df)) {
     
     # select x_out for different crops
-    if (crop=='extensive_pasture') {
+    if (crop=='Extensive_pasture') {
       xout <- c(1987,1988,1990,1991,1992,1994,1996,1998,2000,2001,2002,2004,2006,2008,2010,2011,2012,2014,2015,2016,2017)
-    } else if (crop=='intensive_pasture') {
+    } else if (crop=='Intensive_pasture') {
       xout <- c(1987,1988,1990,1991,1992,1994,1996,1998,2000,2001,2002,2004,2006,2008,2010,2011,2012,2014,2015,2017)
     } 
     # also adapt for animal population
@@ -327,7 +383,6 @@ loop_interpolate_other_crops_timeseries <- function() {
 
 
 ## SCRAP AND POPULATE ANIIMAL DATA -------------------------------------------------------------------------
-
 
 get_agrarian_bovine <- function(var_id, 
                                 year = seq(1987,2017), 

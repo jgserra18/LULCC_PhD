@@ -7,10 +7,10 @@ Main_animals_id,Main_animals,Animals,Animals_id,other_params
 """0004430""",Bovine,Female_calf-1,122,Muni
 """0004430""",Bovine,Male_calf_1-2,211,Muni
 """0004430""",Bovine,Female_calf_1-2,212,Muni
-"""0004430""",Bovine,Male_calf_+2,221,Muni
-"""0004430""",Bovine,Female_calf_+2,222,Muni
-"""0004475""",Pigs,Sows_50+,2,Muni
-"""0004475""",Pigs,Pigs_+50,3,Muni
+"""0004430""",Bovine,Male_calf_2,221,Muni
+"""0004430""",Bovine,Female_calf_2,222,Muni
+"""0004475""",Pigs,Sows_50,2,Muni
+"""0004475""",Pigs,Pigs_50,3,Muni
 """0004475""",Pigs,Pigs_20,1,Muni
 """0004475""",Pigs,Other_swine,4,Muni
 """0004509""",Sheep,Ewes,T,Muni

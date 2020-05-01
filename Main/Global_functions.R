@@ -92,8 +92,7 @@ get_mainfolder_sub <- function(module, main_folder, pattern) {
   }
 }
 
-
-get_activity_data <- function(module, folder, pattern, subfolder, mainfolder, subfolderX2) {
+get_activity_data <- function(module, folder, pattern, subfolder, mainfolder, subfolderX2, subfolderX3, subfolderX4) {
   # gets the path of a given file within folders/subfolders of activity data
   # this can also be used to get output data
   
@@ -105,19 +104,35 @@ get_activity_data <- function(module, folder, pattern, subfolder, mainfolder, su
     act_data <- get_mainfolder_sub(module, main_folder = mainfolder, pattern = folder)
   }
 
-  if (missing(subfolder)==TRUE & missing(subfolderX2)==TRUE) {
+  if (missing(subfolder)==TRUE & missing(subfolderX2)==TRUE & missing(subfolderX3)==TRUE & missing(subfolderX4)==TRUE) {
     
     sel_file <- list.files(path = act_data, pattern = pattern, full.names = TRUE)
     r_file <- identify_read_fileclass(sel_file)
   }
-  else if (missing(subfolderX2)==TRUE) {
+  else if (missing(subfolderX2)==TRUE & missing(subfolderX3)==TRUE & missing(subfolderX4)==TRUE) {
     sel_subfolder <- list.files(path = act_data, pattern = subfolder, full.names = TRUE)
     sel_file <- list.files(path = sel_subfolder, pattern = pattern, full.names = T)
     r_file <- identify_read_fileclass(sel_file)
   } 
-  else {
+  else if (missing(subfolderX3)==TRUE & missing(subfolderX4)==TRUE){
     sel_subfolder <- list.files(path = act_data, pattern = subfolder, full.names = TRUE)
     sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX2, full.names = TRUE)
+    sel_file <- list.files(path = sel_subfolder, pattern = pattern, full.names = T)
+    r_file <- identify_read_fileclass(sel_file)
+  }
+  else if (missing(subfolderX4)==TRUE) {
+    sel_subfolder <- list.files(path = act_data, pattern = subfolder, full.names = TRUE)
+    sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX2, full.names = TRUE)
+    sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX3, full.names = TRUE)
+    sel_file <- list.files(path = sel_subfolder, pattern = pattern, full.names = T)
+    r_file <- identify_read_fileclass(sel_file)
+  } 
+  else {
+
+        sel_subfolder <- list.files(path = act_data, pattern = subfolder, full.names = TRUE)
+    sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX2, full.names = TRUE)
+    sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX3, full.names = TRUE)
+    sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX4, full.names = TRUE)
     sel_file <- list.files(path = sel_subfolder, pattern = pattern, full.names = T)
     r_file <- identify_read_fileclass(sel_file)
   }
@@ -125,6 +140,8 @@ get_activity_data <- function(module, folder, pattern, subfolder, mainfolder, su
   return(r_file)
   rm(list=c('act_data', 'sel_file'))
 }
+
+
 
 get_dir_files <- function(module, folder, param_pattern, subfolder, mainfolder, file_pattern, file_names) {
   # list the files fullpath
@@ -215,49 +232,78 @@ list_main_params <- function(folder, INE_param, main_param) {
 ##  EXPORTERS ---------------------------------------------------------------------------
 
 
-create_output_folders <- function(module, folder, subfolder, subfolderX2) {
+create_output_folders <- function(module, folder, subfolder, subfolderX2, subfolderX3) {
   
   out <-  get_mainfolder_sub(module, 'Output')
   
-  if (missing(subfolder)==TRUE && missing(subfolderX2)==TRUE) {
+  if (missing(subfolder)==TRUE && missing(subfolderX2)==TRUE && missing(subfolderX3)==TRUE) {
     folderpath <- file.path(out, folder)
   }
-  else if (missing(subfolderX2)==TRUE && missing(subfolder)==FALSE) {
+  else if (missing(subfolderX2)==TRUE && missing(subfolderX3)==TRUE && missing(subfolder)==FALSE) {
     folderpath <- file.path(out, folder, subfolder)
   }
-  else {
+  else if (missing(subfolderX3)==TRUE) {
     folderpath <- file.path(out, folder, subfolder, subfolderX2)
+  }
+  else {
+    folderpath <- file.path(out, folder, subfolder, subfolderX2, subfolderX3)
   }
   dir.create(path = folderpath, showWarnings = FALSE, recursive = TRUE)
   
   return(folderpath)
 }
 
-create_activityData_folders <- function(module, folder, subfolder, subfolderX2) {
+
+create_activityData_folders <- function(module, folder, subfolder, subfolderX2, subfolderX3) {
   
   file_path <- get_mainfolder_sub(module, main_folder = folder, pattern = subfolder)
-  file_path <- file.path(file_path, subfolderX2)
+  
+  if (missing(subfolderX3)==TRUE) {
+    file_path <- file.path(file_path, subfolderX2)
+  } 
+  else {
+    file_path <- file.path(file_path, subfolderX2, subfolderX3)
+  }
+
   dir.create(path = file_path, showWarnings = FALSE, recursive = TRUE)
   return(file_path)
 }
 
-export_file <- function(module, file, folder, filename, subfolder, subfolderX2, subfolderX3) {
+export_file <- function(module, file, folder, filename, subfolder, subfolderX2, subfolderX3, subfolderX4) {
   ## NOTE: CURRENTLY ONLY APPLIED TO RASTERS, STACKS/BRICKS AND DATAFRAMES
   
   if (folder=='Activity_data') {
     file_path <- create_activityData_folders(module, folder, subfolder, subfolderX2)
     
-    if (missing(subfolderX3)==FALSE) {
+    if (missing(subfolderX3)==FALSE & missing(subfolderX4)==TRUE) {
+      
       file_path <- file.path(file_path, subfolderX3)
       dir.create(file_path)
+    }
+    else {
+      
+      file_path <- file.path(file_path, subfolderX3)
+      dir.create(file_path)
+      
+      file_path <- file.path(file_path, subfolderX4)
+      dir.create(file_path)
+      
     }
     file_path <- file.path(file_path, filename)
   }
   else {
     file_path <- create_output_folders(module, folder, subfolder, subfolderX2)
     
-    if (missing(subfolderX3)==FALSE) {
+    if (missing(subfolderX3)==FALSE  & missing(subfolderX4)==TRUE) {
+      
       file_path <- file.path(file_path, subfolderX3)
+      dir.create(file_path)
+    }
+    else {
+      
+      file_path <- file.path(file_path, subfolderX3)
+      dir.create(file_path)
+      file_path <- file.path(file_path, subfolderX4)
       dir.create(file_path)
     }
     file_path <- file.path(file_path, filename)
@@ -303,4 +349,23 @@ data_cleaning <- function(dataset) {
   options(warn=0)
   # colnames(dataset) <- gsub('X', '', names(dataset))
   return(dataset)
+}
+
+
+
+## PARAM LIST -----------------------------------------------------------------------------------------------
+
+get_standard_params_list <- function(main_param) {
+  
+  standard_params <- get_activity_data(module = 'Nutrients', folder = 'General_params', pattern = 'Params_list')
+  
+  if (main_param == 'Animals') {
+    standard_params <-  standard_params[, c('Animals','Main_animals')]
+  } 
+  else {
+    standard_params <- standard_params[, c('Main_crop','Crop')]
+  }
+  standard_params <- standard_params[-which(is.na(standard_params)==T), ]  
+ 
+  return(standard_params)
 }
