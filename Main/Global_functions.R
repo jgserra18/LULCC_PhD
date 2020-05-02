@@ -128,8 +128,7 @@ get_activity_data <- function(module, folder, pattern, subfolder, mainfolder, su
     r_file <- identify_read_fileclass(sel_file)
   } 
   else {
-
-        sel_subfolder <- list.files(path = act_data, pattern = subfolder, full.names = TRUE)
+    sel_subfolder <- list.files(path = act_data, pattern = subfolder, full.names = TRUE)
     sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX2, full.names = TRUE)
     sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX3, full.names = TRUE)
     sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX4, full.names = TRUE)

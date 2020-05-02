@@ -4,7 +4,7 @@ Bovine,Male_calf_1-2,0.66,0.36
 Bovine,Non_dairy,0,0
 Bovine,Other_calf,0.66,0.36
 Bovine,Beef_calf,0.66,0.36
-Bovine,Dairy_cows,0.525,0.525
+Bovine,Dairy_cows,0.53,0.53
 Bovine,Female_calf_2,0.66,0.36
 Bovine,Female_calf_1-2,0.66,0.36
 Bovine,Female_calf-1,0.66,0.36
@@ -18,7 +18,7 @@ Pigs,Other_swine,0.98,0.95
 Pigs,Pigs_50,0.98,0.95
 Pigs,Pigs_20,0.98,0.95
 Pigs,Non_pregnant_sows,0.98,0.92
-Poultry,Broilers,0.999,0.96
+Poultry,Broilers,0.99,0.96
 Poultry,Ducks,1,1
 Poultry,Geese,1,1
 Poultry,Laying_hens,1,1

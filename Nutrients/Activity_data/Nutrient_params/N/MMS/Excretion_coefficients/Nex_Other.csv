@@ -5,8 +5,7 @@ Bovine,Beef_calf,25
 Bovine,Male_calf_1-2,40
 Bovine,Female_calf_1-2,40
 Bovine,Male_calf_2,65
-Bovine,Male_calf_2,55
-Bovine,Female_calf_1-2,55
+Bovine,Female_calf_2,55
 Bovine,Other_calf,55
 Goats,Goats,6.52
 Poultry,Broilers,0.45
@@ -21,7 +20,7 @@ Rabbits,Rabbits,9
 Swine,Pregnant_sows,6.5
 Swine,Non_pregnant_sows,5.1
 Swine,Boars,18
-Swine,Pigs_20-50,4
-Swine,Pigs_+50,4
+Swine,Pigs_20,4
+Swine,Pigs_50,4
 Swine,Other_swine,4
 Sheep,Ewes,12

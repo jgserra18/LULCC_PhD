@@ -161,10 +161,9 @@ compute_all_crop_nutrient_offtake <- function(nutrient) {
       export_file(module = 'Nutrients', 
                   file = param_interpol, 
                   filename = param, 
-                  folder = 'Output', 
-                  subfolder = 'Crop_offtake', 
-                  subfolderX2 = nutrient, 
-                  subfolderX3 = main_param)
+                  folder = 'Crop_offtake', 
+                  subfolder = nutrient, 
+                  subfolderX2 = main_param)
     }
   }
   rm(list=c('standard_params','param_col','main_param_col','param_interpol'))

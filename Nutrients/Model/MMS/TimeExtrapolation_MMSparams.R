@@ -27,10 +27,11 @@ linearly_intrapolate_share_MMS <- function(general_param='Distribution', param =
       predict(lm_model, newdata =  data.frame(x =  c(seq(1987,1989), seq(1991,2013), seq(2015,2017)))), 2)
     
     names(lm_prediction) <- paste0('X', c(seq(1987,1989), seq(1991,2013), seq(2015,2017)))
-    lm_prediction <- ifelse(lm_prediction>1, 1, lm_prediction)
-    lm_prediction <- ifelse(lm_prediction<0, 0, lm_prediction)
+    lm_prediction <- ifelse(lm_prediction>1, 1, round(lm_prediction,2))
+    lm_prediction <- ifelse(lm_prediction<0, 0, round(lm_prediction, 2))
     store[i, names(lm_prediction)] <- lm_prediction
   }
+  
   return(store)
   rm(list = c('calc_df','lm_model','lm_prediction'))
 }
