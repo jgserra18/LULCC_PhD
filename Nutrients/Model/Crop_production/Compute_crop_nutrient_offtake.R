@@ -41,8 +41,8 @@ get_spatially_disaggagregated_yields <- function(main_param, param) {
   
   # spatially disaggregate 
   disagg_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Spatial_disaggregation')
-  AR_yields <- plyr::join(disagg_df, AR_yields)
-  AR_yields <- AR_yields[, -c(1, seq(5,8))]
+  AR_yields <- plyr::join(x = disagg_df, y = AR_yields, by = 'agrarian_region_id')
+  AR_yields <- AR_yields[, -c(seq(4,8))]
   
   return(AR_yields)
   rm(list='disagg_df')
@@ -92,7 +92,7 @@ compute_crop_DM_production <- function(main_param, param) {
 convert_offtake_P2O5_to_P <- function() {
   # conversion factor : P2O5 to P = 0.4364
   
-  P2O5_offtake <- get_activity_data(module = 'Nutrients', folder = 'Nutrient_params', subfolder = 'P', subfolderX2 = 'Crops', pattern = 'offtake')
+  P2O5_offtake <- get_activity_data(module = 'Nutrients', folder = 'Nutrient_params', subfolder = 'P', subfolderX2 = 'Crops',subfolderX3 = 'Offtake', pattern = 'offtake')
   P_offtake <- P2O5_offtake
   P_offtake[,3] <- P_offtake[,3] * 0.4364
   
@@ -113,7 +113,7 @@ compute_nutrient_offtake <- function(main_param, param, nutrient) {
   # select appropriate offtake coeficcient
   if (nutrient == 'N') {
     
-    nutrient_offtake <- get_activity_data(module = 'Nutrients', folder = 'Nutrient_params', subfolder = nutrient, subfolderX2 = 'Crops', pattern = 'offtake')
+    nutrient_offtake <- get_activity_data(module = 'Nutrients', folder = 'Nutrient_params', subfolder = nutrient, subfolderX2 = 'Crops', subfolderX3 = 'Offtake', pattern = 'offtake')
   }
   else if (nutrient == 'P') {
     
@@ -121,7 +121,7 @@ compute_nutrient_offtake <- function(main_param, param, nutrient) {
   }
   else {
     
-    nutrient_offtake <- get_activity_data(module = 'Nutrients', folder = 'Nutrient_params', subfolder = nutrient, subfolderX2 = 'Crops', pattern = 'offtake')
+    nutrient_offtake <- get_activity_data(module = 'Nutrients', folder = 'Nutrient_params', subfolder = nutrient, subfolderX2 = 'Crops', subfolderX3 = 'Offtake', pattern = 'offtake')
   }
   
   # select nutrient offtake for the crop
@@ -135,7 +135,6 @@ compute_nutrient_offtake <- function(main_param, param, nutrient) {
   return(nutrient_offtake)
   rm(list=c('Prod_DM','yrs'))
 }
-
 
 
 compute_all_crop_nutrient_offtake <- function(nutrient) {

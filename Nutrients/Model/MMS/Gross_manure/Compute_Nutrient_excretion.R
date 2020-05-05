@@ -80,7 +80,7 @@ loop_gross_manure_nutrient <- function() {
 
 ####  GROSS MANURE ALLOCATION (HOUSING, GRAZING, YARDS) ------------------------------------
 
-source('./Nutrients/Model/MMS/TimeExtrapolation_MMSparams.R')
+source('./Nutrients/Model/MMS/Support_functions/TimeExtrapolation_MMSparams.R')
 
 
 ## dairy cow gross manure conditions -----------------------------------------------------------------
@@ -252,7 +252,7 @@ loop_disaggregate_gross_manure_type <- function() {
   manure_type <- c('Solid','Slurry')
   pathway <- c('Housing','Yards')
   nutrient <- c('N','P')
-  
+
   for (i in manure_type) {
     
     for (j in pathway) {
@@ -266,9 +266,8 @@ loop_disaggregate_gross_manure_type <- function() {
 }
 
 
-## CARBON IMPLEMENTATION 
 
-
+## CARBON IMPLEMENTATION ------------------------------------------------------------
 
 compute_carbon_gross_manure <- function(pathway, manure_type) {
   
@@ -365,9 +364,40 @@ loop_gross_manure_C_totals <- function() {
 }
 
 
-// compute_gross_manure_Cexcretion <- function() {
+
+
+compute_gross_manure_Cexcretion <- function(main_param, param) {
+  # computes the total C excretion for a given animal
   
+  graz_maN <- get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = 'C', subfolderX2 = 'Grazing', subfolderX3 ='Total', subfolderX4 = main_param, pattern = param)
+  housing_maN <- get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = 'C', subfolderX2 = 'Housing', subfolderX3 ='Total', subfolderX4 = main_param, pattern = param)
+  yards_maN <- get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = 'C', subfolderX2 = 'Yards', subfolderX3 ='Total', subfolderX4 = main_param, pattern = param)
   
+  yrs <- paste0('X', seq(1988,2017))
+  
+  graz_maN[, yrs] <- sapply(yrs, function(x) round(graz_maN[, x] + housing_maN[, x] + yards_maN[, x], 1))
+  
+  export_file(module = 'Nutrients', 
+              file = graz_maN, 
+              filename = param, 
+              folder = 'Gross_manure', 
+              subfolder = 'C', 
+              subfolderX2 = 'Total_Cexcretion', 
+              subfolderX3 = main_param)
+  rm(list=c('graz_maN','housing_maN','yards_maN','yrs','graz_maN'))
+}
+
+
+loop_gross_manure_Cexcretion <- function() {
+  
+  standard_params <- get_standard_params_list(main_param = 'Animals')
+  
+  for (i in 1:nrow(standard_params)) {
+    
+    main_param <- standard_params[i, 'Main_animals']
+    param <- standard_params[i, 'Animals']
+    compute_gross_manure_Cexcretion(main_param = main_param, param = param)
+  }
 }
 
 
@@ -427,8 +457,9 @@ compute_total_nutrient_flows_main_param_pathway <- function(nutrient, pathway, m
 }
 
 
-compute_total_nutrient_excretion_gross_manure('N')
 compute_total_nutrient_excretion_gross_manure <- function(nutrient) {
+  # calculate the sum of gross manure of a given nutrient
+  # unit: kg nutrient yr-1
   
   standard_params <- get_standard_params_list(main_param = 'Animals')
   yrs <- paste0('X', seq(1987,2017))
@@ -452,27 +483,37 @@ compute_total_nutrient_excretion_gross_manure <- function(nutrient) {
       # add each dataframe within each main_param in a list
       # calculate total sum for a given main_param
       
-      man_N <- compute_animal_nutrient_excretion(nutrient = nutrient, main_param = i, param = j)
-      store_param[, yrs] <- sapply(yrs, function(x) store_param[,x] <- man_N[, x] + store_param[,x])
+      ifelse(nutrient != 'C',
+             man_N <- compute_animal_nutrient_excretion(nutrient = nutrient, main_param = i, param = j),
+             man_N <-  get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = 'C', subfolderX2 = 'Total_Cexcretion',  subfolderX3 = i, pattern = j))
+      store_param[, yrs] <- sapply(yrs, function(x) man_N[, x] + store_param[,x])
     }
     # export sum of param within main_param
     export_file(module = 'Nutrients', 
                 file = store_param, 
                 filename = i, 
                 folder = 'Gross_manure', 
-                subfolder = paste0('Total_',nutrient,'excretion'), 
-                subfolderX2 = 'Total')
+                subfolder = nutrient,
+                subfolderX2 = paste0('Total_',nutrient,'excretion'), 
+                subfolderX3 = 'Total')
     
     # store sum of main_param in main_param_df
-    store_main_param[, yrs] <- sapply(yrs, function(x) store_main_param[,x] <- store_main_param[, x] + store_param[,x])
+    store_main_param[, yrs] <- sapply(yrs, function(x) store_main_param[, x] + store_param[,x])
   }
   # export sum of main_param
   export_file(module = 'Nutrients', 
               file = store_main_param, 
               filename = 'Total_sum', 
               folder = 'Gross_manure', 
-              subfolder = paste0('Total_',nutrient,'excretion'), 
-              subfolderX2 = 'Total')
+              subfolder = nutrient,
+              subfolderX2 = paste0('Total_',nutrient,'excretion'), 
+              subfolderX3 = 'Total')
+}
+
+loop_total_gross_manure_nutrient_flow <- function() {
+  
+  nutrient <- c('N','C','P')
+  sapply(nutrient, function(x) compute_total_nutrient_excretion_gross_manure(x))
 }
 
 

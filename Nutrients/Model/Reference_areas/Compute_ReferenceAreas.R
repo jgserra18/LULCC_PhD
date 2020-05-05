@@ -32,37 +32,20 @@ compute_municipality_annual_UAA <- function(year) {
 }
 
 
-loop_municipality_UAA <- function(mainland_uaa) {
+loop_municipality_UAA <- function() {
   
   
-  if (mainland_uaa == TRUE) {
+  muni_store <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  yrs <- seq(1987, 2017)
+  
+  for (i in seq_along(yrs)) {
+    print(paste0('Calculating municipality_UAA for ', yrs[i]))
+    uaa <- compute_municipality_annual_UAA(yrs[i])
+    muni_store[, paste0('X',yrs[i])] <- uaa[, 'uaa']
     
-    yrs <- seq(1987, 2017)
-    new_df <- data.frame(yrs = yrs)
-    
-    for (i in 1:nrow(new_df)) {
-      
-      uaa <- compute_municipality_annual_UAA(new_df[i,1])
-      uaa <- sum(uaa[, 'uaa'])
-      new_df[i, 'uaa'] <- uaa
-    }
-    return(new_df)
-    rm(list=c('yrs','uaa'))
   }
-  else {
-    
-    muni_store <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
-    yrs <- seq(1987, 2017)
-    
-    for (i in seq_along(yrs)) {
-      print(paste0('Calculating municipality_UAA for ', yrs[i]))
-      uaa <- compute_municipality_annual_UAA(yrs[i])
-      muni_store[, paste0('X',yrs[i])] <- uaa[, 'uaa']
-      
-    }
-    export_file(module = 'Nutrients', file = muni_store, filename = 'UAA', folder = 'Reference_areas', subfolder2 = 'UAA')
-  }
+  export_file(module = 'Nutrients', file = muni_store, filename = 'UAA', folder = 'Reference_areas', subfolder2 = 'UAA')
 }
-loop_municipality_UAA(mainland_uaa = FALSE)
+
 
 

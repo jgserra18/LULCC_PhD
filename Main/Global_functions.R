@@ -279,6 +279,9 @@ export_file <- function(module, file, folder, filename, subfolder, subfolderX2, 
       file_path <- file.path(file_path, subfolderX3)
       dir.create(file_path)
     }
+    else if (missing(subfolderX3)==TRUE & missing(subfolderX4)==TRUE) {
+      next 
+    }
     else {
       
       file_path <- file.path(file_path, subfolderX3)
@@ -298,6 +301,9 @@ export_file <- function(module, file, folder, filename, subfolder, subfolderX2, 
       file_path <- file.path(file_path, subfolderX3)
       dir.create(file_path)
     }
+    else if (missing(subfolderX3)==TRUE & missing(subfolderX4)==TRUE) {
+       
+    }
     else {
       
       file_path <- file.path(file_path, subfolderX3)
@@ -307,6 +313,9 @@ export_file <- function(module, file, folder, filename, subfolder, subfolderX2, 
     }
     file_path <- file.path(file_path, filename)
   }
+
+  print(paste0('======= Exporting ', filename))
+  
   # write depending on file format
   if (class(file)=='RasterLayer') {
     
@@ -359,12 +368,14 @@ get_standard_params_list <- function(main_param) {
   standard_params <- get_activity_data(module = 'Nutrients', folder = 'General_params', pattern = 'Params_list')
   
   if (main_param == 'Animals') {
+    
     standard_params <-  standard_params[, c('Animals','Main_animals')]
+    standard_params <- standard_params[-which(is.na(standard_params)==T), ]  
   } 
   else {
+    
     standard_params <- standard_params[, c('Main_crop','Crop')]
   }
-  standard_params <- standard_params[-which(is.na(standard_params)==T), ]  
- 
+
   return(standard_params)
 }

@@ -153,7 +153,7 @@ general_data_correction_function <- function(INE_param, main_param, param) {
   # 3 - correct AG_census_muni based on #2
   muni_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', subfolder = INE_param, subfolderX2 = main_param, pattern = param)
   disagg_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Spatial_disaggregation')
-  disagg_df <- plyr::join(disagg_df, adj_data)
+  disagg_df <- plyr::join(disagg_df, adj_data, 'agrarian_region_id')
   
   print('Correcting data --------')
   yrs <- c('X1989','X1999','X2009')
@@ -191,7 +191,7 @@ correct_irrigated_rainfed_crops_INE_muni <- function(INE_param = 'Areas',
   # 4 - correct Ag_census_muni maize/potato based on #3 
   muni_maize <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', subfolder = INE_param, subfolderX2 = main_param, pattern = param)
   disagg_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Spatial_disaggregation')
-  disagg_df <- plyr::join(disagg_df, adj_maize)
+  disagg_df <- plyr::join(disagg_df, adj_maize, 'agrarian_region_id')
 
   yrs <- c('X1989','X1999','X2009')
   muni_maize[, yrs] <- sapply(yrs, function(x) round(disagg_df[, x] * muni_maize[, x], 1))
@@ -226,7 +226,7 @@ compute_disaggregated_irrigated_rainfed_crops_INE_muni <- function(management,
   
   # disaggregate to the municipality
   disagg_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Spatial_disaggregation')
-  disagg_df <- plyr::join(disagg_df, FRAC_AR_manag_maize)
+  disagg_df <- plyr::join(disagg_df, FRAC_AR_manag_maize, 'agrarian_region_id')
   
   yrs <- c('X1989','X1999','X2009')
   new_muni[, yrs] <- sapply(yrs, function(x) round(disagg_df[, x] * new_muni[, x], 1))
@@ -259,7 +259,7 @@ correct_other_fresh_fruits <- function(INE_param = 'Areas',
   # 4 - correct Ag_census_muni  based on #3
   muni_other <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', subfolder = INE_param, subfolderX2 = main_param, pattern = 'other_fresh')
   disagg_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Spatial_disaggregation')
-  disagg_df <- plyr::join(disagg_df, adj_other)
+  disagg_df <- plyr::join(disagg_df, adj_other, 'agrarian_region_id')
   
   yrs <- c('X1989','X1999','X2009')
   muni_other[, yrs] <- sapply(yrs, function(x) round(disagg_df[, x] * muni_other[, x], 1))
@@ -324,7 +324,7 @@ correct_tomatoes <- function(INE_param = 'Areas',
   
   # 3 - correct AG_census_muni based on #2
   disagg_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Spatial_disaggregation')
-  disagg_df <- plyr::join(disagg_df, FRAC_AR)
+  disagg_df <- plyr::join(disagg_df, FRAC_AR, 'agrarian_region_id')
   
   print('Correcting data --------')
   yrs <- c('X1989','X1999','X2009')
@@ -333,7 +333,6 @@ correct_tomatoes <- function(INE_param = 'Areas',
   return(AG_muni_other_industry)
   rm(list=c('AR_tomato','AG_muni_other_industry','AR_AG_muni_other','FRAC_AR','disagg_df','yrs'))
 }
-
 
 
 
@@ -646,7 +645,7 @@ compute_annual_interpolated_param_func <- function(INE_param, main_param, param)
     FRAC_AR <- data_cleaning(FRAC_AR)
     # 2 - call spatial disaggregation and create a template calculation
     disagg_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Spatial_disaggregation')
-    disagg_df <- plyr::join(disagg_df, FRAC_AR)
+    disagg_df <- plyr::join(disagg_df, FRAC_AR, 'agrarian_region_id')
     
     # 4 - calculate new_muni
     AG_muni[, i] <- round(AG_muni[, i] * disagg_df[, 'FRAC_AR'], 1)

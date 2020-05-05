@@ -54,6 +54,20 @@ sumIf_admin_regions <- function(admin, INE_param, main_param, param) {
 }
 
 
+## SUM NATIONAL VALUES ----------------------------------------
+
+compute_mainland_total <- function(calc_df) {
+  # computes the total sum of a dataframe at the mainland 
+  
+  df <- data.frame(id = 'mainland')
+  
+  yrs <- paste0('X', seq(1987,2017))
+  df[, yrs] <- sapply(yrs, function(x) df[, x] <- 0)
+  
+  df[1, yrs] <- sapply(yrs, function(x) sum(calc_df[,x]))
+
+  return(df)
+}
 
 
 
