@@ -1,8 +1,26 @@
-Livestock_class,Grazing
-Bovine,0.02
-Goats,0.01
-Poultry,0.02
-Equides,0.01
-Rabbits,0.01
-Pigs,0.02
-Sheep,0.01
+Main_animal,Animal,Grazing,Source,Unit
+Bovine,Male_calf_2,0.02,"IPCC, 2019",kg N-N2O kg N-1
+Bovine,Male_calf_1-2,0.02,"IPCC, 2019",kg N-N2O kg N-1
+Bovine,Non_dairy,0.02,"IPCC, 2019",kg N-N2O kg N-1
+Bovine,Other_calf,0.02,"IPCC, 2019",kg N-N2O kg N-1
+Bovine,Beef_calf,0.02,"IPCC, 2019",kg N-N2O kg N-1
+Bovine,Dairy_cows,0.02,"IPCC, 2019",kg N-N2O kg N-1
+Bovine,Female_calf_2,0.02,"IPCC, 2019",kg N-N2O kg N-1
+Bovine,Female_calf_1-2,0.02,"IPCC, 2019",kg N-N2O kg N-1
+Bovine,Female_calf-1,0.02,"IPCC, 2019",kg N-N2O kg N-1
+Equides,Horses,0.01,"IPCC, 2019",kg N-N2O kg N-1
+Equides,Other_equidae,0.01,"IPCC, 2019",kg N-N2O kg N-1
+Goats,Goats,0.01,"IPCC, 2019",kg N-N2O kg N-1
+Sheep,Ewes,0.01,"IPCC, 2019",kg N-N2O kg N-1
+Rabbits,Rabbits,0.01,"IPCC, 2019",kg N-N2O kg N-1
+Pigs,Pregnant_sows,0.02,"IPCC, 2019",kg N-N2O kg N-1
+Pigs,Non_pregnant_sows,0.02,"IPCC, 2019",kg N-N2O kg N-1
+Pigs,Other_swine,0.02,"IPCC, 2019",kg N-N2O kg N-1
+Pigs,Pigs_50,0.02,"IPCC, 2019",kg N-N2O kg N-1
+Pigs,Pigs_20,0.02,"IPCC, 2019",kg N-N2O kg N-1
+Poultry,Broilers,0.02,"IPCC, 2019",kg N-N2O kg N-1
+Poultry,Ducks,0.02,"IPCC, 2019",kg N-N2O kg N-1
+Poultry,Geese,0.02,"IPCC, 2019",kg N-N2O kg N-1
+Poultry,Laying_hens,0.02,"IPCC, 2019",kg N-N2O kg N-1
+Poultry,Turkeys,0.02,"IPCC, 2019",kg N-N2O kg N-1
+Poultry,Rep_hens,0.02,"IPCC, 2019",kg N-N2O kg N-1

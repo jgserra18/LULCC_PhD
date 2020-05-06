@@ -55,8 +55,6 @@ compute_gross_manure_nutrient <- function(nutrient) {
     main_param <- standard_params[i, 'Main_animals']
     param <- standard_params[i, 'Animals']
     
-    print(paste0('Exporting ====='))
-    print(param)
     # compute annual nutrient excretion
     animal_excretion <- compute_animal_nutrient_excretion(nutrient, main_param, param)
     export_file(module = 'Nutrients', 
