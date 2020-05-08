@@ -1,7 +1,6 @@
 source('./Main/Global_functions.R')
 
 
-
 ## SUPPORT FUNCTIONS TO HELP FIND THE MMS GASEOUS EMISSION FACTORS FOR A GIVEN ANIMAL
 
 get_N_EFs <- function(N_gas, pathway) {

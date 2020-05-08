@@ -152,7 +152,7 @@ compute_all_crop_nutrient_offtake <- function(nutrient) {
     main_param <- standard_params[i, main_param_col]
     param <- standard_params[i, param_col]
     
-    if (main_param == 'Pastures') {
+    if (main_param == 'Pastures' | main_param == 'Forage') {
       next
     }
     else {

@@ -5,7 +5,6 @@ source('./Main/Data_operations.R')
 
 library('ggplot2')
 
-man_p <- read.csv('./Nutrients/Output/BNF/N/Total/Total_sum.csv')
 
 compute_values_by_mainland_UAA <- function(calc_df) {
   
@@ -37,5 +36,5 @@ plot_mainland_values <- function(calc_df) {
     scale_y_continuous(limits = limits_y)
 }
 
-plot_mainland_values(man_p)
-man_p
+plot_mainland_values(d)
+

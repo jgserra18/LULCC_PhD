@@ -152,8 +152,8 @@ general_func_gross_manure_allocation <- function(nutrient, pathway) {
     
     main_param <- standard_params[i, 'Main_animals']
     param <- standard_params[i, 'Animals']
-    print(param)
-    # get gross man N
+
+        # get gross man N
     man_nutrient <- compute_animal_nutrient_excretion(nutrient, main_param, param)
     pathway_N <- man_nutrient
     
