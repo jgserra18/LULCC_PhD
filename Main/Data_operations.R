@@ -1,6 +1,41 @@
 source('./Main/Global_functions.R')
 
 
+## linear extrapolation ---------------------------------- 
+
+general_linear_extrapolation_3years <- function(file_df, existing_years, xout=c(seq(1987,1989), seq(1991,1998), seq(2000,2008), seq(2010,2017))) {
+  
+  new_file <- file_df[, -c(1,2)]
+  names(new_file) <- gsub('X','',names(new_file))
+  
+  store <- file_df[, c(1,2)]
+  
+  calc_cols <- paste0('X', seq(1987,2017))
+  store[, calc_cols] <- sapply(calc_cols, function(x) store[,] <- NA)
+
+  populate_cols <- existing_years
+  store[, populate_cols] <- sapply(populate_cols, function(x) store[,x] <- file_df[,x])
+  
+  
+  for (i in 1:nrow(new_file)) {
+    
+    calc_df <- data.frame(y = c(new_file[i,1], new_file[i,2], new_file[i,3]), x = c(1990,1999,2009))
+    lm_model <- lm(y~x, calc_df)
+    lm_prediction <- round(
+      predict(lm_model, newdata =  data.frame(x =  xout)), 2)
+    
+    names(lm_prediction) <- paste0('X', xout)
+    lm_prediction <- ifelse(lm_prediction>1, 1, round(lm_prediction,2))
+    lm_prediction <- ifelse(lm_prediction<0, 0, round(lm_prediction, 2))
+    store[i, names(lm_prediction)] <- lm_prediction
+  }
+  return(store)
+  rm(list=c('new_file','calc_cols','populate_cols','calc_df', 'lm_model','lm_prediction'))
+}
+
+
+
+
 disaggregate_admin <- function(admin, INE_param, main_param, param, df) {
 
   # spatially disaggregate 

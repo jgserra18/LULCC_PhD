@@ -103,7 +103,6 @@ get_activity_data <- function(module, folder, pattern, subfolder, mainfolder, su
   else {
     act_data <- get_mainfolder_sub(module, main_folder = mainfolder, pattern = folder)
   }
-
   if (missing(subfolder)==TRUE & missing(subfolderX2)==TRUE & missing(subfolderX3)==TRUE & missing(subfolderX4)==TRUE) {
     
     sel_file <- list.files(path = act_data, pattern = pattern, full.names = TRUE)
@@ -121,6 +120,7 @@ get_activity_data <- function(module, folder, pattern, subfolder, mainfolder, su
     r_file <- identify_read_fileclass(sel_file)
   }
   else if (missing(subfolderX4)==TRUE) {
+
     sel_subfolder <- list.files(path = act_data, pattern = subfolder, full.names = TRUE)
     sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX2, full.names = TRUE)
     sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX3, full.names = TRUE)
@@ -142,11 +142,18 @@ get_activity_data <- function(module, folder, pattern, subfolder, mainfolder, su
 
 
 
-get_dir_files <- function(module, folder, param_pattern, subfolder, mainfolder, file_pattern, file_names) {
+get_dir_files <- function(module, folder, param_pattern, subfolder, subfolderX2, mainfolder, file_pattern, file_names) {
   # list the files fullpath
   
   main <- get_mainfolder_sub(module, folder, param_pattern)
   folder <- file.path(main, subfolder)
+
+  if (missing(subfolderX2)==TRUE) {
+    folder <- folder
+  }
+  else {
+    folder <- file.path(folder, subfolderX2)
+  }
   
   if (missing(mainfolder)==FALSE) {
     folder <- file.path(folder, mainfolder)

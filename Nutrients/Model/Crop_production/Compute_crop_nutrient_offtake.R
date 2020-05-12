@@ -71,7 +71,7 @@ compute_crop_DM_production <- function(main_param, param) {
   
   
   # get data ------------------------------------------------
-  FRAC_DM <- get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Crops', pattern = 'DM_content')
+  FRAC_DM <- get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Crops', subfolderX2 = 'Offtake', pattern = 'DM_content')
   FRAC_DM <- find_crop_variable(df = FRAC_DM, param_col = 'crop', param = param, var = 'DM_frac')
   
   areas <- get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Areas', subfolderX2 = main_param, pattern = param)

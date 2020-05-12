@@ -168,7 +168,7 @@ updated_partition <- function(x, size, admin='PT', admin_id, spatial_res, spatia
   train_ids <- create_setSeed_folder(admin, admin_id, spatial_res)
   train_ids <- read.csv(list.files(train_ids, full.names = TRUE))[,1]
   
-  if (spatial) {
+  if (spatial == T) {
     points <- as(points, "SpatialPoints")
     
     train <- points[train_ids]
@@ -206,7 +206,6 @@ feed_getPredictiveModelInputData <- function(expVar, st_clc, admin='PT', admin_i
   } else {
     part <- create_CLC_partition(st_clc, admin, admin_id, spatial_res)
   }
-  print('1')       
   train_data <- getPredictiveModelInputData(obs=st_clc, ef=expVar, cells=part[['train']])
   
   return(list(part, train_data))

@@ -1,0 +1,34 @@
+Main_crop,Crop,DM_frac,FRAC_removed,R_BG_BIO,source,slope,intercept,R_P2O5_kgNtonDM-1,source
+cereals,Barley,0.89,0.67,0.22,"APA, 2017; Table 5.45",0.98,0.59,2,"IPCC, 2006"
+cereals,Rainfed_maize,0.87,0.65,0.22,"APA, 2017; Table 5.45",1.03,0.61,3.5,"IPCC, 2006"
+cereals,Irrigated_maize,0.87,0.65,0.22,"APA, 2017; Table 5.45",1.03,0.61,3.5,"IPCC, 2006"
+cereals,Oat,0.89,0.67,0.25,"APA, 2017; Table 5.45",0.91,0.89,3,"IPCC, 2006"
+cereals,Rice,0.89,0.67,0.16,"APA, 2017; Table 5.45",0.95,2.46,4.5,"IPCC, 2006"
+cereals,Rye,0.88,0.67,0.23,"APA, 2017; Table 5.45",1.09,0.88,2.5,"IPCC, 2006"
+cereals,Triticale,0.88,0.67,0.23,"APA, 2017; Table 5.45",1.61,0.4,2.5,"IPCC, 2006"
+cereals,Wheat,0.89,0.67,0.24,"APA, 2017; Table 5.45",1.51,0.52,2,"IPCC, 2006"
+citrus,Lemon,0.6,0,NA,"Dias, 2002",NA,NA,,NA
+citrus,Orange,0.6,0,NA,"Dias, 2002",NA,NA,,NA
+citrus,Other_citrus,0.6,0,NA,"Dias, 2002",NA,NA,,NA
+citrus,Tangerine,0.6,0,NA,"Dias, 2002",NA,NA,,NA
+dried_fruits,Almond,0.94,0,NA,"Dias, 2002",NA,NA,,NA
+dried_fruits,Chestnut,0.94,0,NA,"Dias, 2002",NA,NA,,NA
+dried_fruits,Locust,0.94,0,NA,"Dias, 2002",NA,NA,,NA
+dried_fruits,Nuuts,0.94,0,NA,"Dias, 2002",NA,NA,,NA
+dried_fruits,Other_dried_nuts,0.94,0,NA,"Dias, 2002",NA,NA,,NA
+fresh_fruits,Apple,0.6,0,NA,"APA, 2017; Table 5.45",NA,NA,,NA
+fresh_fruits,Cherry,0.6,0,NA,"APA, 2017; Table 5.45",NA,NA,,NA
+fresh_fruits,other_fresh,0.6,0,NA,"APA, 2017; Table 5.45",NA,NA,,NA
+fresh_fruits,Peach,0.6,0,NA,"APA, 2017; Table 5.45",NA,NA,,NA
+fresh_fruits,Pear,0.6,0,NA,"APA, 2017; Table 5.45",NA,NA,,NA
+industry,Sunflower,0.87,0,0.22,"APA, 2017; Table 5.45",0.1,1.06,2.5,"IPCC, 2006"
+industry,Tomato,0.06,0,0.2,"APA, 2017; Table 5.45",0.1,1.06,,"IPCC, 2006"
+olive_grove,Olive_grove,0.6,0,NA,"Dias, 2002",NA,NA,,NA
+potato,Irrigated_potato,0.19,0,0.2,"APA, 2017; Table 5.45",0.1,1.06,0.5,"IPCC, 2006"
+potato,Rainfed_potato,0.19,0,0.2,"APA, 2017; Table 5.45",0.1,1.06,0.5,"IPCC, 2006"
+vineyard,Vineyard,0.75,0,NA,"Dias, 2002",NA,NA,,NA
+pulses,Beans,0.88,0,0.19,"APA, 2017; Table 5.45",1.09,0.88,,"IPCC, 2006"
+pulses,Chickpea,0.91,0,0.19,"APA, 2017; Table 5.45; CdBPA, 2018",1.09,0.88,,"IPCC, 2006"
+pulses,Other_dried_pulses,0.91,0,0.19,"APA, 2017; Table 5.45",1.09,0.88,,"IPCC, 2006"
+Pastures,Intensive_pasture,0.9,0,0.8,"APA, 2017; Table 5.45; CdBPA, 2019",0.3,0,,"IPCC, 2006"
+Pastures,Extensive_pasture,0.9,0,0.8,"APA, 2017; Table 5.46",0.3,0,,"IPCC, 2006"

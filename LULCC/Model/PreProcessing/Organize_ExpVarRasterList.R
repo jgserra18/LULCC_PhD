@@ -102,7 +102,7 @@ stack_environmental_data <- function(spatial_res) {
   
   for (i in folders) {
     
-    l_files <- get_dir_files(module = 'LULCC', folder = 'Activity_data', subfolder = i, mainfolder = as.character(paste0(spatial_res,'m')))
+    l_files <- get_dir_files(module = 'LULCC', folder = 'Activity_data', param_pattern =  i, subfolder = as.character(paste0(spatial_res,'m')))
     folder_path <- get_folderpath(module = 'LULCC', 'Activity_data', i)
     
     for (j in l_files) {
