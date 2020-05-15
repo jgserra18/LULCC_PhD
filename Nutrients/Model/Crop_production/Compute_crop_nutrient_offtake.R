@@ -101,7 +101,6 @@ convert_offtake_P2O5_to_P <- function() {
 }
 
 
-
 compute_nutrient_offtake <- function(main_param, param, nutrient) {
   # calculates the nutrient offtake of a given crop
   # unit: kg Nutrient yr-1 

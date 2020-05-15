@@ -17,8 +17,8 @@ Pigs,Pregnant_sows,0.02,0.08
 Pigs,Other_swine,0.02,0.05
 Pigs,Pigs_50,0.02,0.05
 Pigs,Pigs_20,0.02,0.05
-Pigs,Non_pregnant_sows,0.02,0.05
-Poultry,Broilers,0.001,0.04
+Pigs,Non_pregnant_sows,0.02,0.08
+Poultry,Broilers,0.01,0.04
 Poultry,Ducks,0,0
 Poultry,Geese,0,0
 Poultry,Laying_hens,0,0

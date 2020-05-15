@@ -123,4 +123,3 @@ general_func_animal_bedding <- function(main_param, param, bedding_param) {
   rm(list=c('bedding_params','FRAC_MMS_solid','animal_pop','yrs'))
 }
 
-

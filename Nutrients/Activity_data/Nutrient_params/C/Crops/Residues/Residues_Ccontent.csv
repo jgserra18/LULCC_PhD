@@ -1,0 +1,17 @@
+Main_crop,Crop,C_N,Source
+cereals,Wheat,100,CdBP18
+cereals,Oat,100,CdBP18
+cereals,Rye,100,CdBP18
+cereals,Barley,105,CdBP18
+cereals,Triticale,100,CdBP18
+cereals,Rice,100,CdBP18
+cereals,Rainfed_maize,75,CdBP18
+cereals,Irrigated_maize,75,CdBP18
+Forage,forage_roots,75,CdBP18
+Forage,Annual_mixtures,70,CdBP18
+Forage,forage_sorghum,70,CdBP18
+Forage,forage_oat,100,CdBP18
+Forage,forage_maize,75,CdBP18
+Forage,other_forage,70,CdBP18
+Industry_crops,Tomato,104,CdBP18
+Industry_crops,Sunflower,24,

@@ -4,7 +4,7 @@ source('./LULCC/Model/LULC/LULCC_modelling.R')
 
 rasterOptions(progress = 'window', maxmemory = 1e+11)
 
-param <- set_LULCC_params(spatial_res = '500')
+param <- set_LULCC_params(spatial_res = '1000')
 glm_model <- compute_LULCC_models(params = param, model = 'glm')
 dmd <- compute_LULCC_demand(param = param)
 
@@ -17,7 +17,7 @@ order <- c(222,244,512,212,223,242,243,3,211,231,221,241,1,213,321,2)
 order <- c(243,3,321,221,242,212,223,244,211,213,231,2,241,222,1,512)
 fom <- find_best_fom(unrestricted = T, spatial_res = '1000',model_lc = 'glm')
 order <- fom[[1]]
-
+order
 ordered_model <- OrderedModel(obs=param[[2]],ef=param[[1]],models=glm_model,time=0:28, demand=dmd, 
                               order=order)
 
@@ -25,7 +25,7 @@ clues_model <- allocate(ordered_model, stochastic = F)
 clues.tabs <- ThreeMapComparison(x=clues_model,factors=2^(1:8),timestep=28)
 clues.agr <- AgreementBudget(clues.tabs)
 clues.fom <- FigureOfMerit(x=clues.tabs)
-
+clues.fom@overall
 plot(clues.fom)
 
 export_LULC_OrderHierarchy <- function(unrestricted, file, admin_reg, admin_id, model_lc, spatial_res) {
@@ -60,7 +60,7 @@ export_LULC_OrderHierarchy <- function(unrestricted, file, admin_reg, admin_id, 
 }
 
 
-fine_tune_orderedModel(admin='PT', spatial_res = '1000', iter = 10, model_lc = 'glm')
+fine_tune_orderedModel(spatial_res = '1000', iter = 15, model_lc = 'glm')
 fine_tune_orderedModel <- function(admin, admin_id, spatial_res, iter, model_lc, param) {
   # fine tune LULC ordered model land use order
   # admin reg is the administrative unit (e.g., NUTS2, NVZ)

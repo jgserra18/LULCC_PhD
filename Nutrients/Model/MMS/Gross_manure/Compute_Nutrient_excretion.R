@@ -43,6 +43,7 @@ compute_animal_nutrient_excretion <- function(nutrient, main_param, param) {
   rm(list=c('nutrient_coef','animal_pop','calc_cols'))
 }
 
+
 ## gross manure of a given nutrient --------------------------------------
 
 compute_gross_manure_nutrient <- function(nutrient) {
@@ -100,28 +101,26 @@ grazing_dairy_cows_condition <- function(dairy_graz_frac) {
 }
 
 
-
-other_pathway_dairy_cows_condition <- function(dairy_other_frac) {
+housing_dairy_cows_condition <- function(dairy_other_frac) {
   # rescales yard and housing frac for dairy cows based on the assumption that AR_region == 1 no grazing dairy
   
   ## get grazing FRAC timeseries (1987-2017)
-  FRAC_grazing <- linearly_intrapolate_share_MMS(general_param = 'Distribution', param = 'Grazing')
-  animal_row <- which(FRAC_grazing[, 'Animals'] == 'Dairy_cows')
-  FRAC_grazing <- FRAC_grazing[animal_row, paste0('X', seq(1987,2017))]
+  FRAC_grazing <- correct_share_MMS_pathway('Grazing','Dairy_cows')
 
   # rescale dairy_other_frac
-  corrected_dairy_other_frac <- round(dairy_other_frac / (1-FRAC_grazing), 2)
+  calc_cols <- paste0('X', seq(1987,2017))
+  new_dairy_frac <- dairy_other_frac
+  new_dairy_frac[, calc_cols] <- sapply(calc_cols, function(x) round(dairy_other_frac[, x] + FRAC_grazing[, x], 2))
   
   
   disagg_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Spatial_disaggregation')
   
   rows_AR_1 <- which(disagg_df$agrarian_region_id == '1')
   
-  calc_cols <- paste0('X', seq(1987,2017))
   disagg_df[, calc_cols] <- sapply(calc_cols, function(x) disagg_df[,x] <- NA)
   
   disagg_df[-rows_AR_1, calc_cols] <- sapply(calc_cols, function(x) disagg_df[-rows_AR_1, x] <- dairy_other_frac[, x])
-  disagg_df[rows_AR_1, calc_cols] <- sapply(calc_cols, function(x) disagg_df[rows_AR_1, x] <- corrected_dairy_other_frac[, x])
+  disagg_df[rows_AR_1, calc_cols] <- sapply(calc_cols, function(x) disagg_df[rows_AR_1, x] <- new_dairy_frac[, x])
   
   return(disagg_df)
 }
@@ -144,8 +143,7 @@ compute_dairy_manure_pathway <- function(dairy_man_nutrient, dairy_pathway_frac)
 general_func_gross_manure_allocation <- function(nutrient, pathway) {
   # general function to ocmpute gross manure allocation
   
-  FRAC_pathway <- linearly_intrapolate_share_MMS(general_param = 'Distribution', param = pathway)
-  
+
   standard_params <- get_standard_params_list(main_param = 'Animals')
   
   for (i in 1:nrow(standard_params)) {
@@ -153,22 +151,21 @@ general_func_gross_manure_allocation <- function(nutrient, pathway) {
     main_param <- standard_params[i, 'Main_animals']
     param <- standard_params[i, 'Animals']
 
-        # get gross man N
+    FRAC_pathway_animal <- correct_share_MMS_pathway(pathway = pathway, param = param)
+    
+    # get gross man N
     man_nutrient <- compute_animal_nutrient_excretion(nutrient, main_param, param)
     pathway_N <- man_nutrient
     
-    # subset historical grazing FRAC
-    animal_row <- which(FRAC_pathway[, 'Animals'] == param)
-    FRAC_pathway_animal <- FRAC_pathway[animal_row, paste0('X', seq(1987,2017))]
     
     if (param == 'Dairy_cows' && pathway == 'Grazing') {
       
       FRAC_pathway_animal <- grazing_dairy_cows_condition(dairy_graz_frac = FRAC_pathway_animal)
       pathway_N <- compute_dairy_manure_pathway(man_nutrient, FRAC_pathway_animal)
     }
-    else if (param == 'Dairy_cows' && pathway != 'Grazing') {
+    else if (param == 'Dairy_cows' && pathway == 'Housing') {
       
-      FRAC_pathway_animal <- other_pathway_dairy_cows_condition(dairy_other_frac =  FRAC_pathway_animal)
+      FRAC_pathway_animal <- housing_dairy_cows_condition(dairy_other_frac =  FRAC_pathway_animal)
       pathway_N <- compute_dairy_manure_pathway(man_nutrient, FRAC_pathway_animal)
     }
     else {
@@ -176,6 +173,7 @@ general_func_gross_manure_allocation <- function(nutrient, pathway) {
       calc_cols <- paste0('X', seq(1987,2017))
       pathway_N[, calc_cols] <- sapply(calc_cols, function(x) round(pathway_N[, x] * FRAC_pathway_animal[, x], 1))
     }
+    
     export_file(module = 'Nutrients', 
                 file = pathway_N, 
                 filename = param, 
@@ -187,7 +185,6 @@ general_func_gross_manure_allocation <- function(nutrient, pathway) {
   }
 }
 
-
 loop_manure_allocation_pathway <- function() {
   
   pathway <- c('Grazing','Housing','Yards')
@@ -195,7 +192,10 @@ loop_manure_allocation_pathway <- function() {
   
   for (i in nutrients) {
     
-    sapply(pathway, function(x) general_func_gross_manure_allocation(nutrient = i, pathway = x))
+    for (j in pathway) {
+      print(paste0('Nutrient: ', i, '/n Pathway: ', j))
+      general_func_gross_manure_allocation(nutrient = i, pathway = j)
+    }
   }
 }
 
@@ -213,7 +213,7 @@ general_func_disaggregate_gross_manure_type <- function(main_param, param, manur
   
   
   yrs <- paste0('X', seq(1987,2017))
-  pathway_maN[, yrs] <- sapply(yrs, function(x) round(pathway_maN[, x] <- pathway_maN[,x] * FRAC_manure_type[,x], 1))
+  pathway_maN[, yrs] <- sapply(yrs, function(x) round(pathway_maN[,x] * FRAC_manure_type[,x], 1))
   
   return(pathway_maN)
   rm(list=c('FRAC_manure_type','animal_row','yrs'))
@@ -248,7 +248,7 @@ compute_disaggregate_gross_manure_type_pathway <- function(manure_type, pathway,
 loop_disaggregate_gross_manure_type <- function() {
   
   manure_type <- c('Solid','Slurry')
-  pathway <- c('Housing','Yards')
+  pathway <- c('Housing')
   nutrient <- c('N','P')
 
   for (i in manure_type) {
@@ -301,7 +301,6 @@ compute_carbon_gross_manure <- function(pathway, manure_type) {
   }
 }
 
-
 loop_gross_manure_C_all_params <- function() {
   
   pathway <- c('Grazing','Housing','Yards')
@@ -312,6 +311,12 @@ loop_gross_manure_C_all_params <- function() {
     for (j in manure_type) {
 
       if (i == 'Grazing' & (j == 'Slurry' | j == 'Solid')) {
+        compute_carbon_gross_manure(pathway = i, manure_type = 'Total')
+      }
+      else if (i == 'Yards' & (j == 'Slurry')) {
+        next 
+      }
+      else if (i == 'Yards' & j == 'Solid') {
         compute_carbon_gross_manure(pathway = i, manure_type = 'Total')
       }
       else {
@@ -354,10 +359,9 @@ compute_gross_manure_C_totals <- function(pathway) {
 }
 
 
-
 loop_gross_manure_C_totals <- function() {
   
-  pathway <- c('Housing','Yards')
+  pathway <- c('Housing')
   sapply(pathway, function(x) compute_gross_manure_C_totals(pathway = x))
 }
 
@@ -400,8 +404,6 @@ loop_gross_manure_Cexcretion <- function() {
 
 
 ## TOTALS BY ANIMAL CATEGORY AND TOTALS -------------------------------------------------------
-
-
 
 compute_total_nutrient_flows_main_param_pathway <- function(nutrient, pathway, manure_type) {
   
@@ -508,6 +510,7 @@ compute_total_nutrient_excretion_gross_manure <- function(nutrient) {
               subfolderX3 = 'Total')
 }
 
+
 loop_total_gross_manure_nutrient_flow <- function() {
   
   nutrient <- c('N','C','P')
@@ -528,12 +531,19 @@ loop_total_manure_nutrient_flows <- function() {
       for (c in manure_type) {
         
         if (b == 'Grazing' & (c == 'Slurry' | c == 'Solid')) {
+          
+          compute_total_nutrient_flows_main_param_pathway(nutrient = a, pathway = b, manure_type = 'Total')        
+        }
+        else if (b == 'Yards') {
+          
           compute_total_nutrient_flows_main_param_pathway(nutrient = a, pathway = b, manure_type = 'Total')        
         }
         else {
+          
           compute_total_nutrient_flows_main_param_pathway(nutrient = a, pathway = b, manure_type = c)        
         }
       }
     }
   }
 }
+

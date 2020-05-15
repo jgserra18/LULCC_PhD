@@ -47,27 +47,45 @@ compute_solid_N_entering_storage <- function(main_param, param, manure_type = 'S
 
 ## COMPUTE N/TAN IN STORAGE (SOLID SYSTEMS) -------------------------------------------------------
 
-# ASSUMPTION -----
-# X_STORE_SLURRY AND X_STORE_FYM are the same as the previous Share_MMS
+
+set_manure_storage_fraction <- function(main_param, manure_type) {
+  # note: these may have to be worked on
+  
+  X_store_solid <- data.frame(Main_animal = c('Bovine','Equides','Goats','Pigs','Poultry','Rabbits','Sheep'),
+                              X_store_solid = c(0.8, 0.7, 0.7, 0.7, 0.7, 0.8, 0.8))
+  X_store_slurry <- data.frame(Main_animal = c('Bovine','Equides','Goats','Pigs','Poultry','Rabbits','Sheep'),
+                              X_store_solid = c(0.5,0,0,0.5,0.5,0,0))
+  
+  if (manure_type == 'Solid') {
+    
+    X_store_solid <- subset(X_store_solid, Main_animal == main_param)[, 2]
+    return(X_store_solid)
+  }
+  else {
+    
+    X_store_slurry <- subset(X_store_slurry, Main_animal == main_param)[, 2]
+    return(X_store_slurry)
+  }
+}
+
 
 compute_solid_TAN_storage <- function(main_param, param, manure_type = 'Solid', manure_spreading) {
   
   TAN_solid_entering  <- compute_solid_TAN_entering_storage(main_param, param, manure_type)
   
   # X_STORE_SOLID
-  FRAC_MMS_solid <-  linearly_intrapolate_share_MMS(general_param = 'Share_MMS', param = 'Solid')
-  FRAC_MMS_solid <- subset(FRAC_MMS_solid, Animals == param)
+  X_store_solid <- set_manure_storage_fraction(main_param = main_param, manure_type = manure_type)
   
   # calculation
   yrs <- paste0('X', seq(1987,2017))
   
   if (missing(manure_spreading) == TRUE) {
     
-    TAN_solid_entering[, yrs] <- sapply(yrs, function(x) round(TAN_solid_entering[,x] * FRAC_MMS_solid[,x], 1))
+    TAN_solid_entering[, yrs] <- sapply(yrs, function(x) round(TAN_solid_entering[,x] * X_store_solid, 1))
   }
   else {
     
-    TAN_solid_entering[, yrs] <- sapply(yrs, function(x) round(TAN_solid_entering[,x] * (1 - FRAC_MMS_solid[,x]), 1))
+    TAN_solid_entering[, yrs] <- sapply(yrs, function(x) round(TAN_solid_entering[,x] * (1 - X_store_solid), 1))
   }
 
   return(TAN_solid_entering)
@@ -79,19 +97,19 @@ compute_solid_N_storage <- function(main_param, param, manure_type = 'Solid', ma
   N_solid_entering  <- compute_solid_N_entering_storage(main_param, param, manure_type)
   
   # X_STORE_SOLID
-  FRAC_MMS_solid <-  linearly_intrapolate_share_MMS(general_param = 'Share_MMS', param = 'Solid')
-  FRAC_MMS_solid <- subset(FRAC_MMS_solid, Animals == param)
+  X_store_solid <- set_manure_storage_fraction(main_param = main_param, manure_type = manure_type)
+  
   
   # calculation
   yrs <- paste0('X', seq(1987,2017))
   
   if (missing(manure_spreading) == TRUE) {
     
-    N_solid_entering[, yrs] <- sapply(yrs, function(x) round(N_solid_entering[,x] * FRAC_MMS_solid[,x], 1))
+    N_solid_entering[, yrs] <- sapply(yrs, function(x) round(N_solid_entering[,x] * X_store_solid, 1))
   }
   else {
     
-    N_solid_entering[, yrs] <- sapply(yrs, function(x) round(N_solid_entering[,x] * (1 - FRAC_MMS_solid[,x]), 1))
+    N_solid_entering[, yrs] <- sapply(yrs, function(x) round(N_solid_entering[,x] * (1 - X_store_solid), 1))
   }
 
   return(N_solid_entering)
@@ -119,8 +137,7 @@ compute_slurry_TAN_storage <- function(main_param, param, manure_type = 'Slurry'
   yard_NH3 <- get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gas_N_emissions', subfolder = 'NH3', subfolderX2 = 'Yards', subfolderX3 = 'Total', subfolderX4 = main_param, pattern = param)
   
   # X_STORE_SLURRY
-  FRAC_MMS_slurry <-  linearly_intrapolate_share_MMS(general_param = 'Share_MMS', param = 'Slurry')
-  FRAC_MMS_slurry <- subset(FRAC_MMS_slurry, Animals == param)
+  X_store_slurry <- set_manure_storage_fraction(main_param = main_param, manure_type = manure_type)
   
   # calculation
   yrs <- paste0('X', seq(1987,2017))
@@ -128,19 +145,19 @@ compute_slurry_TAN_storage <- function(main_param, param, manure_type = 'Slurry'
   # manure storage == FRAC_MMS_slurry || manure_spreading == 1 - FRAC_MMS_slurry
   if (missing(manure_spreading) == TRUE) {
     
-    house_TAN[, yrs] <- sapply(yrs, function(x) round( ( (house_TAN[, x] - house_NH3[,x]) + 
-                                                           (yard_TAN[,x] - yard_NH3[,x]) ) *
-                                                         FRAC_MMS_slurry[, x], 1))
+    house_TAN[, yrs] <- sapply(yrs, function(x) round(  
+      ((house_TAN[,x] - house_NH3[,x]) + (yard_TAN[,x] - yard_NH3[,x])) * X_store_slurry, 1))
   }
   else {
-    house_TAN[, yrs] <- sapply(yrs, function(x) round( ( (house_TAN[, x] - house_NH3[,x]) + 
-                                                           (yard_TAN[,x] - yard_NH3[,x]) ) *
-                                                         (1 - FRAC_MMS_slurry[, x]), 1))
+    house_TAN[, yrs] <- sapply(yrs, function(x) round( ((house_TAN[, x] - house_NH3[,x]) + 
+                                                           (yard_TAN[,x] - yard_NH3[,x])) *
+                                                         (1 - X_store_slurry), 1))
   }
 
   return(house_TAN)
-  rm(list=c('house_maN','yard_maN','yard_TAN','house_NH3','yard_NH3','FRAC_MMS_slurry'))
 }
+
+
 
 
 compute_slurry_N_storage <- function(main_param, param, manure_type = 'Slurry', manure_spreading) {
@@ -155,8 +172,8 @@ compute_slurry_N_storage <- function(main_param, param, manure_type = 'Slurry', 
   yard_NH3 <- get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gas_N_emissions', subfolder = 'NH3', subfolderX2 = 'Yards', subfolderX3 = 'Total', subfolderX4 = main_param, pattern = param)
   
   # X_STORE_SLURRY
-  FRAC_MMS_slurry <-  linearly_intrapolate_share_MMS(general_param = 'Share_MMS', param = 'Slurry')
-  FRAC_MMS_slurry <- subset(FRAC_MMS_slurry, Animals == param)  
+  X_store_slurry <- set_manure_storage_fraction(main_param = main_param, manure_type = manure_type)
+  
   # calculation
   yrs <- paste0('X', seq(1987,2017))
   
@@ -165,12 +182,12 @@ compute_slurry_N_storage <- function(main_param, param, manure_type = 'Slurry', 
     
     house_maN[, yrs] <- sapply(yrs, function(x) round( ( (house_maN[, x] - house_NH3[,x]) + 
                                                            (yard_maN[,x] - yard_NH3[,x]) ) *
-                                                         FRAC_MMS_slurry[, x], 1))
+                                                         X_store_slurry, 1))
   }
   else {
     house_maN[, yrs] <- sapply(yrs, function(x) round( ( (house_maN[, x] - house_NH3[,x]) + 
                                                            (yard_maN[,x] - yard_NH3[,x]) ) *
-                                                         (1 - FRAC_MMS_slurry[, x]), 1))
+                                                         (1 - X_store_slurry), 1))
   }
   
   return(house_maN)
@@ -196,6 +213,40 @@ correct_slurry_TAN_storage <- function(main_param, param, manure_type = 'Slurry'
   rm(list=c('f_min','storage_N'))
 }
 
+
+
+loop_N_storage <- function() {
+  
+  standard_params <- get_standard_params_list(main_param = 'Animals')
+
+  for (i in 1:nrow(standard_params)) {
+    
+    main_param <- standard_params[i, 'Main_animals']
+    param <- standard_params[i, 'Animals']
+    
+    storageN_slurry <- compute_slurry_N_storage(main_param = main_param, param = param)
+    storageN_slurry <- data_cleaning(storageN_slurry)
+    export_file(module = 'Nutrients', 
+                file = storageN_slurry, 
+                filename = param, 
+                folder = 'Gross_manure', 
+                subfolder = 'N', 
+                subfolderX2 = 'Storage',
+                subfolderX3 = 'Slurry',
+                subfolderX4 = main_param)
+    
+    storageN_FYM <- compute_solid_N_storage(main_param = main_param, param = param)
+    storageN_FYM <- data_cleaning(storageN_FYM)
+    export_file(module = 'Nutrients', 
+                file = storageN_FYM, 
+                filename = param, 
+                folder = 'Gross_manure', 
+                subfolder = 'N', 
+                subfolderX2 = 'Storage',
+                subfolderX3 = 'Solid',
+                subfolderX4 = main_param)
+  }
+}
 
 
 ## COMPUTE GASEOUS N EMISSIONS IN STORAGE (LIQUID SYSTEMS) ------------------------------------------------------
@@ -252,7 +303,6 @@ loop_slurry_solid_storage_all_N_emissions <- function() {
 
 ## COMPUTE TOTAL STORAGE EMISSIONS (E_STORAGE_SLURRY/SOLID) -----------------
 
-
 general_func_compute_total_storage_emissions <- function(main_param, param, manure_type) {
   # general function to compute the sum of N emissions from manure storage
   # unit: kg N yr-1
@@ -276,7 +326,6 @@ general_func_compute_total_storage_emissions <- function(main_param, param, manu
   return(storage_Nemissions_df)
   rm(list='storage_Nemissions')
 }
-
 
 
 compute_all_total_storage_emissions <- function() {

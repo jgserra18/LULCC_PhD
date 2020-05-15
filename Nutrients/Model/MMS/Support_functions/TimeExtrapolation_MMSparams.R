@@ -38,3 +38,53 @@ linearly_intrapolate_share_MMS <- function(general_param='Distribution', param =
 
 
 
+## CORRECT GROSS MANURE ALLOCATION TO DIFFERENT PATHWAYS (GRAZING, YARD, HOUSING) ----------------
+
+# when interpolating for the entire timeperiod, the sum of the difference fractions must be 1
+# if not, the difference is allocated to housing
+
+correct_share_MMS_pathway <- function(pathway, param) {
+  # correct the years where the sum < 1
+  # allocates what remains to housing
+  
+  graz <- linearly_intrapolate_share_MMS(general_param = 'Distribution', param = 'Grazing')
+  yard <- linearly_intrapolate_share_MMS(general_param = 'Distribution', param = 'Yards')
+  house <- linearly_intrapolate_share_MMS(general_param = 'Distribution', param = 'Housing')
+  
+  total <- house
+  
+  yrs <- paste0('X', seq(1987,2017))
+  total[, yrs] <- graz[, yrs] + yard[, yrs] + house[, yrs]
+  
+  # ids where != 1
+  dif_ids <- which(total<1, arr.ind = T)
+  
+  for (i in 1:nrow(dif_ids)) {
+    
+    r <- dif_ids[i,1]
+    c <- dif_ids[i,2]
+    
+    house[r,c] <- house[r,c] + (1 - total[r,c])
+  }
+  
+  if (pathway == 'Grazing') {
+    
+    graz <- subset(graz, Animals == param)
+    return(graz)
+    rm(list=c('yard','house','total'))
+  }
+  else if (pathway == 'Yards') {
+    
+    yard <- subset(yard, Animals == param)
+    return(yard)
+    rm(list=c('graz','house','total'))
+  }
+  else if (pathway == 'Housing') {
+    
+    house <- subset(house, Animals == param)
+    return(house)
+    rm(list=c('graz','yard','total'))
+  }
+}
+
+

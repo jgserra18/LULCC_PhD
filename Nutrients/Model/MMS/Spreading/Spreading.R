@@ -32,49 +32,6 @@ compute_slurry_N_spreading <- function(main_param, param, manure_type = 'Solid')
 
 
 
-## ALLOCATE THE FRACTION OF MANURE SPREADING, AND LIKEWISE THE FRAC OF THE MANURE DISCARGED INTO STREAMS OR TRANSPORTED ELSEWHERE ------------------
-
-manure_spreading_allocation_FRAC <- function(manure_allocation) {
-  # manure_allocation == 'Fertiliser' | 'River_discharge' | 'Transport'
-  
-  FRAC_allocation <- get_activity_data(module = 'Nutrients', subfolder = 'General_params', subfolderX2 = 'Animals', subfolderX3 = 'Manure_allocation', pattern = manure_allocation)
-
-}
-
-
-
-
-allocate_slurry_spreading <- function(N_flow, main_param, param, manure_type = 'Slurry') {
-  
-  FRAC_spreading <- get_activity_data(module = 'Nutrients', subfolder = 'General_params', subfolderX2 = 'Animals', subfolderX3 = 'Manure_allocation', pattern = 'Fertiliser')
-  
-  ifelse(N_flow == 'TAN',
-         slurry_spread <- compute_slurry_TAN_spreading(main_param, param, manure_type),
-         slurry_spread <- compute_slurry_N_spreading(main_param, param, manure_type))
-  
-  # calculation
-  yrs <- paste0('X', seq(1987,2017))
-  slurry_spread[, yrs] <- sapply(yrs, function(x) round(slurry_spread[,x] * FRAC_spreading[, 'X2009'], 1))
-  
-  return(slurry_spread)
-}
-
-
-allocate_solid_manure_spreading <- function(N_flow, main_param, param, manure_type = 'Solid') {
-  
-  FRAC_spreading <- get_activity_data(module = 'Nutrients', subfolder = 'General_params', subfolderX2 = 'Animals', subfolderX3 = 'Manure_allocation', pattern = 'Fertiliser')
-  
-  ifelse(N_flow == 'TAN',
-         solid_spread <- compute_solid_TAN_spreading(main_param, param, manure_type),
-         solid_spread <- compute_solid_N_spreading(main_param, param, manure_type))
-  
-  # calculation
-  yrs <- paste0('X', seq(1987,2017))
-  solid_spread[, yrs] <- sapply(yrs, function(x) round(solid_spread[,x] * FRAC_spreading[, 'X2009'], 1))
-  
-  return(solid_spread)
-}
-
 
 ## COMPUTE N/TAN AVAILABLE FOR SPREADING -----------------------------------------------------------------------------------
 # EQ 31
@@ -101,9 +58,8 @@ compute_total_slurry_available_spreading <- function(N_flow, main_param, param, 
 }
 
 
-
 compute_total_solid_available_spreading <- function(N_flow, main_param, param, manure_type = 'Solid') {
-  
+  # computes the total amounts of N available for spreading (immediate spread + stored then)
   
   ifelse(N_flow == 'TAN',
          solid_spread <- compute_solid_TAN_spreading(main_param, param, manure_type),
@@ -125,15 +81,53 @@ compute_total_solid_available_spreading <- function(N_flow, main_param, param, m
 
 
 
+## ALLOCATE THE FRACTION OF MANURE SPREADING, AND LIKEWISE THE FRAC OF THE MANURE DISCARGED INTO STREAMS OR TRANSPORTED ELSEWHERE ------------------
+
+manure_spreading_allocation_FRAC <- function(manure_allocation) {
+  # manure_allocation == 'Fertiliser' | 'River_discharge' | 'Transport'
+  
+  FRAC_allocation <- get_activity_data(module = 'Nutrients', subfolder = 'General_params', subfolderX2 = 'Animals', subfolderX3 = 'Manure_allocation', pattern = manure_allocation)
+  return(FRAC_allocation)
+}
+
+allocate_slurry_spreading <- function(N_flow, main_param, param, manure_type = 'Slurry', manure_use = 'Fertiliser') {
+  # by default it is set to Fertiliser, but manure_spreading_allocation_FRAC can eb used
+  
+  FRAC_spreading <- get_activity_data(module = 'Nutrients', subfolder = 'General_params', subfolderX2 = 'Animals', subfolderX3 = 'Manure_allocation', pattern = manure_use)
+  slurry_spread <- compute_total_slurry_available_spreading(N_flow, main_param, param, manure_type)
+  
+  # calculation
+  yrs <- paste0('X', seq(1987,2017))
+  slurry_spread[, yrs] <- sapply(yrs, function(x) round(slurry_spread[,x] * FRAC_spreading[, 'X2009'], 1))
+  
+  return(slurry_spread)
+}
+
+
+allocate_solid_manure_spreading <- function(N_flow, main_param, param, manure_type = 'Solid', manure_use = 'Fertiliser') {
+  # by default it is set to Fertiliser, but manure_spreading_allocation_FRAC can eb used
+  
+  FRAC_spreading <- get_activity_data(module = 'Nutrients', subfolder = 'General_params', subfolderX2 = 'Animals', subfolderX3 = 'Manure_allocation', pattern = manure_use)
+  solid_spread <- compute_total_solid_available_spreading(N_flow, main_param, param, manure_type)
+  
+  # calculation
+  yrs <- paste0('X', seq(1987,2017))
+  solid_spread[, yrs] <- sapply(yrs, function(x) round(solid_spread[,x] * FRAC_spreading[, 'X2009'], 1))
+  
+  return(solid_spread)
+}
+
+
 ## COMPUTE NH3 EMISSIONS DURING AND FOLLOWING SPREADING  -----------------------------------------------------------------------------------
+
 
 compute_manure_spreading_NH3_emissions <- function(main_param, param, manure_type) {
   
   EF <- select_animal_N_EFs(N_gas = 'NH3', pathway = 'Spreading', param = param, manure_type = manure_type)
   
   ifelse(manure_type == 'Solid',
-         man_spreadN <- compute_total_solid_available_spreading('TAN',main_param, param),
-         man_spreadN <- compute_total_slurry_available_spreading('TAN',main_param, param))
+         man_spreadN <- allocate_solid_manure_spreading('TAN',main_param, param, manure_type),
+         man_spreadN <- allocate_slurry_spreading('TAN',main_param, param, manure_type))
   
   # calculation
   yrs <- paste0('X', seq(1987,2017))
@@ -155,7 +149,7 @@ loop_manure_spreading_NH3_emissions <- function() {
       main_param <- standard_params[i, 'Main_animals']
       param <- standard_params[i, 'Animals']
       
-      man_spread_NH3 <- compute_manure_spreading_NH3_emissions(main_param, param, j)
+      man_spread_NH3 <- compute_manure_spreading_NH3_emissions(main_param, param, manure_type = j)
       export_file(module = 'Nutrients', 
                   file = man_spread_NH3, 
                   filename = param, 
@@ -172,24 +166,23 @@ loop_manure_spreading_NH3_emissions <- function() {
 
 ## COMPUTE NET N RETURNED TO SOIL AFTER SPREADING  -----------------------------------------------------------------------------------
 
-
-compute_manure_spreading_net_N <- function(N_flow, main_param, param, manure_type) {
-  
-  
+compute_manure_spreading_net_N <- function(N_flow, main_param, param, manure_type, manure_use = 'Fertiliser') {
   
   if (manure_type == 'Solid') {
     
     ifelse(N_flow == 'TAN',
-           man_spreadN <- compute_total_solid_available_spreading('TAN',main_param, param),
-           man_spreadN <- compute_total_solid_available_spreading('N',main_param, param))
+           man_spreadN <- allocate_solid_manure_spreading('TAN',main_param, param, manure_type),
+           man_spreadN <- allocate_solid_manure_spreading('N',main_param, param,manure_type))
   }
   else {
     ifelse(N_flow == 'TAN',
-           man_spreadN <- compute_total_slurry_available_spreading('TAN',main_param, param),
-           man_spreadN <- compute_total_slurry_available_spreading('N',main_param, param))
+           man_spreadN <- allocate_slurry_spreading('TAN',main_param, param, manure_type),
+           man_spreadN <- allocate_slurry_spreading('N',main_param, param))
   }
   
-  man_spread_NH3 <- get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gas_N_emissions', subfolder = 'NH3', subfolderX2 = 'Spreading', subfolderX3 = manure_type, subfolderX4 = main_param, pattern = param)
+  sub_use <- ifelse(manure_use == 'Fertiliser', 'Spreading', manure_use)
+  
+  man_spread_NH3 <- compute_manure_spreading_NH3_emissions(main_param, param, manure_type)
   
   # calculation
   yrs <- paste0('X', seq(1987,2017))
@@ -199,7 +192,8 @@ compute_manure_spreading_net_N <- function(N_flow, main_param, param, manure_typ
   rm(list='man_spread_NH3')
 }
 
-
+compute_all_manure_spreading_net_N()
+// something is wrong
 
 compute_all_manure_spreading_net_N <- function() {
   # computes total N returned to the soil following NH3 application
@@ -216,17 +210,28 @@ compute_all_manure_spreading_net_N <- function() {
       main_param <- standard_params[i, 'Main_animals']
       param <- standard_params[i, 'Animals']
       
-      man_net_N <- compute_manure_spreading_net_N(N_flow = 'N', main_param, param, j)
-      export_file(module = 'Nutrients', 
-                  file = man_net_N, 
-                  filename = param, 
-                  folder = 'Fertilisers', 
-                  subfolder = 'N', 
-                  subfolderX2 = 'Spreading',
-                  subfolderX3 = j,
-                  subfolderX4 = main_param)
+      man_net_N <- compute_manure_spreading_net_N(N_flow = 'N',main_param =  main_param , param =  param, manure_type = j, manure_use = 'Fertiliser')
+      # check if there is negative numbers
+      condition <- which(man_net_N<0)
+      
+      if (identical(integer(0), condition)==TRUE) {
+        export_file(module = 'Nutrients', 
+                    file = man_net_N, 
+                    filename = param, 
+                    folder = 'Fertilisers', 
+                    subfolder = 'N', 
+                    subfolderX2 = 'Spreading',
+                    subfolderX3 = j,
+                    subfolderX4 = main_param)
+      }
+      else {
+        print('Something is wrong.')
+        break
+      }
     }
   }
   rm(list='man_net_N')
 }
 
+d <- compute_manure_spreading_net_N('TAN','Bovine','Dairy_cows','Solid')
+which(d<0)

@@ -1,0 +1,8 @@
+agrarian_region_id,agrarian_region,Wheat,Rye,Oat,Barley,Triticale,Rainfed_maize,Irrigated_maize,Rice
+Entre Douro e Minho,1,30,30,30,30,30,10,10,20
+Trás-os-Montes,2,30,30,30,30,30,10,10,20
+Beira Litoral,3,30,30,30,30,30,10,10,20
+Beira Interior,4,30,30,30,30,30,10,10,20
+Ribatejo e Oeste,5,30,30,30,30,30,10,10,20
+Alentejo,6,30,30,30,30,30,10,10,20
+Algarve,7,30,30,30,30,30,10,10,20

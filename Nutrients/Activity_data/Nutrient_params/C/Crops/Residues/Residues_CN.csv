@@ -1,0 +1,24 @@
+Main_crop,Crop,C_N,Source
+cereals,Wheat,100,CdBP18
+cereals,Oat,100,CdBP18
+cereals,Rye,100,CdBP18
+cereals,Barley,105,CdBP18
+cereals,Triticale,100,CdBP18
+cereals,Rice,100,CdBP18
+cereals,Rainfed_maize,75,CdBP18
+cereals,Irrigated_maize,75,CdBP18
+Forage,forage_roots,75,CdBP18
+Forage,Annual_mixtures,70,CdBP18
+Forage,forage_sorghum,70,CdBP18
+Forage,forage_oat,100,CdBP18
+Forage,forage_maize,75,CdBP18
+Forage,other_forage,70,CdBP18
+Industry_crops,Tomato,16,https://books.google.pt/books?id=45JyXJzDsxgC&pg=PA170&lpg=PA170&dq=tomato+crop+residues+CN+ratio&source=bl&ots=n-84BftwQq&sig=ACfU3U1Ife6iSGgIn5rvs1Qk-bJwka9zCQ&hl=pt-PT&sa=X&ved=2ahUKEwjSz_Gt1bPpAhUD3hoKHSitCvQQ6AEwBHoECAsQAQ#v=onepage&q=tomato%20crop%20residues%20CN%20ratio&f=false
+Industry_crops,Sunflower,24,CdBP18
+pulses,Beans,20,Adapted from CdPB18
+pulses,Chickpea,20,Adapted from CdPB18
+pulses,Other_dried_pulses,20,Adapted from CdPB18
+potato,Irrigated_potato,25,https://energypedia.info/wiki/Nitrogen-content_and_C/N-ratio_of_Organic_Substrates
+potato,Rainfed_potato,25,https://energypedia.info/wiki/Nitrogen-content_and_C/N-ratio_of_Organic_Substrates
+Horticulture,Horticulture_intensive,12.5,https://energypedia.info/wiki/Nitrogen-content_and_C/N-ratio_of_Organic_Substrates
+Horticulture,Horticulture_extensive,12.5,https://energypedia.info/wiki/Nitrogen-content_and_C/N-ratio_of_Organic_Substrates
