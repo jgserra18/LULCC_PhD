@@ -21,8 +21,14 @@ compute_solid_TAN_entering_storage <- function(main_param, param, manure_type = 
   Straw_bedding <- general_func_animal_bedding(main_param, param, bedding_param = 'Straw')
   
   yrs <- paste0('X', seq(1987,2017))
-  house_TAN[, yrs] <- sapply(yrs, function(x) round( house_TAN[, x] - ( house_NH3[,x]) + (Straw_bedding[,x] * f_imm), 1))
   
+  if (param == 'Non_dairy') {
+    house_TAN[, yrs] <- 0
+  }
+  else {
+    house_TAN[, yrs] <- sapply(yrs, function(x) round( house_TAN[, x] - ( house_NH3[,x]) + (Straw_bedding[,x] * f_imm), 1))
+  }
+
   return(house_TAN)
   rm(list=c('f_imm','house_maN','house_NH3','yrs'))
 }
@@ -37,8 +43,14 @@ compute_solid_N_entering_storage <- function(main_param, param, manure_type = 'S
   N_bedding <- general_func_animal_bedding(main_param, param, bedding_param = 'N_bedding')
   
   yrs <- paste0('X', seq(1987,2017))
-  house_maN[, yrs] <- sapply(yrs, function(x) round( house_maN[, x] +  N_bedding[,x] - house_NH3[,x], 1))
   
+  if (param == 'Non_dairy') {
+    house_maN[, yrs] <- 0
+  }
+  else {
+    house_maN[, yrs] <- sapply(yrs, function(x) round( house_maN[, x] +  N_bedding[,x] - house_NH3[,x], 1))
+  }
+
   return(house_maN)
   rm(list=c('house_NH3','N_bedding','yrs'))
 }
@@ -212,7 +224,6 @@ correct_slurry_TAN_storage <- function(main_param, param, manure_type = 'Slurry'
   return(storage_TAN)
   rm(list=c('f_min','storage_N'))
 }
-
 
 
 loop_N_storage <- function() {

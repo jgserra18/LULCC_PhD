@@ -1,7 +1,5 @@
 
 
-d <- Nflow_check1('Poultry','Broilers')
-
 check_error_rounding <- function(df, param) {
   
   row_sums <- rowSums(df[, paste0('X', seq(1987,2017))])
@@ -173,7 +171,7 @@ Nflow_check5 <- function(main_param, param) {
 
 
 ## CHECK 6 -----------------------------------------
-loop_param_checker(Nflow_check6)
+
 Nflow_check6 <- function(main_param, param) {
   
   slurry_TAN_storage <- correct_slurry_TAN_storage(main_param, param)

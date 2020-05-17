@@ -133,6 +133,15 @@ compute_manure_spreading_NH3_emissions <- function(main_param, param, manure_typ
   yrs <- paste0('X', seq(1987,2017))
   man_spreadN[, yrs] <- sapply(yrs, function(x) round(man_spreadN[,x] * EF, 1))
   
+  export_file(module = 'Nutrients', 
+              file = man_spreadN, 
+              filename = param, 
+              folder = 'Gross_manure', 
+              subfolder = 'N', 
+              subfolderX2 = 'Gross_spreading',
+              subfolderX3 = manure_type,
+              subfolderX4 = main_param)
+  
   return(man_spreadN)
 }
 
@@ -193,7 +202,6 @@ compute_manure_spreading_net_N <- function(N_flow, main_param, param, manure_typ
 }
 
 compute_all_manure_spreading_net_N()
-// something is wrong
 
 compute_all_manure_spreading_net_N <- function() {
   # computes total N returned to the soil following NH3 application
@@ -209,7 +217,7 @@ compute_all_manure_spreading_net_N <- function() {
       
       main_param <- standard_params[i, 'Main_animals']
       param <- standard_params[i, 'Animals']
-      
+      print(param)
       man_net_N <- compute_manure_spreading_net_N(N_flow = 'N',main_param =  main_param , param =  param, manure_type = j, manure_use = 'Fertiliser')
       # check if there is negative numbers
       condition <- which(man_net_N<0)
@@ -218,9 +226,9 @@ compute_all_manure_spreading_net_N <- function() {
         export_file(module = 'Nutrients', 
                     file = man_net_N, 
                     filename = param, 
-                    folder = 'Fertilisers', 
+                    folder = 'Gross_manure', 
                     subfolder = 'N', 
-                    subfolderX2 = 'Spreading',
+                    subfolderX2 = 'Net_spreading',
                     subfolderX3 = j,
                     subfolderX4 = main_param)
       }
@@ -233,5 +241,5 @@ compute_all_manure_spreading_net_N <- function() {
   rm(list='man_net_N')
 }
 
-d <- compute_manure_spreading_net_N('TAN','Bovine','Dairy_cows','Solid')
-which(d<0)
+d <- compute_manure_spreading_net_N('N','Bovine','Male_calf_1-2','Solid')
+d
