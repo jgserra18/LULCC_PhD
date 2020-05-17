@@ -103,7 +103,6 @@ allocate_slurry_spreading <- function(N_flow, main_param, param, manure_type = '
   return(slurry_spread)
 }
 
-
 allocate_solid_manure_spreading <- function(N_flow, main_param, param, manure_type = 'Solid', manure_use = 'Fertiliser') {
   # by default it is set to Fertiliser, but manure_spreading_allocation_FRAC can eb used
   
@@ -176,6 +175,7 @@ loop_manure_spreading_NH3_emissions <- function() {
 ## COMPUTE NET N RETURNED TO SOIL AFTER SPREADING  -----------------------------------------------------------------------------------
 
 compute_manure_spreading_net_N <- function(N_flow, main_param, param, manure_type, manure_use = 'Fertiliser') {
+  # unit: kg N yr-1
   
   if (manure_type == 'Solid') {
     
@@ -201,7 +201,7 @@ compute_manure_spreading_net_N <- function(N_flow, main_param, param, manure_typ
   rm(list='man_spread_NH3')
 }
 
-compute_all_manure_spreading_net_N()
+
 
 compute_all_manure_spreading_net_N <- function() {
   # computes total N returned to the soil following NH3 application
@@ -241,5 +241,3 @@ compute_all_manure_spreading_net_N <- function() {
   rm(list='man_net_N')
 }
 
-d <- compute_manure_spreading_net_N('N','Bovine','Male_calf_1-2','Solid')
-d
