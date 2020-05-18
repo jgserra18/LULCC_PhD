@@ -95,6 +95,7 @@ allocate_slurry_spreading <- function(N_flow, main_param, param, manure_type = '
   
   FRAC_spreading <- get_activity_data(module = 'Nutrients', subfolder = 'General_params', subfolderX2 = 'Animals', subfolderX3 = 'Manure_allocation', pattern = manure_use)
   slurry_spread <- compute_total_slurry_available_spreading(N_flow, main_param, param, manure_type)
+  slurry_spread <- data_cleaning(slurry_spread)
   
   # calculation
   yrs <- paste0('X', seq(1987,2017))
@@ -120,6 +121,8 @@ allocate_solid_manure_spreading <- function(N_flow, main_param, param, manure_ty
 ## COMPUTE NH3 EMISSIONS DURING AND FOLLOWING SPREADING  -----------------------------------------------------------------------------------
 
 
+
+
 compute_manure_spreading_NH3_emissions <- function(main_param, param, manure_type) {
   
   EF <- select_animal_N_EFs(N_gas = 'NH3', pathway = 'Spreading', param = param, manure_type = manure_type)
@@ -131,15 +134,6 @@ compute_manure_spreading_NH3_emissions <- function(main_param, param, manure_typ
   # calculation
   yrs <- paste0('X', seq(1987,2017))
   man_spreadN[, yrs] <- sapply(yrs, function(x) round(man_spreadN[,x] * EF, 1))
-  
-  export_file(module = 'Nutrients', 
-              file = man_spreadN, 
-              filename = param, 
-              folder = 'Gross_manure', 
-              subfolder = 'N', 
-              subfolderX2 = 'Gross_spreading',
-              subfolderX3 = manure_type,
-              subfolderX4 = main_param)
   
   return(man_spreadN)
 }
@@ -156,6 +150,18 @@ loop_manure_spreading_NH3_emissions <- function() {
       
       main_param <- standard_params[i, 'Main_animals']
       param <- standard_params[i, 'Animals']
+      
+      ifelse(j == 'Solid',
+             man_spreadN <- allocate_solid_manure_spreading('N',main_param, param, j),
+             man_spreadN <- allocate_slurry_spreading('N',main_param, param, j))
+      export_file(module = 'Nutrients', 
+                  file = man_spreadN, 
+                  filename = param, 
+                  folder = 'Gross_manure', 
+                  subfolder = 'N', 
+                  subfolderX2 = 'Gross_spreading',
+                  subfolderX3 = j,
+                  subfolderX4 = main_param)
       
       man_spread_NH3 <- compute_manure_spreading_NH3_emissions(main_param, param, manure_type = j)
       export_file(module = 'Nutrients', 

@@ -136,6 +136,7 @@ compute_nutrient_offtake <- function(main_param, param, nutrient) {
 }
 
 
+
 compute_all_crop_nutrient_offtake <- function(nutrient) {
   # computes nutrient offtake for each crop for the specified nutrient (P,C,N)
   # unit: kg nutrient yr-1
@@ -174,4 +175,37 @@ loop_nutrient_offtake <- function() {
   
   nutrient <- c('C','N','P')
   sapply(nutrient, compute_all_crop_nutrient_offtake)
+}
+
+
+
+compute_total_nutrient_offtake('N')
+compute_total_nutrient_offtake <- function(nutrient) {
+  
+  yrs <- paste0('X', seq(1987,2017))
+  store_main_param <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  store_main_param[, yrs] <- sapply(yrs, function(x) store_main_param[,x] <- 0)
+  
+  standard_params <- get_standard_params_list(main_param = 'Crops')
+  
+  for (i in 1:nrow(standard_params)) {
+    
+    main_param <- standard_params[i, 1]
+    param <- standard_params[i,2]
+    
+    if (main_param == 'Pastures' | main_param == 'Forage') {
+      next
+    }
+    else {
+      
+      crop_offtake <- get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Crop_offtake', subfolder = nutrient, subfolderX2 = main_param, pattern = param)
+      store_main_param[, yrs] <- sapply(yrs, function(x) round(store_main_param[,x] + crop_offtake[,x], 1))
+    }
+  }
+  export_file(module = 'Nutrients', 
+              file = store_main_param, 
+              filename = 'Total_sum', 
+              folder = 'Crop_offtake', 
+              subfolder = nutrient, 
+              subfolderX2 = 'Total')
 }

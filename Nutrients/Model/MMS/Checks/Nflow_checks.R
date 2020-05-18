@@ -54,7 +54,6 @@ loop_param_checker <- function(fun) {
 ## CHECK 1 -----------------------------
 source('./Nutrients/Model/MMS/Gross_manure/Compute_Nutrient_excretion.R')
 
-
 Nflow_check1 <- function(main_param, param) {
   
   animal_pop <-  get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Animals', subfolderX2 = main_param, pattern = param)
@@ -168,7 +167,7 @@ Nflow_check5 <- function(main_param, param) {
   
   return(check)
 }
-
+loop_param_checker(Nflow_check6)
 
 ## CHECK 6 -----------------------------------------
 
@@ -185,8 +184,7 @@ Nflow_check6 <- function(main_param, param) {
   yard_NH3 <- compute_yards_NH3_emissions(main_param, param, 'Slurry')
   house_slurry_NH3 <- compute_housing_NH3_emissions(main_param, param, 'Slurry')
   
-  FRAC_MMS_slurry <-  linearly_intrapolate_share_MMS(general_param = 'Share_MMS', param = 'Slurry')
-  FRAC_MMS_slurry <- subset(FRAC_MMS_slurry, Animals == param)
+  X_store_slurry <-  set_manure_storage_fraction(main_param = main_param, manure_type = 'Slurry')
   
   
   storage_slurry_NH3 <- general_func_compute_storage_Nemissions(N_gas = 'NH3', main_param = main_param, param = param, manure_type = 'Slurry')
@@ -201,10 +199,70 @@ Nflow_check6 <- function(main_param, param) {
   yrs <- paste0('X', seq(1987,2017))
   
   E_storage[, yrs] <- sapply(yrs, function(x) round(storage_slurry_NH3[,x] + storage_slurry_N2O[,x] + storage_slurry_NOx[,x] + storage_slurry_NN2[,x], 1))
-  check[,yrs] <- sapply(yrs, function(x) round(slurry_TAN_storage[, x] + ( (yardTAN[,x] + house_slurryTAN[,x]) - (yard_NH3[,x] + house_slurry_NH3[,x])) * (1 - FRAC_MMS_slurry[,x]) - E_storage[, x] - spread_TAN[,x], 0))
+  check[,yrs] <- sapply(yrs, function(x) round(slurry_TAN_storage[, x] + ( (yardTAN[,x] + house_slurryTAN[,x]) - (yard_NH3[,x] + house_slurry_NH3[,x])) * (1 - X_store_slurry) - E_storage[, x] - spread_TAN[,x], 0))
   
   return(check)
   rm(list=c('slurry_TAN_storage','yardN','yardTAN','house_slurryN','house_slurryTAN','yard_NH3','house_slurry_NH3','FRAC_MMS_slurry','storage_slurry_NH3','storage_slurry_N2O','storage_slurry_NOx','storage_slurry_NN2','E_storage'))
 }
 
-loop_param_checker(Nflow_check6)
+## CHECK 7 -----------------------------------------
+
+Nflow_check7 <- function(main_param, param) {
+  
+  house_solidN <-  get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = 'N', subfolderX2 = 'Housing', subfolderX3 ='Solid', subfolderX4 = main_param, pattern = param)
+  house_solidTAN <- convert_N_to_TAN_dataframe(main_param = main_param, df = house_solidN)
+  
+  Straw_bedding <- general_func_animal_bedding(main_param, param, bedding_param = 'Straw')
+  f_imm = 0.0067
+  
+  E_house <- compute_housing_NH3_emissions(main_param, param, manure_type = 'Solid')
+  E_storage <- general_func_compute_total_storage_emissions(main_param, param, 'Solid')
+  
+  applic_solid_TAN <- compute_solid_TAN_spreading(main_param, param, 'Solid')
+  
+  check <- E_house
+  yrs <- paste0('X', seq(1987,2017))
+  check[,yrs] <- sapply(yrs, function(x) round((house_solidTAN[,x]-(Straw_bedding[,x] * f_imm)-E_house[,x]) - E_storage[,x] - applic_solid_TAN[,x], 1))
+  
+  return(check)
+}
+
+## CHECK 8 -----------------------------------------
+
+Nflow_check8 <- function(main_param, param) {
+  
+  house_slurryN <-  get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = 'N', subfolderX2 = 'Housing', subfolderX3 ='Slurry', subfolderX4 = main_param, pattern = param)
+  yards_N <-  get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = 'N', subfolderX2 = 'Yards', subfolderX3 ='Total', subfolderX4 = main_param, pattern = param)
+  E_house <- compute_housing_NH3_emissions(main_param, param, manure_type = 'Slurry')
+  E_yards <- compute_yards_NH3_emissions(main_param = main_param, param = param, manure_type = 'Total')
+  E_storage <- general_func_compute_total_storage_emissions(main_param, param, 'Slurry')
+  E_app <- compute_manure_spreading_NH3_emissions(main_param, param, 'Slurry')
+  net_slurry_spread <- compute_manure_spreading_net_N(N_flow = 'N',main_param =  main_param , param =  param, manure_type = 'Slurry')
+  
+  check <- E_house
+  yrs <- paste0('X', seq(1987,2017))
+  check[,yrs] <- sapply(yrs, function(x) round( (house_slurryN[,x] + yards_N[,x]) - (E_house[,x] + E_yards[,x] + E_storage[,x] + E_app[,x]) - net_slurry_spread[,x], 1))
+  
+  return(check)
+}
+
+## CHECK 9 -----------------------------------------
+
+Nflow_check9 <- function(main_param, param) {
+  
+  house_solidN <-  get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = 'N', subfolderX2 = 'Housing', subfolderX3 ='Solid', subfolderX4 = main_param, pattern = param)
+  N_bedding <- general_func_animal_bedding(main_param, param, bedding_param = 'N_bedding')
+  E_house <- compute_housing_NH3_emissions(main_param, param, manure_type = 'Solid')
+  X_store_solid <-  set_manure_storage_fraction(main_param = main_param, manure_type = 'Solid')
+  E_storage <- general_func_compute_total_storage_emissions(main_param, param, 'Solid')
+  E_app <- compute_manure_spreading_NH3_emissions(main_param, param, 'Solid')
+  net_solid_spread <- compute_manure_spreading_net_N(N_flow = 'N',main_param =  main_param , param =  param, manure_type = 'Solid')
+  
+  
+  check <- E_house
+  yrs <- paste0('X', seq(1987,2017))
+  check[,yrs] <- sapply(yrs, function(x) round( ((house_solidN[,x] + N_bedding[,x] - E_house[,x]) * X_store_solid) - net_solid_spread[,x] - E_app[,x] - net_solid_spread[,x], 1))
+  
+  return(check)
+}
+

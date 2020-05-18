@@ -81,7 +81,6 @@ CLC_df <- function() {
   #rm(list=c('clc_cat', 'clc_label', 'clc_df', 'stclc_cats', 'l_unique', 'max_length'))
 }
 
-
 feed_ObsLulcRasterStack <- function(admin, admin_id, spatial_res) {
   # feed the necessary input data to Mould's LULCC framework "ObsLulcRasterStack" function
   # i.e., CLC categories and labels and the CLC stack

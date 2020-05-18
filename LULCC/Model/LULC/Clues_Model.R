@@ -34,7 +34,7 @@ export_LULC_elasticity <- function(unrestricted, file, admin_reg, admin_id, mode
 d <- compute_LULCC_prediction(param = param, glm_model = glm_model)
 
 param <- set_LULCC_params(spatial_res = '1000')
-glm_model <- compute_LULCC_models(params = param, model = 'rf')
+glm_model <- compute_LULCC_models(params = param, model = 'glm')
 
 predict_eval <- compute_LULCC_prediction(param = param, glm_model = glm_model)
 plot(list(predict_eval[[2]]))
