@@ -33,7 +33,6 @@ plot_params_over_time <- function(module, param, main_var, var_name) {
 }
 
 
-
 lulcc_plot <- function(stack_file) {
   # plots raster stacks 
   

@@ -180,9 +180,11 @@ aggregate_stack_ExpVarRaster <- function(spatial_res) {
   stat <- get_output_statistical_data(spatial_res)
   
   st <- stack(mrb, environ, stat)
+  st <- (st - cellStats(st, 'min')) / (cellStats(st, 'max')-cellStats(st, 'min'))
   return(st)
   rm(list=c('mrb', 'environ', 'stat'))
 }
+
 
 feed_ExpVarRasterList <- function(admin, admin_id, spatial_res) {
   

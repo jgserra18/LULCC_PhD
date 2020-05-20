@@ -81,6 +81,7 @@ CLC_df <- function() {
   #rm(list=c('clc_cat', 'clc_label', 'clc_df', 'stclc_cats', 'l_unique', 'max_length'))
 }
 
+
 feed_ObsLulcRasterStack <- function(admin, admin_id, spatial_res) {
   # feed the necessary input data to Mould's LULCC framework "ObsLulcRasterStack" function
   # i.e., CLC categories and labels and the CLC stack
@@ -101,6 +102,17 @@ feed_ObsLulcRasterStack <- function(admin, admin_id, spatial_res) {
     st_clc <- general_RasterCrop_admin(module = 'LULCC',r_file = st_clc, admin = admin, admin_id = admin_id)
     #clc_df <- CLC_df(st_clc)
     clc_df <- CLC_df()
+    
+    if (admin == 'NUTS2' & admin_id == 11) {
+      
+      cats <- getValues(st_clc[[1]])
+      cats <- unique(cats)
+      cats <- cats[order(cats)]
+      cats <- cats[-which(is.na(cats)==T)]
+      
+      df <- data.frame(cat = cats)
+      clc_df <- plyr::join(df, clc_df, 'cat')
+    }
     lu <- ObsLulcRasterStack(x=st_clc,
                              categories=clc_df[,1],
                              labels = as.character(clc_df[, 2]),

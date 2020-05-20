@@ -83,7 +83,6 @@ create_model_formula <- function(st_clc) {
 # HENCE WHY ALL THE PREDICTIONS FOR A GIVEN ADMINISTRATIVE REGION (E.G., ALENTEJO) REQUIRES A SINGLE RUN OF SETSEED!!!
 # OTHERWISE ALL THE SIMULATIONS TO REFINE THE ORDER/ELASTICITY WILL BE DIFFERENT REGARDLESS!!!!!!!
 
-
 create_setSeed_folder <- function(admin='PT', admin_id, spatial_res) {
   
   file_path <- create_new_directory('./LULCC/Activity_data/', 'Set_seed')
@@ -196,6 +195,23 @@ create_CLC_partition <- function(st_clc, admin='PT', admin_id, spatial_res) {
   return(part)
 }
 
+
+
+feed_getPredictiveModelInputData <- function(r_expVar, r_st_clc, admin='PT', admin_id, spatial_res) {
+  # feeds  Mould's LULCC getPredictiveModelInputData function the necessary data
+  # i.e., obs LULCC, Exploratory Vars and the train partition
+  # output: a list where index1 is the partition data and index 2 is the train data
+  
+  if (missing(admin)==TRUE && missing(admin_id)==TRUE) {
+    part <- create_CLC_partition(r_st_clc,spatial_res = spatial_res)
+  } else {
+    part <- create_CLC_partition(r_st_clc, admin, admin_id, spatial_res)
+  }
+  train_data <- getPredictiveModelInputData(obs=r_st_clc, ef=r_expVar, cells=part[['train']])
+  
+  return(list(part, train_data))
+}
+
 feed_getPredictiveModelInputData <- function(expVar, st_clc, admin='PT', admin_id, spatial_res) {
   # feeds  Mould's LULCC getPredictiveModelInputData function the necessary data
   # i.e., obs LULCC, Exploratory Vars and the train partition
@@ -210,6 +226,8 @@ feed_getPredictiveModelInputData <- function(expVar, st_clc, admin='PT', admin_i
   
   return(list(part, train_data))
 }
+
+
 
 set_LULCC_params <- function(admin='PT', admin_id, spatial_res) {
   # set and load LULCC params
@@ -236,6 +254,61 @@ set_LULCC_params <- function(admin='PT', admin_id, spatial_res) {
 
 ##  LULCC MODELS PREDICTION ----------------------------------------------------------------------------------
 
+.checkFormula <- function(formula, categories, labels) {
+  dep <- sapply(formula, function(x) as.character(x)[2])
+  
+  if (any(is.na(categories), is.na(labels))) {
+    stop("'categories' and 'labels' must be supplied if 'obs' is missing")
+  } 
+  
+  if (length(categories) != length(labels)) {
+    stop("'labels' must correspond to 'categories'")
+  }
+  
+  ## if (!missing(obs)) {
+  ##     categories <- obs@categories
+  ##     labels <- obs@labels
+  ## } else {
+  ##     if (missing(categories) | missing(labels)) {
+  ##         stop("'categories' and 'labels' must be supplied if 'obs' is missing")
+  ##     } else {
+  ##         if (length(categories) != length(labels)) {
+  ##             stop("'labels' must correspond to 'categories'")
+  ##         }
+  ##     }
+  ## }
+  
+  if (!all(labels %in% dep)) {
+    stop("a formula must be supplied for each land use type")
+  }
+  
+  formula <- formula[match(dep, labels)]
+}
+require(glm2)
+glmModels <- function(formula, family=binomial, model=FALSE, ..., obs, categories=NA, labels=NA) {
+  
+  glm.models <- list()
+  
+  if (!missing(obs)) {
+    categories <- obs@categories
+    labels <- obs@labels
+  }
+  formula <- .checkFormula(formula, categories, labels)
+  
+  for (i in 1:length(formula)) {
+    form <- formula[[i]]
+    glm.models[[i]] <- glm2::glm2(form, family=family, model=model, control = list(maxit=100), ...)
+  }
+  
+  out <- new("PredictiveModelList",
+             models=glm.models,
+             categories=categories,
+             labels=labels)
+}
+
+
+
+
 
 compute_LULCC_models <- function(params, model) {
   # predict LULCC based on the select models (glm, rpart, rf)
@@ -244,7 +317,7 @@ compute_LULCC_models <- function(params, model) {
   expVar <- params[[1]]
   st_clc <- params[[2]]
   train_data <- params[[3]]
-  # correct train data NAs
+    # correct train data NAs
   train_data[is.na(train_data)] <- 0
   
   forms <- create_model_formula(st_clc)

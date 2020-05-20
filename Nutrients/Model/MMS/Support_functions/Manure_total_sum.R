@@ -1,9 +1,7 @@
 source('./Nutrients/Model/MMS/Gross_manure/Compute_Nutrient_excretion.R')
 
 
-d <- compute_manure_type_total_flows('Gross_manure','N','Transported_IntraMunicipality','Solid')
-sum(d$X2009)/1000000
-
+compute_manure_type_total_flows('Gross_manure','N','Transported_IntraMunicipality','Slurry')
 compute_manure_type_total_flows <- function(main_folder, nutrient, pathway, manure_type) {
   
   standard_params <- get_standard_params_list(main_param = 'Animals')
@@ -33,7 +31,14 @@ compute_manure_type_total_flows <- function(main_folder, nutrient, pathway, manu
     # store sum of main_param in main_param_df
     store_main_param[, yrs] <- sapply(yrs, function(x) store_main_param[, x] + store_param[,x])
   }
-  return(store_main_param)
+  export_file(module = 'Nutrients', 
+              file = store_main_param, 
+              filename = 'Total_sum', 
+              folder = main_folder, 
+              subfolder = nutrient,
+              subfolderX2 = pathway, 
+              subfolderX3 = manure_type,
+              subfolderX4 = 'Total')
 }
 
 
