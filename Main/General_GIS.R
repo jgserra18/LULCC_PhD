@@ -30,14 +30,21 @@ fasterize__100m <- function(module, shp_file, col_field) {
 }
 
 
-resample_to_CLC <- function(module, raster_file, mask_CLC, spatial_res) {
+resample_to_CLC <- function(module='LULCC', raster_file, mask_CLC, spatial_res, ngb) {
   # resamples the rasterfiles to the CLC
   # this is because the extents are somewhat and somehow different
   # nothing major
   # additionally, there is an option to mask the rasterfile according to CLC
   
   clc <- get_activity_data(module, 'CLC', '2000', spatial_res)
-  r_v2 <- resample(raster_file, clc)
+  
+  if (missing(ngb)==TRUE) {
+    r_v2 <- resample(raster_file, clc)
+  }
+  else {
+    r_v2 <- resample(raster_file, clc, method='ngb')
+  }
+
   
   if (missing(mask_CLC)==TRUE) {
     return(r_v2)

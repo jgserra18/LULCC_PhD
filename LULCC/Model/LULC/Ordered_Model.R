@@ -1,41 +1,43 @@
 source('./LULCC/Model/LULC/LULCC_modelling.R')
 
-order <- c(211,213,222,1,223,212,2,321,3,244,243,242,231,221,241,512)
-order <- c(212,223,243,221,222,321,231,213,512,211,242,1,3,244,241,2)
-order <- c(241,321,512,213,231,212,244,1,221,223,222,242,3,211,243,2)
-order <- c(222,244,512,212,223,242,243,3,211,231,221,241,1,213,321,2)
-order <- c(243,3,321,221,242,212,223,244,211,213,231,2,241,222,1,512)
-order <- c(243,1,242,2,241,321,3,244,221,222,211,213,223,231,212,512)
-
-rasterOptions(progress = 'window', maxmemory = 1e+15)
-nuts2_id <- c(18,15,16,11,17)
-
-param <- set_LULCC_params(admin = 'NUTS2', admin_id = 16, spatial_res = '500')
-glm_model <- compute_LULCC_models(params = param, model = 'glm')
-dmd <- compute_LULCC_demand(param = param)
-
-fom <- find_best_fom(unrestricted = T,admin = 'NUTS2',admin_id = 16, spatial_res = '500',model_lc = 'glm')
-order <- fom[[1]]
-
-ordered_model <- OrderedModel(obs=param[[2]],ef=param[[1]],models=glm_model,time=0:28, demand=dmd, 
-                              order=order)
-
-clues_model <- allocate(ordered_model, stochastic = F)
-clues.tabs <- ThreeMapComparison(x=clues_model,factors=2^(1:8),timestep=28)
-clues.agr <- AgreementBudget(clues.tabs)
-clues.fom <- FigureOfMerit(x=clues.tabs)
-
-r_fom <- round(clues.fom@overall[[1]], 3)
-max_fom <- round(fom[[2]], 3)
-
-if (r_fom != max_fom) {
-  print('======= FoM are different!')
-  print(paste0('FoM is ', r_fom, 'and max FoM is', max_fom))
-}  else {
-  print('====== FoMs match.')
-  print(paste0('FoM is ', r_fom, 'and max FoM is', max_fom))
+fnc <- function() {
+  
+  order <- c(211,213,222,1,223,212,2,321,3,244,243,242,231,221,241,512)
+  order <- c(212,223,243,221,222,321,231,213,512,211,242,1,3,244,241,2)
+  order <- c(241,321,512,213,231,212,244,1,221,223,222,242,3,211,243,2)
+  order <- c(222,244,512,212,223,242,243,3,211,231,221,241,1,213,321,2)
+  order <- c(243,3,321,221,242,212,223,244,211,213,231,2,241,222,1,512)
+  order <- c(243,1,242,2,241,321,3,244,221,222,211,213,223,231,212,512)
+  
+  rasterOptions(progress = 'window', maxmemory = 1e+15)
+  nuts2_id <- c(18,15,16,11,17)
+  
+  param <- set_LULCC_params(admin = 'NUTS2', admin_id = 16, spatial_res = '500')
+  glm_model <- compute_LULCC_models(params = param, model = 'glm')
+  dmd <- compute_LULCC_demand(param = param)
+  
+  fom <- find_best_fom(unrestricted = T,admin = 'NUTS2',admin_id = 16, spatial_res = '500',model_lc = 'glm')
+  order <- fom[[1]]
+  
+  ordered_model <- OrderedModel(obs=param[[2]],ef=param[[1]],models=glm_model,time=0:28, demand=dmd, 
+                                order=order)
+  
+  clues_model <- allocate(ordered_model, stochastic = F)
+  clues.tabs <- ThreeMapComparison(x=clues_model,factors=2^(1:8),timestep=28)
+  clues.agr <- AgreementBudget(clues.tabs)
+  clues.fom <- FigureOfMerit(x=clues.tabs)
+  
+  r_fom <- round(clues.fom@overall[[1]], 3)
+  max_fom <- round(fom[[2]], 3)
+  
+  if (r_fom != max_fom) {
+    print('======= FoM are different!')
+    print(paste0('FoM is ', r_fom, 'and max FoM is', max_fom))
+  }  else {
+    print('====== FoMs match.')
+    print(paste0('FoM is ', r_fom, 'and max FoM is', max_fom))
+  }
 }
-
 
 
 export_LULC_OrderHierarchy <- function(unrestricted, file, admin_reg, admin_id, model_lc, spatial_res) {
@@ -69,7 +71,7 @@ export_LULC_OrderHierarchy <- function(unrestricted, file, admin_reg, admin_id, 
   rm(list=c('order_path', 'file_name'))
 }
 
-fine_tune_orderedModel('NUTS2',16,'500',15,'glm')
+
 fine_tune_orderedModel <- function(admin, admin_id, spatial_res, iter, model_lc, param, rs = TRUE) {
   # fine tune LULC ordered model land use order
   # admin reg is the administrative unit (e.g., NUTS2, NVZ)
@@ -144,7 +146,7 @@ fine_tune_orderedModel <- function(admin, admin_id, spatial_res, iter, model_lc,
 }
 
 
-loop_fineTuning_NUTS2_ordered(spatial_res = '500', iter = 15, model_lc = 'rpart', rs = F)
+
 loop_fineTuning_NUTS2_ordered <- function(admin='NUTS2', spatial_res, iter, model_lc, rs = F) {
 
     
@@ -157,7 +159,7 @@ loop_fineTuning_NUTS2_ordered <- function(admin='NUTS2', spatial_res, iter, mode
 }
 
 
-func <- function(admin = 'NUTS2', spatial_res, model_lc) {
+compute_FomValidated_LULCC_NUTS2 <- function(admin = 'NUTS2', spatial_res, model_lc) {
   
   nuts2_id <- c(18,15,16,11,17)
   r_store <- list()
@@ -202,81 +204,49 @@ func <- function(admin = 'NUTS2', spatial_res, model_lc) {
     }
   }
 }
-func(admin = 'NUTS2', spatial_res = '500', model_lc = 'glm')
-
-nuts2_id <- c(18,15,16,11,17)
-r_list <- list()
-
-for (i in 1:length(nuts2_id)) {
-  
-
-  file_yr <- get_dir_files(module = 'LULCC', folder = 'Output', param_pattern = 'LULC', subfolder = 'NUTS2', subfolderX2 = nuts2_id[i], mainfolder = '500', file_pattern = '1999')
-  r_file <- raster(file_yr)
-  r_list <- append(r_file, r_list)
-}
-
-r_list$fun = sum
-r_list <- do.call(mosaic, r_list)
-plot(r_list)
-plot(d)
-st1 <- stack(st1)
-st2 <- stack(st2)
-st <- mosaic(st1,st2, fun=sum)
-plot(st[[1]])
-#r_store$fun <- sum
-#r_store <- do.call(mosaic, r_store)
-
-#r_store <- do.call(mosaic, r_store)
-
-d <- create_mainland_mosaic_NUTS2_ordered(spatial_res = '500', model_lc = 'glm')
 
 
-create_mainland_mosaic_NUTS2_ordered <- function(admin='NUTS2', spatial_res, model_lc) {
-  
+create_mainland_annual_NUTS2_raster_mosaic <- function(spatial_res, year) {
+  # creates a raster mosaic based on the annual LULC map for each NUTS2 region
   
   nuts2_id <- c(18,15,16,11,17)
-  #r_store <- list()
+  r_list <- list()
   
-  for (i in nuts2_id) {
+  for (i in 1:length(nuts2_id)) {
     
-    param <- set_LULCC_params(admin,i, spatial_res)
-    glm_model <- compute_LULCC_models(params = param, model = model_lc)
-    dmd <- compute_LULCC_demand(param = param)
-    rules <- get_LULCC_rules()
-    order_vars <- find_best_fom(unrestricted = TRUE, admin, i, spatial_res, model_lc)
-    order <- order_vars[[1]]
-    ordered_model <- OrderedModel(obs=param[[2]],ef=param[[1]],models=glm_model,time=0:28, demand=dmd,
-                                  order=order)
-    ordered_model <- allocate(ordered_model, stochastic = F)
-    clues_tabs <- ThreeMapComparison(x=ordered_model,factors=2^(1:8),timestep=28)
-    clues.fom <- FigureOfMerit(x=clues_tabs)
     
-    fom <- round(clues.fom@overall[[1]], 3)
-    max_fom <- round(order_vars[[2]], 3)
-    
-    if (fom != max_fom) {
-      print('======= FoM are different!')
-      print(paste0('FoM is ', fom, 'and max FoM is', max_fom))
-    }
-    
-    else {
-      print('====== FoMs match.')
-      print(paste0('FoM is ', fom, 'and max FoM is', max_fom))
-      
-      out_lulc <- ordered_model@output
-      names(out_lulc) <- paste0(i,'_',model_lc, '_LULC_', seq(1990,2018,1))
-      
-      # store
-      r_store <- append(r_store, out_lulc)
-    }
+    file_yr <- get_dir_files(module = 'LULCC', folder = 'Output', param_pattern = 'LULC', subfolder = 'NUTS2', subfolderX2 = nuts2_id[i], mainfolder = spatial_res, file_pattern = year)
+    r_file <- raster(file_yr)
+    r_list <- append(r_file, r_list)
   }
-  #r_store <- stack(r_store)
-  #r_store$fun <- sum
-  #r_store <- do.call(mosaic, r_store)
+  r_list$fun = sum
+  r_list <- do.call(mosaic, r_list)
+  clc_mask <- get_activity_data(module = 'LULCC', folder = 'CLC', pattern = '1990', subfolder = '500')
+  r_list <- mask(crop(r_list, extent(clc_mask)), clc_mask)
   
-  return(r_store)
-  rm(list=c('param','glm_model','ordered_model','clues_tabs','clues.fom'))
+  return(r_list)
+  rm(list=c('file_yr','r_file','clc_mask'))
 }
+
+loop_mainland_NUTS2_raster_mosaic <- function(spatial_res, mosaic = FALSE) {
+  
+  
+  yr <- as.character(seq(1990,2018))
+  
+  if (mosaic == TRUE) { r_list <- list() }
+
+  for (i in yr) {
+    
+    lulc_yr <- create_mainland_annual_NUTS2_raster_mosaic(spatial_res = spatial_res, year = i)
+    export_file(module = 'LULCC', file = lulc_yr, folder = 'LULC', filename = paste0('Mainland_glm_', i), 
+                subfolder = 'PT', subfolderX2 = spatial_res)
+    if (mosaic == TRUE) { r_list <- append(lulc_yr, r_list) }
+  }
+  
+  if (mosaic == TRUE) { return(r_list)}
+}
+
+
 
 
 
@@ -288,8 +258,6 @@ loop_fineTuning_Ordered <- function(admin, admin_id, iter, model_lc, param) {
     fine_tune_orderedModel(admin = admin, admin_id = admin_id, spatial_res = i, iter = iter, model_lc = model_lc, param = param)
   }
 }
-fine_tune_orderedModel(admin='PT',spatial_res = '1000', iter = 25, model_lc = 'glm')
-
 
 
 find_best_fom <- function(unrestricted, admin='PT', admin_id, spatial_res, model_lc) {
@@ -372,4 +340,3 @@ compute_annualOrdered_LULC <- function(admin='PT', admin_id, spatial_res, model_
   }
 }
 
-compute_annualOrdered_LULC('NVZ','Tejo','200', 'glm', T)

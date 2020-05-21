@@ -86,7 +86,6 @@ compute_crop_DM_production <- function(main_param, param) {
   rm(list=c('FRAC_DM','areas','yields','yrs'))
 }
 
-
 ## COMPUTE NUTRIENT OFFTAKE OF DRY MATTER PRODUCTION ---------------------------------------------------------------------------
 
 convert_offtake_P2O5_to_P <- function() {
@@ -99,7 +98,6 @@ convert_offtake_P2O5_to_P <- function() {
   return(P_offtake)
   rm(list='P2O5_offtake')
 }
-
 
 compute_nutrient_offtake <- function(main_param, param, nutrient) {
   # calculates the nutrient offtake of a given crop
@@ -136,7 +134,6 @@ compute_nutrient_offtake <- function(main_param, param, nutrient) {
 }
 
 
-
 compute_all_crop_nutrient_offtake <- function(nutrient) {
   # computes nutrient offtake for each crop for the specified nutrient (P,C,N)
   # unit: kg nutrient yr-1
@@ -152,10 +149,8 @@ compute_all_crop_nutrient_offtake <- function(nutrient) {
     main_param <- standard_params[i, main_param_col]
     param <- standard_params[i, param_col]
     
-    if (main_param == 'Pastures' | main_param == 'Forage') {
-      next
-    }
-    else {
+    if (main_param != 'Pastures' & main_param != 'Forage') {
+      
       param_interpol <- compute_nutrient_offtake(main_param, param, nutrient)
       export_file(module = 'Nutrients', 
                   file = param_interpol, 
@@ -164,19 +159,10 @@ compute_all_crop_nutrient_offtake <- function(nutrient) {
                   subfolder = nutrient, 
                   subfolderX2 = main_param)
     }
+
   }
   rm(list=c('standard_params','param_col','main_param_col','param_interpol'))
 }
-
-
-
-
-loop_nutrient_offtake <- function() {
-  
-  nutrient <- c('C','N','P')
-  sapply(nutrient, compute_all_crop_nutrient_offtake)
-}
-
 
 
 compute_total_nutrient_offtake('N')
@@ -209,3 +195,11 @@ compute_total_nutrient_offtake <- function(nutrient) {
               subfolder = nutrient, 
               subfolderX2 = 'Total')
 }
+
+loop_nutrient_offtake <- function() {
+  
+  nutrient <- c('N','P','C')
+  sapply(nutrient, compute_all_crop_nutrient_offtake)
+}
+
+

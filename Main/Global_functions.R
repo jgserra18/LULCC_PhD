@@ -92,7 +92,7 @@ get_mainfolder_sub <- function(module, main_folder, pattern) {
   }
 }
 
-get_activity_data <- function(module, folder, pattern, subfolder, mainfolder, subfolderX2, subfolderX3, subfolderX4) {
+get_activity_data <- function(module, folder, pattern, subfolder, mainfolder, subfolderX2, subfolderX3, subfolderX4, subfolderX5) {
   # gets the path of a given file within folders/subfolders of activity data
   # this can also be used to get output data
   
@@ -127,11 +127,21 @@ get_activity_data <- function(module, folder, pattern, subfolder, mainfolder, su
     sel_file <- list.files(path = sel_subfolder, pattern = pattern, full.names = T)
     r_file <- identify_read_fileclass(sel_file)
   } 
+  else if (missing(subfolderX5)==TRUE) {
+
+    sel_subfolder <- list.files(path = act_data, pattern = subfolder, full.names = TRUE)
+    sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX2, full.names = TRUE)
+    sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX3, full.names = TRUE)
+    sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX4, full.names = TRUE)
+    sel_file <- list.files(path = sel_subfolder, pattern = pattern, full.names = T)
+    r_file <- identify_read_fileclass(sel_file)
+  }
   else {
     sel_subfolder <- list.files(path = act_data, pattern = subfolder, full.names = TRUE)
     sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX2, full.names = TRUE)
     sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX3, full.names = TRUE)
     sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX4, full.names = TRUE)
+    sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX5, full.names = TRUE)
     sel_file <- list.files(path = sel_subfolder, pattern = pattern, full.names = T)
     r_file <- identify_read_fileclass(sel_file)
   }
@@ -275,19 +285,39 @@ create_activityData_folders <- function(module, folder, subfolder, subfolderX2, 
   return(file_path)
 }
 
-export_file <- function(module, file, folder, filename, subfolder, subfolderX2, subfolderX3, subfolderX4) {
+export_file <- function(module, file, folder, filename, subfolder, subfolderX2, subfolderX3, subfolderX4, subfolderX5, subfolderX6) {
   ## NOTE: CURRENTLY ONLY APPLIED TO RASTERS, STACKS/BRICKS AND DATAFRAMES
   
   if (folder=='Activity_data') {
     file_path <- create_activityData_folders(module, folder, subfolder, subfolderX2)
     
-    if (missing(subfolderX3)==FALSE & missing(subfolderX4)==TRUE) {
+    if (missing(subfolderX3)==FALSE & missing(subfolderX4)==TRUE & missing(subfolderX5)==TRUE & missing(subfolderX6)==TRUE) {
       
       file_path <- file.path(file_path, subfolderX3)
       dir.create(file_path)
     }
-    else if (missing(subfolderX3)==TRUE & missing(subfolderX4)==TRUE) {
-      next 
+    else if (missing(subfolderX3)==TRUE & missing(subfolderX4)==TRUE & missing(subfolderX5)==TRUE & missing(subfolderX6)==TRUE) {
+
+      print('Awkward') 
+    }
+    else if (missing(subfolderX3)==FALSE & missing(subfolderX4)==FALSE & missing(subfolderX5)==TRUE & missing(subfolderX6)==TRUE) {
+
+      file_path <- file.path(file_path, subfolderX3)
+      dir.create(file_path)
+      
+      file_path <- file.path(file_path, subfolderX4)
+      dir.create(file_path)
+    }
+    else if (missing(subfolderX3)==FALSE & missing(subfolderX4)==FALSE & missing(subfolderX5)==FALSE &  missing(subfolderX6)==TRUE) {
+
+      file_path <- file.path(file_path, subfolderX3)
+      dir.create(file_path)
+      
+      file_path <- file.path(file_path, subfolderX4)
+      dir.create(file_path)
+
+      file_path <- file.path(file_path, subfolderX5)
+      dir.create(file_path)
     }
     else {
       
@@ -296,28 +326,51 @@ export_file <- function(module, file, folder, filename, subfolder, subfolderX2, 
       
       file_path <- file.path(file_path, subfolderX4)
       dir.create(file_path)
-      
+
+      file_path <- file.path(file_path, subfolderX5)
+      dir.create(file_path)
+
+      file_path <- file.path(file_path, subfolderX6)
+      dir.create(file_path)
     }
+
     file_path <- file.path(file_path, filename)
   }
+
   else {
+
     file_path <- create_output_folders(module, folder, subfolder, subfolderX2)
     
-    if (missing(subfolderX3)==FALSE  & missing(subfolderX4)==TRUE) {
+    if (missing(subfolderX3)==FALSE & missing(subfolderX4)==TRUE & missing(subfolderX5)==TRUE) {
       
       file_path <- file.path(file_path, subfolderX3)
       dir.create(file_path)
     }
-    else if (missing(subfolderX3)==TRUE & missing(subfolderX4)==TRUE) {
-       
+    else if (missing(subfolderX3)==TRUE & missing(subfolderX4)==TRUE & missing(subfolderX5)==TRUE) {
+
+      print('Awkward') 
     }
+    else if (missing(subfolderX3)==FALSE & missing(subfolderX4)==FALSE & missing(subfolderX5)==TRUE) {
+
+      file_path <- file.path(file_path, subfolderX3)
+      dir.create(file_path)
+      
+      file_path <- file.path(file_path, subfolderX4)
+      dir.create(file_path)
+    }
+
     else {
       
       file_path <- file.path(file_path, subfolderX3)
       dir.create(file_path)
+      
       file_path <- file.path(file_path, subfolderX4)
       dir.create(file_path)
+
+      file_path <- file.path(file_path, subfolderX5)
+      dir.create(file_path)
     }
+
     file_path <- file.path(file_path, filename)
   }
 

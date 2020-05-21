@@ -1,9 +1,9 @@
 main_crop,crop,Avg_offtake,source,Assumption
-Cereals,Barley,17.91,"CdBPA, 2018",
+Cereals,Barley,18,"CdBPA, 2018",
 Cereals,Rainfed_maize,27.68,"CdBPA, 2018",
 Cereals,Irrigated_maize,27.68,"CdBPA, 2018",
-Cereals,Oat,23.2,"CdBPA, 2018",
-Cereals,Rice,12.29,"CdBPA, 2018",
+Cereals,Oat,23,"CdBPA, 2018",
+Cereals,Rice,12.25,"CdBPA, 2018",
 Cereals,Rye,33,"CdBPA, 2018",
 Cereals,Triticale,19.25,"CdBPA, 2018",rye
 Cereals,Wheat,20.64,"CdBPA, 2018",

@@ -1,6 +1,8 @@
-NUTS2_ID,NUTS2,intensive_pasture
-11,Norte,0
-16,Centro,0
-17,AML,0
-18,Alentejo,0
-15,Algarve,0
+agrarian_region_id,agrarian_region,Intensive_pasture
+Entre Douro e Minho,1,0
+Trás-os-Montes,2,0
+Beira Litoral,3,0
+Beira Interior,4,0
+Ribatejo e Oeste,5,0
+Alentejo,6,0
+Algarve,7,0

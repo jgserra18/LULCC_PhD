@@ -291,11 +291,6 @@ compute_vegetables_residues_left <- function(main_param = 'Horticulture', param,
   return(residues_vegN)
 }
 
-main_param = 'Potato'
-param = 'Rainfed_potato'
-residue_practice = 'Left'
-nutrient = 'N'
-
 general_funct_crop_residues_nutrient <- function(main_param, param, residue_practice, nutrient) {
   # general function that is able to compute crop residues N, either left or removed from the field
   # general function to be later implemented according to residue practice
@@ -380,9 +375,8 @@ compute_crop_residues_nutrient <- function(nutrient) {
 loop_crop_residues_left_removed <- function() {
   
   nutrients <- c('N','P')
-  sapply(nutrients, compute_crop_residues_nutrient(x))
+  sapply(nutrients, function(x) compute_crop_residues_nutrient(x))
 }
-
 
 
 ## CROP RESIDUES BURNT IN SITU-------------------------------------------------------
@@ -483,6 +477,7 @@ compute_cereals_burnt_residues_N <- function(main_param = 'Cereals', param) {
   rm(list=c('crop_area', 'R_AG', 'N_AG'))
 }
 
+
 compute_all_crop_residues_burnt_N <- function() {
   
   main_crops <- c('Cereals','Vineyard', 'Olive_grove','Citrus','Dried_fruits','Fresh_fruits')
@@ -548,7 +543,6 @@ compute_total_crop_residues <- function(nutrient) {
         
         store_main_param[, yrs] <- sapply(yrs, function(x) round( store_main_param[, x] + res_param[,x], 1))
         store_manag[, yrs] <- sapply(yrs, function(x) round( store_manag[, x] + res_param[,x], 1))
-        print(store_main_param)
       }
       # export main param
       export_file(module = 'Nutrients', 
@@ -570,10 +564,11 @@ compute_total_crop_residues <- function(nutrient) {
   }
 }
 
+
 loop_total_crop_residues <- function() {
   
   nutrients <- c('N','P')
-  sapply(nutrients, compute_total_crop_residues(x))
+  sapply(nutrients, function(x) compute_total_crop_residues(x))
 }
 
 
