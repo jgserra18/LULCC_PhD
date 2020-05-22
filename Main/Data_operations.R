@@ -3,6 +3,7 @@ source('./Main/Global_functions.R')
 
 ## linear extrapolation ---------------------------------- 
 
+# needs to be corrected
 general_linear_extrapolation_3years <- function(file_df, existing_years, xout=c(seq(1987,1989), seq(1991,1998), seq(2000,2008), seq(2010,2017))) {
   
   new_file <- file_df[, -c(1,2)]

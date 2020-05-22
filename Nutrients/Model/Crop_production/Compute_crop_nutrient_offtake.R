@@ -165,7 +165,7 @@ compute_all_crop_nutrient_offtake <- function(nutrient) {
 }
 
 
-compute_total_nutrient_offtake('N')
+
 compute_total_nutrient_offtake <- function(nutrient) {
   
   yrs <- paste0('X', seq(1987,2017))
