@@ -20,7 +20,7 @@ linearly_interpolate_sludge_biomass_municipality <- function(existing_years = se
   store[, calc_cols] <- sapply(calc_cols, function(x) store[,] <- NA)
   
   populate_cols <- paste0('X', seq(2006,2017))
-  store[, populate_cols] <- sapply(populate_cols, function(x) store[,x] <- file_df[,x])
+  store[, populate_cols] <- sapply(populate_cols, function(x) store[,x] <- sludge_muni[,x])
   
   for (i in 1:nrow(new_file)) {
     
@@ -164,6 +164,7 @@ compute_arable_land_sludge_FRAC_UAA = function(urban_area) {
 distribute_sludge_lisbon_porto <- function(nutrient, urban_area) {
   # algorithm: distributes the sludge produced in Porto and Lisbon municipalities over the respective NUTS3 region
   # the sludge is distributed according to the fraction of the potential area (arable land - horticultural and industrial crops) comparing to the UAA of the NUTS3
+  # updates the amounts of sludge per municipality
   # unit: tonnes nutrient yr-1
   
   if (urban_area == 'Lisbon') { muni_id = '1106' } else { muni_id = '1312' }
@@ -175,52 +176,77 @@ distribute_sludge_lisbon_porto <- function(nutrient, urban_area) {
   # potential application area fraction and subset it to the respective urban area
   FRAC_Parea = compute_arable_land_sludge_FRAC_UAA(urban_area)
   
+  # computes the total amounts of sludge to be distributed ----------------------------------------
+  add_city_sludge = city_sludge
   yrs <- paste0('X', seq(1987,2017))
-  FRAC_Parea[, yrs] <- sapply(yrs, function(x) round(FRAC_Parea[, x] * city_sludge[, x], 2))
+  add_city_sludge[, yrs] <- sapply(yrs, function(x) round(FRAC_Parea[, x] * add_city_sludge[, x], 2))
   
-  return(FRAC_Parea)
+  # computes the updated amounts of sludge pr municipality ----------------------------------------
+  city_sludge[, yrs] <- sapply(yrs, function(x) round(add_city_sludge[, x] + city_sludge[, x], 1))
+
+  return(city_sludge)
 }
 
 
-compute_distributed_sludge_nutrient_content <- function(nutrient) {
+
+compute_updated_distributed_sludge_nutrient_content <- function(nutrient) {
+  # distributes the urban sludge to their respective NUTS3 region
+  # updates municipality rates to the whole country
+  # unit: tonnes nutrient yr-1
   
+  
+  # creates a dataframe with the updated amounts of sludge in the big main urban areas in Portugal 
   AML_sludge = distribute_sludge_lisbon_porto(nutrient, 'Lisbon')
   AMP_sludge = distribute_sludge_lisbon_porto(nutrient, 'Porto')
   urban_sludge = rbind(AML_sludge, AMP_sludge)
   urban_ids = urban_sludge[, 1]
   
+  # calls the old amounts of sluge
   muni_sludge = compute_sludge_P_N_C_content(nutrient)
+  
+  # updates the new sludge --------------------------------------------- 
+  yrs <- paste0('X', seq(1987,2017))
   
   for (i in 1:length(urban_ids)) {
     
-    row = which(muni_sludge[,1] == as.character(urban_ids[i]))
-    muni_sludge[row, ] = urban_sludge[i, ]
+    row = which(muni_sludge[, 1] == as.integer(urban_ids[i]))
+    
+    for (j in yrs) {
+      
+      muni_sludge[row, j] <- urban_sludge[i, j]
+    }
   }
+  
   return(muni_sludge)
+  rm(list=c('AML_sludge','AMP_sludge','urban_sludge','urban_ids','yrs'))
 }
-
-d <- compute_distributed_sludge_nutrient_content('N')
-d
 
 
 
 
 loop_sludge_nutrient_content <- function() {
+  # unit: kg nutrient yr-1 
   
   nutrient = c('N','P','C')
   
   for (i in nutrient) {
     
-    sludge_nutrient = compute_sludge_P_N_C_content(i)
+    sludge_nutrient = compute_updated_distributed_sludge_nutrient_content(i)
+    
+    yrs <- paste0('X', seq(1987,2017))
+    sludge_nutrient[, yrs] <- sapply(yrs, function(x) round(sludge_nutrient[, x] * 1000, 1))
+    
     export_file(module = 'Nutrients', 
                 file = sludge_nutrient, 
                 filename = 'Total_sum', 
                 folder = 'Fertilisation', 
-                subfolder = nutrient, 
+                subfolder = i, 
                 subfolderX2 = 'Biosolids', 
                 subfolderX3 = 'Total')
   }
 }
 
 
-loop_sludge_nutrient_content()
+
+
+

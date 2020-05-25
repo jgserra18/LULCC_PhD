@@ -1,7 +1,60 @@
 source('./Nutrients/Model/MMS/Gross_manure/Compute_Nutrient_excretion.R')
 
 
-compute_manure_type_total_flows('Gross_manure','N','Transported_IntraMunicipality','Slurry')
+## TOTALS PER ANIMAL CATEGORY ---------------------------------------------------------------------------------------------------- 
+
+
+compute_totals_per_animalParam = function(main_param, main_folder, nutrient, pathway, manure_type) {
+  # calculates the totals for a given main_param
+  
+  
+  # find animal params 
+  standard_params <- get_standard_params_list(main_param = 'Animals')
+  animal_rows <- which(standard_params[, 'Main_animals'] == main_param)
+  params <- standard_params[animal_rows, 'Animals']
+  
+  # prepare dataframe for calculations
+  # prepare dataframe to store all gross manure spreading
+  yrs <- paste0('X', seq(1987,2017))
+  store <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  store[, yrs] <- sapply(yrs, function(x) store[,x] <- 0)
+  
+  for (animal in params) {
+    
+    param_flow = get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = main_folder, subfolder = nutrient, subfolderX2 = pathway, subfolderX3 = manure_type, subfolderX4 = main_param, pattern = animal)
+    store[, yrs] = sapply(yrs, function(x) round(store[,x] + param_flow[,x], 1))
+  }
+  export_file(module = 'Nutrients', 
+              file = store, 
+              filename = main_param, 
+              folder = main_folder, 
+              subfolder = nutrient,
+              subfolderX2 = pathway, 
+              subfolderX3 = manure_type,
+              subfolderX4 = 'Total')
+  rm(list=c('store','param_flow'))
+}
+
+
+loop_totals_per_animalParam = function(main_folder, nutrient, pathway) {
+  
+  
+  man_type = c('Solid','Slurry')
+  standard_params <- get_standard_params_list(main_param = 'Animals')
+  main_params <- unique(standard_params$Main_animals)
+  
+  for (i in man_type) {
+    
+    
+    for (j in main_params) {
+      
+      compute_totals_per_animalParam(main_param = j, main_folder = main_folder, nutrient, pathway, i)
+    }
+  }
+}
+
+
+
 compute_manure_type_total_flows <- function(main_folder, nutrient, pathway, manure_type) {
   
   standard_params <- get_standard_params_list(main_param = 'Animals')

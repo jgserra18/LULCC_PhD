@@ -355,3 +355,5 @@ compute_all_total_storage_emissions <- function() {
     }
   }
 }
+
+// bovine have slurry and shouldn't have'

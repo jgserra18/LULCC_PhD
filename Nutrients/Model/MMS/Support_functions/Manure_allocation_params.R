@@ -63,8 +63,17 @@ get_historical_scenario_annual_rate <- function(Manure_frac, year) {
 
 
 
-// what about biogas ?? 
-// what will happen if in the future the share of biogas gets bigger? Apply EMEP algorithm and assess emissions
+#* // what about biogas ?? 
+#* // what will happen if in the future the share of biogas gets bigger? Apply EMEP algorithm and assess emissions
+
+
+manure_spreading_allocation_FRAC <- function(manure_allocation) {
+  # manure_allocation == 'Fertiliser' | 'River_discharge' | 'Transport'
+  
+  FRAC_allocation <- get_activity_data(module = 'Nutrients', subfolder = 'General_params', subfolderX2 = 'Animals', subfolderX3 = 'Manure_allocation', pattern = manure_allocation)
+  return(FRAC_allocation)
+}
+
 
 construct_historical_FRAC_spreading_scenario <- function() {
   
@@ -110,7 +119,4 @@ construct_historical_FRAC_spreading_scenario <- function() {
   
   return(df)
 }
-d = construct_historical_FRAC_spreading_scenario()
-View(d)
-correct_ids <- which(d>1, arr.ind = TRUE)
 

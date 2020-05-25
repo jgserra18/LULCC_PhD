@@ -285,12 +285,16 @@ create_activityData_folders <- function(module, folder, subfolder, subfolderX2, 
   return(file_path)
 }
 
+
+
+
 export_file <- function(module, file, folder, filename, subfolder, subfolderX2, subfolderX3, subfolderX4, subfolderX5, subfolderX6) {
   ## NOTE: CURRENTLY ONLY APPLIED TO RASTERS, STACKS/BRICKS AND DATAFRAMES
   
-  if (folder=='Activity_data') {
-    file_path <- create_activityData_folders(module, folder, subfolder, subfolderX2)
-    
+  ifelse(folder=='Activity_data',
+    file_path <- create_activityData_folders(module, folder, subfolder, subfolderX2), 
+    file_path <- create_output_folders(module, folder, subfolder, subfolderX2) )
+  
     if (missing(subfolderX3)==FALSE & missing(subfolderX4)==TRUE & missing(subfolderX5)==TRUE & missing(subfolderX6)==TRUE) {
       
       file_path <- file.path(file_path, subfolderX3)
@@ -334,45 +338,7 @@ export_file <- function(module, file, folder, filename, subfolder, subfolderX2, 
       dir.create(file_path)
     }
 
-    file_path <- file.path(file_path, filename)
-  }
-
-  else {
-
-    file_path <- create_output_folders(module, folder, subfolder, subfolderX2)
-    
-    if (missing(subfolderX3)==FALSE & missing(subfolderX4)==TRUE & missing(subfolderX5)==TRUE) {
-      
-      file_path <- file.path(file_path, subfolderX3)
-      dir.create(file_path)
-    }
-    else if (missing(subfolderX3)==TRUE & missing(subfolderX4)==TRUE & missing(subfolderX5)==TRUE) {
-
-      print('Awkward') 
-    }
-    else if (missing(subfolderX3)==FALSE & missing(subfolderX4)==FALSE & missing(subfolderX5)==TRUE) {
-
-      file_path <- file.path(file_path, subfolderX3)
-      dir.create(file_path)
-      
-      file_path <- file.path(file_path, subfolderX4)
-      dir.create(file_path)
-    }
-
-    else {
-      
-      file_path <- file.path(file_path, subfolderX3)
-      dir.create(file_path)
-      
-      file_path <- file.path(file_path, subfolderX4)
-      dir.create(file_path)
-
-      file_path <- file.path(file_path, subfolderX5)
-      dir.create(file_path)
-    }
-
-    file_path <- file.path(file_path, filename)
-  }
+  file_path <- file.path(file_path, filename)
 
   print(paste0('======= Exporting ', filename))
   
@@ -399,6 +365,9 @@ export_file <- function(module, file, folder, filename, subfolder, subfolderX2, 
     write_sf(file, file_path)
   }
 }
+
+
+
 
 
 ## DATA CLEANING ----------------------------------------------------------------------------------------
