@@ -45,5 +45,4 @@ compute_crop_totals_mainland <- function(main_folder, nutrient, pathway) {
               subfolderX3 = 'Total')
 }
 
-nutrient_flows <- get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Fertilisation', subfolder = 'N', subfolderX2 = 'Crop_requirements',  subfolderX3 = 'Cereals', pattern = 'Wheat')
-compute_crop_totals_mainland('Fertilisation','N', 'Crop_requirements')
+
