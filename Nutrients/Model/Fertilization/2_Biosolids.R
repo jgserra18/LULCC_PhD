@@ -1,5 +1,8 @@
 source('./Main/Global_functions.R')
 
+
+
+
 # LINEARLY INTERPOLATED SLUDGE BIOMASS DATA --------------------------------------------------------------------------------------------------- 
 
 linearly_interpolate_sludge_biomass_municipality <- function(existing_years = seq(2006,2017), xout = seq(1987,2005)) {
@@ -131,7 +134,7 @@ compute_arable_land_sludge_application <- function() {
     main_param <- standard_params[i, 'Main_crop']
     param <- standard_params[i, 'Crop']
     
-    if (main_param == 'Horticulture' | main_param == 'Industry_crops') {
+    if (main_param == 'Horticulture' | main_param == 'Industry_crops' | param == 'Extensive_pasture') {
       break
     }
     else {
@@ -160,7 +163,6 @@ compute_arable_land_sludge_FRAC_UAA = function(urban_area) {
 }
 
 
-
 distribute_sludge_lisbon_porto <- function(nutrient, urban_area) {
   # algorithm: distributes the sludge produced in Porto and Lisbon municipalities over the respective NUTS3 region
   # the sludge is distributed according to the fraction of the potential area (arable land - horticultural and industrial crops) comparing to the UAA of the NUTS3
@@ -179,14 +181,15 @@ distribute_sludge_lisbon_porto <- function(nutrient, urban_area) {
   # computes the total amounts of sludge to be distributed ----------------------------------------
   add_city_sludge = city_sludge
   yrs <- paste0('X', seq(1987,2017))
-  add_city_sludge[, yrs] <- sapply(yrs, function(x) round(FRAC_Parea[, x] * add_city_sludge[, x], 2))
+  FRAC_Parea[, yrs] <- sapply(yrs, function(x) round(FRAC_Parea[, x] * add_city_sludge[, x], 2))
   
+  //something wrong here
+  // totals dont add up
   # computes the updated amounts of sludge pr municipality ----------------------------------------
-  city_sludge[, yrs] <- sapply(yrs, function(x) round(add_city_sludge[, x] + city_sludge[, x], 1))
+  #city_sludge[, yrs] <- sapply(yrs, function(x) round(FRAC_Parea[, x] + city_sludge[, x], 1))
 
-  return(city_sludge)
+  return(FRAC_Parea)
 }
-
 
 
 compute_updated_distributed_sludge_nutrient_content <- function(nutrient) {
@@ -223,7 +226,7 @@ compute_updated_distributed_sludge_nutrient_content <- function(nutrient) {
 
 
 
-
+loop_sludge_nutrient_content()
 loop_sludge_nutrient_content <- function() {
   # unit: kg nutrient yr-1 
   

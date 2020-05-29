@@ -34,8 +34,7 @@ compute_totals_per_animalParam = function(main_param, main_folder, nutrient, pat
               subfolderX4 = 'Total')
   rm(list=c('store','param_flow'))
 }
-
-
+loop_totals_per_animalParam('Gross_manure','N', 'Gross_spreading')
 loop_totals_per_animalParam = function(main_folder, nutrient, pathway) {
   
   

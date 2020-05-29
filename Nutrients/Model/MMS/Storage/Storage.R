@@ -60,23 +60,22 @@ compute_solid_N_entering_storage <- function(main_param, param, manure_type = 'S
 ## COMPUTE N/TAN IN STORAGE (SOLID SYSTEMS) -------------------------------------------------------
 
 
-set_manure_storage_fraction <- function(main_param, manure_type) {
+set_manure_storage_fraction <- function(param, manure_type) {
   # note: these may have to be worked on
   
-  X_store_solid <- data.frame(Main_animal = c('Bovine','Equides','Goats','Pigs','Poultry','Rabbits','Sheep'),
-                              X_store_solid = c(0.8, 0.7, 0.7, 0.7, 0.7, 0.8, 0.8))
-  X_store_slurry <- data.frame(Main_animal = c('Bovine','Equides','Goats','Pigs','Poultry','Rabbits','Sheep'),
-                              X_store_solid = c(0.5,0,0,0.5,0.5,0,0))
+  
+  X_store = get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Animals', subfolderX2 = 'Store_MMS', pattern = manure_type)
   
   if (manure_type == 'Solid') {
     
-    X_store_solid <- subset(X_store_solid, Main_animal == main_param)[, 2]
-    return(X_store_solid)
+    
+    X_store <- subset(X_store, Animals == param)[, 'X_store']
+    return(X_store)
   }
   else {
     
-    X_store_slurry <- subset(X_store_slurry, Main_animal == main_param)[, 2]
-    return(X_store_slurry)
+    X_store <- subset(X_store, Animals == param)[, 'X_store']
+    return(X_store)
   }
 }
 
@@ -86,7 +85,7 @@ compute_solid_TAN_storage <- function(main_param, param, manure_type = 'Solid', 
   TAN_solid_entering  <- compute_solid_TAN_entering_storage(main_param, param, manure_type)
   
   # X_STORE_SOLID
-  X_store_solid <- set_manure_storage_fraction(main_param = main_param, manure_type = manure_type)
+  X_store_solid <- set_manure_storage_fraction(param = param, manure_type = manure_type)
   
   # calculation
   yrs <- paste0('X', seq(1987,2017))
@@ -109,7 +108,7 @@ compute_solid_N_storage <- function(main_param, param, manure_type = 'Solid', ma
   N_solid_entering  <- compute_solid_N_entering_storage(main_param, param, manure_type)
   
   # X_STORE_SOLID
-  X_store_solid <- set_manure_storage_fraction(main_param = main_param, manure_type = manure_type)
+  X_store_solid <- set_manure_storage_fraction(param = param, manure_type = manure_type)
   
   
   # calculation
@@ -149,7 +148,7 @@ compute_slurry_TAN_storage <- function(main_param, param, manure_type = 'Slurry'
   yard_NH3 <- get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gas_N_emissions', subfolder = 'NH3', subfolderX2 = 'Yards', subfolderX3 = 'Total', subfolderX4 = main_param, pattern = param)
   
   # X_STORE_SLURRY
-  X_store_slurry <- set_manure_storage_fraction(main_param = main_param, manure_type = manure_type)
+  X_store_slurry <- set_manure_storage_fraction(param = param, manure_type = manure_type)
   
   # calculation
   yrs <- paste0('X', seq(1987,2017))
@@ -184,7 +183,7 @@ compute_slurry_N_storage <- function(main_param, param, manure_type = 'Slurry', 
   yard_NH3 <- get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gas_N_emissions', subfolder = 'NH3', subfolderX2 = 'Yards', subfolderX3 = 'Total', subfolderX4 = main_param, pattern = param)
   
   # X_STORE_SLURRY
-  X_store_slurry <- set_manure_storage_fraction(main_param = main_param, manure_type = manure_type)
+  X_store_slurry <- set_manure_storage_fraction(param = param, manure_type = manure_type)
   
   # calculation
   yrs <- paste0('X', seq(1987,2017))
@@ -355,5 +354,3 @@ compute_all_total_storage_emissions <- function() {
     }
   }
 }
-
-// bovine have slurry and shouldn't have'

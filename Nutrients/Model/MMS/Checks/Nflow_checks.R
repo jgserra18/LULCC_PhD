@@ -78,6 +78,7 @@ Nflow_check1 <- function(main_param, param) {
   
   return(check)
 }
+loop_param_checker(Nflow_check1)
 
 
 ## CHECK 2 -----------------------------
@@ -101,6 +102,7 @@ Nflow_check2 <- function(main_param, param) {
   
   return(check)
 }
+loop_param_checker(Nflow_check2)
 
 ## CHECK 3 + 4---------------------------------
 
@@ -124,15 +126,16 @@ Nflow_check3 <- function(main_param, param) {
   
   return(check_TAN)
 }
+loop_param_checker(Nflow_check3)
+
+
 
 ## CHECK 4 ---------------------------------
 
 Nflow_check4 <- function(main_param, param) {
   
   house_slurryN <-  get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = 'N', subfolderX2 = 'Housing', subfolderX3 ='Slurry', subfolderX4 = main_param, pattern = param)
-
   house_solidN <-  get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = 'N', subfolderX2 = 'Housing', subfolderX3 ='Solid', subfolderX4 = main_param, pattern = param)
-
   house_totalN <-  get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = 'N', subfolderX2 = 'Housing', subfolderX3 ='Total', subfolderX4 = main_param, pattern = param)
 
   check_N <- house_totalN
@@ -142,6 +145,7 @@ Nflow_check4 <- function(main_param, param) {
   
   return(check_N)
 }
+loop_param_checker(Nflow_check4)
 
 ## CHECK 5 ----------------------------------------
 
@@ -167,9 +171,12 @@ Nflow_check5 <- function(main_param, param) {
   
   return(check)
 }
-loop_param_checker(Nflow_check6)
+loop_param_checker(Nflow_check5)
+
 
 ## CHECK 6 -----------------------------------------
+
+source('./Nutrients/Model/MMS/Spreading/Spreading.R')
 
 Nflow_check6 <- function(main_param, param) {
   
@@ -184,7 +191,7 @@ Nflow_check6 <- function(main_param, param) {
   yard_NH3 <- compute_yards_NH3_emissions(main_param, param, 'Slurry')
   house_slurry_NH3 <- compute_housing_NH3_emissions(main_param, param, 'Slurry')
   
-  X_store_slurry <-  set_manure_storage_fraction(main_param = main_param, manure_type = 'Slurry')
+  X_store_slurry <-  set_manure_storage_fraction(param = param, manure_type = 'Slurry')
   
   
   storage_slurry_NH3 <- general_func_compute_storage_Nemissions(N_gas = 'NH3', main_param = main_param, param = param, manure_type = 'Slurry')
@@ -204,6 +211,7 @@ Nflow_check6 <- function(main_param, param) {
   return(check)
   rm(list=c('slurry_TAN_storage','yardN','yardTAN','house_slurryN','house_slurryTAN','yard_NH3','house_slurry_NH3','FRAC_MMS_slurry','storage_slurry_NH3','storage_slurry_N2O','storage_slurry_NOx','storage_slurry_NN2','E_storage'))
 }
+loop_param_checker(Nflow_check6)
 
 ## CHECK 7 -----------------------------------------
 
@@ -226,6 +234,8 @@ Nflow_check7 <- function(main_param, param) {
   
   return(check)
 }
+loop_param_checker(Nflow_check7)
+
 
 ## CHECK 8 -----------------------------------------
 
@@ -245,6 +255,7 @@ Nflow_check8 <- function(main_param, param) {
   
   return(check)
 }
+loop_param_checker(Nflow_check8)
 
 ## CHECK 9 -----------------------------------------
 
@@ -253,7 +264,7 @@ Nflow_check9 <- function(main_param, param) {
   house_solidN <-  get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = 'N', subfolderX2 = 'Housing', subfolderX3 ='Solid', subfolderX4 = main_param, pattern = param)
   N_bedding <- general_func_animal_bedding(main_param, param, bedding_param = 'N_bedding')
   E_house <- compute_housing_NH3_emissions(main_param, param, manure_type = 'Solid')
-  X_store_solid <-  set_manure_storage_fraction(main_param = main_param, manure_type = 'Solid')
+  X_store_solid <-  set_manure_storage_fraction(param = param, manure_type = 'Solid')
   E_storage <- general_func_compute_total_storage_emissions(main_param, param, 'Solid')
   E_app <- compute_manure_spreading_NH3_emissions(main_param, param, 'Solid')
   net_solid_spread <- compute_manure_spreading_net_N(N_flow = 'N',main_param =  main_param , param =  param, manure_type = 'Solid')
@@ -265,4 +276,5 @@ Nflow_check9 <- function(main_param, param) {
   
   return(check)
 }
+
 

@@ -428,7 +428,8 @@ loop_fodder_crops_manure_application_rate = function(nutrient) {
               folder = 'Fertilisation', 
               subfolder = nutrient, 
               subfolderX2 = 'Manure_surplus', 
-              subfolderX3 = 'Method I')
+              subfolderX3 = 'Method I',
+              subfolderX4 = main_param)
 }
 
 
@@ -507,46 +508,36 @@ methodII_fodder_nutrientReq_minus_Man = function(nutrient, main_param, param, ma
   # unit: kg nutrient yr-1
   
   nutrient_req = get_activity_data(module = 'Nutrients', mainfolder =  'Output', folder = 'Fertilisation', subfolder = nutrient, subfolderX2 = 'Crop_requirements', subfolderX3 = main_param, pattern = param)
-
+  
   # calculation: Nutrient_requirement - Gross_man_allocated_nutrient
 
   for (i in 1:nrow(nutrient_req)) {
     
     for (j in 4:ncol(nutrient_req)) {
       
-      if ( ( nutrient_req[i,j] > man_surplus_df[i,j] ) == TRUE) {
+      if ( nutrient_req[i,j] > man_surplus_df[i,j] ) {
         
         nutrient_req[i,j] = round (nutrient_req[i,j] - man_surplus_df[i,j] , 1)
         man_surplus_df[i,j] = 0
       }
-      else if ( ( nutrient_req[i,j] == man_surplus_df[i,j] ) == TRUE) {
+      else if ( nutrient_req[i,j] == man_surplus_df[i,j] )  {
         
         nutrient_req[i,j] = 0
         man_surplus_df[i,j] = 0
       }
       else {
         
-        nutrient_req[i,j] = 0
         man_surplus_df[i,j] = round ( man_surplus_df[i,j] - nutrient_req[i,j] , 1)
+        nutrient_req[i,j] = 0
       }
     }
   }
   
   # remaining nutrient demand
-  remaining_nutrient_req = compute_manure_surplus(nutrient_req)[[1]]
+  #remaining_nutrient_req = compute_manure_surplus(nutrient_req)[[1]]
 
-  return(list(remaining_nutrient_req = remaining_nutrient_req, man_surplus_df = man_surplus_df))
+  return(list(nutrient_req,man_surplus_df))
 }
-
-tot_nutrient_req = get_activity_data(module = 'Nutrients', mainfolder =  'Output', folder = 'Fertilisation', subfolder = 'N', subfolderX2 = 'Crop_requirements', subfolderX3 = 'Forage', pattern = 'forage_maize')
-man = methodII_fodder_nutrientReq_minus_Man('N','Forage','forage_maize', fodder_gross_man)[[2]]
-rem = methodII_fodder_nutrientReq_minus_Man('N','Forage','forage_maize', fodder_gross_man)[[1]]
-N_app = tot_nutrient_req[, yrs] - rem[, yrs]
-
-sum(fodder_gross_man$X1987)/1e6
-sum(N_app$X1987)/1e6
-sum(man$X1987)/1e6
-
 
 
 methodII_nonFodder_nutrientReq_minus_man = function(nutrient='N', main_param='Cereals', param='Irrigated_maize', man_surplus_df) {
@@ -600,10 +591,7 @@ methodII_nonFodder_nutrientReq_minus_man = function(nutrient='N', main_param='Ce
 
 
 
-
-
-
-compute_methodII_nutrient_flows = function(nutrient) {
+loop_methodII_nutrient_flows = function(nutrient) {
   
   man_app_hierarchy = get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Crops', subfolderX2 = 'Fertilisers', subfolderX3 = 'Manure_crop_distribution', pattern = 'Crop_hierarchy')
   
@@ -630,11 +618,10 @@ compute_methodII_nutrient_flows = function(nutrient) {
       # 2- computes manure surplus 
       # 3 - calculates crop manure application rates
       # 4 - update gross manure from ruminants
-      nut_req = methodII_crop_nutrientReq_minus_Man(nutrient, main_param, param)[[1]]
-      man_surplus = methodII_crop_nutrientReq_minus_Man(nutrient, main_param, param, fodder_gross_man)[[2]]
+      nut_req = methodII_fodder_nutrientReq_minus_Man(nutrient, main_param, param, fodder_gross_man)[[1]]
+      fodder_gross_man = methodII_fodder_nutrientReq_minus_Man(nutrient, main_param, param, fodder_gross_man)[[2]]
       man_app_rate = compute_crop_manure_application_rate(nutrient, main_param, param, nutrient_remaining_df = nut_req)
-      fodder_gross_man[, yrs] = sapply(yrs, function(x) round ( fodder_gross_man[,x] - man_app_rate[,x] * crop_area[,x] + man_surplus[,x], 1 ))
-      
+
       # export 
       export_file(module = 'Nutrients', 
                   file = man_app_rate, 
@@ -653,10 +640,9 @@ compute_methodII_nutrient_flows = function(nutrient) {
       # 4 - update gross manure from non_ruminants
       
       nut_req = methodII_nonFodder_nutrientReq_minus_man(nutrient, main_param, param, nonFodder_gross_man)[[1]]
-      man_surplus = methodII_crop_nutrientReq_minus_Man(nutrient, main_param, param, nonFodder_gross_man)[[2]]
+      nonFodder_gross_man = methodII_nonFodder_nutrientReq_minus_man(nutrient, main_param, param, nonFodder_gross_man)[[2]]
       man_app_rate = compute_crop_manure_application_rate(nutrient, main_param, param, nut_req)
-      nonFodder_gross_man[, yrs] = sapply(yrs, function(x) round ( nonFodder_gross_man[,x] - man_app_rate[,x] * crop_area[,x] + man_surplus[,x], 1 ))
-      
+
       # export 
       export_file(module = 'Nutrients', 
                   file = man_app_rate, 
@@ -685,5 +671,3 @@ compute_methodII_nutrient_flows = function(nutrient) {
               subfolderX2 = 'Manure_surplus', 
               subfolderX3 = 'Method II')
 }
-compute_methodII_nutrient_flows('N')
-

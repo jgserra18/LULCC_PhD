@@ -83,11 +83,11 @@ compute_total_solid_available_spreading <- function(N_flow, main_param, param, m
 
 ## ALLOCATE THE FRACTION OF MANURE SPREADING, AND LIKEWISE THE FRAC OF THE MANURE DISCARGED INTO STREAMS OR TRANSPORTED ELSEWHERE ------------------
 
-source('./Nutrients/Model/MMS/Support_functions/Manure_allocation_params.R')
+#source('./Nutrients/Model/MMS/Support_functions/Manure_allocation_params.R')
 
 
 allocate_slurry_spreading <- function(N_flow, main_param, param, manure_type = 'Slurry', manure_use = 'Fertiliser') {
-  # by default it is set to Fertiliser, but manure_spreading_allocation_FRAC can eb used
+  # by default it is set to Fertilizer, but manure_spreading_allocation_FRAC can in used
   
   FRAC_spreading <- get_activity_data(module = 'Nutrients', subfolder = 'General_params', subfolderX2 = 'Animals', subfolderX3 = 'Manure_allocation', pattern = manure_use)
   slurry_spread <- compute_total_slurry_available_spreading(N_flow, main_param, param, manure_type)
@@ -101,7 +101,7 @@ allocate_slurry_spreading <- function(N_flow, main_param, param, manure_type = '
 }
 
 allocate_solid_manure_spreading <- function(N_flow, main_param, param, manure_type = 'Solid', manure_use = 'Fertiliser') {
-  # by default it is set to Fertiliser, but manure_spreading_allocation_FRAC can eb used
+  # by default it is set to Fertilizer, but manure_spreading_allocation_FRAC can in used
   
   FRAC_spreading <- get_activity_data(module = 'Nutrients', subfolder = 'General_params', subfolderX2 = 'Animals', subfolderX3 = 'Manure_allocation', pattern = manure_use)
   solid_spread <- compute_total_solid_available_spreading(N_flow, main_param, param, manure_type)
@@ -115,7 +115,6 @@ allocate_solid_manure_spreading <- function(N_flow, main_param, param, manure_ty
 
 
 ## COMPUTE NH3 EMISSIONS DURING AND FOLLOWING SPREADING  -----------------------------------------------------------------------------------
-
 
 
 
