@@ -133,9 +133,9 @@ compute_arable_land_sludge_application <- function() {
     
     main_param <- standard_params[i, 'Main_crop']
     param <- standard_params[i, 'Crop']
-    
+
     if (main_param == 'Horticulture' | main_param == 'Industry_crops' | param == 'Extensive_pasture') {
-      break
+      next 
     }
     else {
       
@@ -146,6 +146,7 @@ compute_arable_land_sludge_application <- function() {
   }
   return(store)
 }
+
 
 
 compute_arable_land_sludge_FRAC_UAA = function(urban_area) {
@@ -183,13 +184,27 @@ distribute_sludge_lisbon_porto <- function(nutrient, urban_area) {
   yrs <- paste0('X', seq(1987,2017))
   FRAC_Parea[, yrs] <- sapply(yrs, function(x) round(FRAC_Parea[, x] * add_city_sludge[, x], 2))
   
-  //something wrong here
-  // totals dont add up
   # computes the updated amounts of sludge pr municipality ----------------------------------------
-  #city_sludge[, yrs] <- sapply(yrs, function(x) round(FRAC_Parea[, x] + city_sludge[, x], 1))
-
+  for (i in 1:nrow(FRAC_Parea)) {
+    
+    id = FRAC_Parea[i, 'Muni_ID']
+    
+    if (id == '1106' | id == '1312') {
+      next 
+    }
+    else {
+      for (j in yrs) {
+        
+        old_sludge_muni = sludge_muni[which(sludge_muni[, 'Muni_ID'] == id), j]
+        FRAC_Parea[i, j] = FRAC_Parea[i, j] + old_sludge_muni
+      }
+    }
+  }
   return(FRAC_Parea)
 }
+
+
+
 
 
 compute_updated_distributed_sludge_nutrient_content <- function(nutrient) {
@@ -225,8 +240,6 @@ compute_updated_distributed_sludge_nutrient_content <- function(nutrient) {
 }
 
 
-
-loop_sludge_nutrient_content()
 loop_sludge_nutrient_content <- function() {
   # unit: kg nutrient yr-1 
   
