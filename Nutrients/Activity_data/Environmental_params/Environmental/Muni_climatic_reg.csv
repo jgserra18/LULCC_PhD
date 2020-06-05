@@ -1,0 +1,282 @@
+Muni_ID,ID,Muni,Climate,Climatic_ID
+1601,1111601,Arcos de Valdevez,Cool,temperate
+1602,1111602,Caminha,Cool,temperate
+1603,1111603,Melgaço,Cool,temperate
+1604,1111604,Monção,Cool,temperate
+1605,1111605,Paredes de Coura,Cool,temperate
+1606,1111606,Ponte da Barca,Cool,temperate
+1607,1111607,Ponte de Lima,Cool,temperate
+1608,1111608,Valença,Cool,temperate
+1609,1111609,Viana do Castelo,Cool,temperate
+1610,1111610,Vila Nova de Cerveira,Cool,temperate
+301,1120301,Amares,Cool,temperate
+302,1120302,Barcelos,Cool,temperate
+303,1120303,Braga,Cool,temperate
+306,1120306,Esposende,Cool,temperate
+310,1120310,Terras de Bouro,Cool,temperate
+313,1120313,Vila Verde,Cool,temperate
+307,1130307,Fafe,Cool,temperate
+308,1130308,Guimarães,Cool,temperate
+309,1130309,Póvoa de Lanhoso,Cool,temperate
+311,1130311,Vieira do Minho,Cool,temperate
+312,1130312,Vila Nova de Famalicão,Cool,temperate
+314,1130314,Vizela,Cool,temperate
+1314,1131314,Santo Tirso,Cool,temperate
+1318,1131318,Trofa,Cool,temperate
+107,1140107,Espinho,Cool,temperate
+1304,1141304,Gondomar,Cool,temperate
+1306,1141306,Maia,Cool,temperate
+1308,1141308,Matosinhos,Cool,temperate
+1312,1141312,Porto,Cool,temperate
+1313,1141313,Póvoa de Varzim,Cool,temperate
+1315,1141315,Valongo,Cool,temperate
+1316,1141316,Vila do Conde,Cool,temperate
+1317,1141317,Vila Nova de Gaia,Cool,temperate
+106,1150106,Castelo de Paiva,Cool,temperate
+304,1150304,Cabeceiras de Basto,Cool,temperate
+305,1150305,Celorico de Basto,Cool,temperate
+1301,1151301,Amarante,Cool,temperate
+1302,1151302,Baião,Cool,temperate
+1303,1151303,Felgueiras,Cool,temperate
+1305,1151305,Lousada,Cool,temperate
+1307,1151307,Marco de Canaveses,Cool,temperate
+1309,1151309,Paços de Ferreira,Cool,temperate
+1310,1151310,Paredes,Cool,temperate
+1311,1151311,Penafiel,Cool,temperate
+1705,1151705,Mondim de Basto,Cool,temperate
+1709,1151709,Ribeira de Pena,Cool,temperate
+1804,1151804,Cinfães,Cool,temperate
+1813,1151813,Resende,Cool,temperate
+104,1160104,Arouca,Cool,temperate
+109,1160109,Santa Maria da Feira,Cool,temperate
+113,1160113,Oliveira de Azeméis,Cool,temperate
+116,1160116,São João da Madeira,Cool,temperate
+119,1160119,Vale de Cambra,Cool,temperate
+403,1170403,Carrazeda de Ansiães,Cool,temperate
+404,1170404,Freixo de Espada à Cinta,Cool,temperate
+409,1170409,Torre de Moncorvo,Cool,temperate
+410,1170410,Vila Flor,Cool,temperate
+914,1170914,Vila Nova de Foz Côa,Cool,temperate
+1701,1171701,Alijó,Cool,temperate
+1704,1171704,Mesão Frio,Temperate,mediterranean
+1708,1171708,Peso da Régua,Cool,temperate
+1710,1171710,Sabrosa,Cool,temperate
+1711,1171711,Santa Marta de Penaguião,Cool,temperate
+1714,1171714,Vila Real,Cool,temperate
+1801,1171801,Armamar,Cool,temperate
+1805,1171805,Lamego,Cool,temperate
+1807,1171807,Moimenta da Beira,Cool,temperate
+1812,1171812,Penedono,Cool,temperate
+1815,1171815,São João da Pesqueira,Cool,temperate
+1818,1171818,Sernancelhe,Cool,temperate
+1819,1171819,Tabuaço,Cool,temperate
+1820,1171820,Tarouca,Cool,temperate
+401,1180401,Alfândega da Fé,Cool,temperate
+402,1180402,Bragança,Cool,temperate
+405,1180405,Macedo de Cavaleiros,Cool,temperate
+406,1180406,Miranda do Douro,Cool,temperate
+407,1180407,Mirandela,Cool,temperate
+408,1180408,Mogadouro,Cool,temperate
+411,1180411,Vimioso,Cool,temperate
+412,1180412,Vinhais,Cool,temperate
+1702,1181702,Boticas,Cool,temperate
+1703,1181703,Chaves,Cool,temperate
+1706,1181706,Montalegre,Cool,temperate
+1707,1181707,Murça,Cool,temperate
+1712,1181712,Valpaços,Cool,temperate
+1713,1181713,Vila Pouca de Aguiar,Cool,temperate
+801,1500801,Albufeira,Temperate,mediterranean
+802,1500802,Alcoutim,Temperate,mediterranean
+803,1500803,Aljezur,Temperate,mediterranean
+804,1500804,Castro Marim,Temperate,mediterranean
+805,1500805,Faro,Temperate,mediterranean
+806,1500806,Lagoa,Temperate,mediterranean
+807,1500807,Lagos,Temperate,mediterranean
+808,1500808,Loulé,Temperate,mediterranean
+809,1500809,Monchique,Cool,temperate
+810,1500810,Olhão,Temperate,mediterranean
+811,1500811,Portimão,Temperate,mediterranean
+812,1500812,São Brás de Alportel,Temperate,mediterranean
+813,1500813,Silves,Temperate,mediterranean
+814,1500814,Tavira,Temperate,mediterranean
+815,1500815,Vila do Bispo,Temperate,mediterranean
+816,1500816,Vila Real de Santo António,Temperate,mediterranean
+101,1610101,Águeda,Cool,temperate
+102,1610102,Albergaria-a-Velha,Cool,temperate
+103,1610103,Anadia,Temperate,mediterranean
+105,1610105,Aveiro,Cool,temperate
+108,1610108,Estarreja,Cool,temperate
+110,1610110,Ílhavo,Cool,temperate
+111,1610111,Mealhada,Temperate,mediterranean
+112,1610112,Murtosa,Cool,temperate
+114,1610114,Oliveira do Bairro,Cool,temperate
+115,1610115,Ovar,Cool,temperate
+117,1610117,Sever do Vouga,Cool,temperate
+118,1610118,Vagos,Cool,temperate
+602,1620602,Cantanhede,Cool,temperate
+603,1620603,Coimbra,Temperate,mediterranean
+604,1620604,Condeixa-a-Nova,Temperate,mediterranean
+605,1620605,Figueira da Foz,Cool,temperate
+608,1620608,Mira,Cool,temperate
+610,1620610,Montemor-o-Velho,Cool,temperate
+613,1620613,Penacova,Temperate,mediterranean
+615,1620615,Soure,Temperate,mediterranean
+1004,1631004,Batalha,Cool,temperate
+1009,1631009,Leiria,Cool,temperate
+1010,1631010,Marinha Grande,Cool,temperate
+1015,1631015,Pombal,Cool,temperate
+1016,1631016,Porto de Mós,Cool,temperate
+601,1640601,Arganil,Cool,temperate
+606,1640606,Góis,Cool,temperate
+607,1640607,Lousã,Cool,temperate
+609,1640609,Miranda do Corvo,Cool,temperate
+611,1640611,Oliveira do Hospital,Cool,temperate
+612,1640612,Pampilhosa da Serra,Cool,temperate
+614,1640614,Penela,Cool,temperate
+616,1640616,Tábua,Cool,temperate
+617,1640617,Vila Nova de Poiares,Cool,temperate
+1002,1641002,Alvaiázere,Cool,temperate
+1003,1641003,Ansião,Cool,temperate
+1007,1641007,Castanheira de Pêra,Cool,temperate
+1008,1641008,Figueiró dos Vinhos,Cool,temperate
+1013,1641013,Pedrógão Grande,Cool,temperate
+901,1650901,Aguiar da Beira,Cool,temperate
+1802,1651802,Carregal do Sal,Cool,temperate
+1803,1651803,Castro Daire,Cool,temperate
+1806,1651806,Mangualde,Cool,temperate
+1808,1651808,Mortágua,Cool,temperate
+1809,1651809,Nelas,Cool,temperate
+1810,1651810,Oliveira de Frades,Cool,temperate
+1811,1651811,Penalva do Castelo,Cool,temperate
+1814,1651814,Santa Comba Dão,Temperate,mediterranean
+1816,1651816,São Pedro do Sul,Cool,temperate
+1817,1651817,Sátão,Cool,temperate
+1821,1651821,Tondela,Cool,temperate
+1822,1651822,Vila Nova de Paiva,Cool,temperate
+1823,1651823,Viseu,Cool,temperate
+1824,1651824,Vouzela,Cool,temperate
+506,1660506,Oleiros,Cool,temperate
+508,1660508,Proença-a-Nova,Cool,temperate
+509,1660509,Sertã,Cool,temperate
+510,1660510,Vila de Rei,Cool,temperate
+1413,1661413,Mação,Cool,temperate
+905,1670905,Fornos de Algodres,Cool,temperate
+906,1670906,Gouveia,Cool,temperate
+912,1670912,Seia,Cool,temperate
+902,1680902,Almeida,Cool,temperate
+903,1680903,Celorico da Beira,Cool,temperate
+904,1680904,Figueira de Castelo Rodrigo,Cool,temperate
+907,1680907,Guarda,Cool,temperate
+908,1680908,Manteigas,Cool,temperate
+909,1680909,Meda,Cool,temperate
+910,1680910,Pinhel,Cool,temperate
+911,1680911,Sabugal,Cool,temperate
+913,1680913,Trancoso,Cool,temperate
+502,1690502,Castelo Branco,Temperate,mediterranean
+505,1690505,Idanha-a-Nova,Temperate,mediterranean
+507,1690507,Penamacor,Cool,temperate
+511,1690511,Vila Velha de Ródão,Temperate,mediterranean
+1105,1711105,Cascais,Temperate,mediterranean
+1106,1711106,Lisboa,Temperate,mediterranean
+1107,1711107,Loures,Temperate,mediterranean
+1109,1711109,Mafra,Temperate,mediterranean
+1110,1711110,Oeiras,Temperate,mediterranean
+1111,1711111,Sintra,Temperate,mediterranean
+1114,1711114,Vila Franca de Xira,Temperate,mediterranean
+1115,1711115,Amadora,Temperate,mediterranean
+1116,1711116,Odivelas,Temperate,mediterranean
+1502,1721502,Alcochete,Temperate,mediterranean
+1503,1721503,Almada,Temperate,mediterranean
+1504,1721504,Barreiro,Temperate,mediterranean
+1506,1721506,Moita,Temperate,mediterranean
+1507,1721507,Montijo,Temperate,mediterranean
+1508,1721508,Palmela,Temperate,mediterranean
+1510,1721510,Seixal,Temperate,mediterranean
+1511,1721511,Sesimbra,Temperate,mediterranean
+1512,1721512,Setúbal,Temperate,mediterranean
+211,1810211,Odemira,Temperate,mediterranean
+1501,1811501,Alcácer do Sal,Temperate,mediterranean
+1505,1811505,Grândola,Temperate,mediterranean
+1509,1811509,Santiago do Cacém,Temperate,mediterranean
+1513,1811513,Sines,Temperate,mediterranean
+707,1820707,Mora,Temperate,mediterranean
+1201,1821201,Alter do Chão,Temperate,mediterranean
+1202,1821202,Arronches,Temperate,mediterranean
+1203,1821203,Avis,Temperate,mediterranean
+1204,1821204,Campo Maior,Temperate,mediterranean
+1205,1821205,Castelo de Vide,Temperate,mediterranean
+1206,1821206,Crato,Temperate,mediterranean
+1207,1821207,Elvas,Temperate,mediterranean
+1208,1821208,Fronteira,Temperate,mediterranean
+1209,1821209,Gavião,Temperate,mediterranean
+1210,1821210,Marvão,Temperate,mediterranean
+1211,1821211,Monforte,Temperate,mediterranean
+1212,1821212,Nisa,Temperate,mediterranean
+1213,1821213,Ponte de Sor,Temperate,mediterranean
+1214,1821214,Portalegre,Temperate,mediterranean
+701,1830701,Alandroal,Temperate,mediterranean
+702,1830702,Arraiolos,Temperate,mediterranean
+703,1830703,Borba,Temperate,mediterranean
+704,1830704,Estremoz,Temperate,mediterranean
+705,1830705,Évora,Temperate,mediterranean
+706,1830706,Montemor-o-Novo,Temperate,mediterranean
+708,1830708,Mourão,Temperate,mediterranean
+709,1830709,Portel,Temperate,mediterranean
+710,1830710,Redondo,Temperate,mediterranean
+711,1830711,Reguengos de Monsaraz,Temperate,mediterranean
+712,1830712,Vendas Novas,Temperate,mediterranean
+713,1830713,Viana do Alentejo,Temperate,mediterranean
+714,1830714,Vila Viçosa,Temperate,mediterranean
+1215,1831215,Sousel,Temperate,mediterranean
+201,1840201,Aljustrel,Temperate,mediterranean
+202,1840202,Almodôvar,Temperate,mediterranean
+203,1840203,Alvito,Temperate,mediterranean
+204,1840204,Barrancos,Temperate,mediterranean
+205,1840205,Beja,Temperate,mediterranean
+206,1840206,Castro Verde,Temperate,mediterranean
+207,1840207,Cuba,Temperate,mediterranean
+208,1840208,Ferreira do Alentejo,Temperate,mediterranean
+209,1840209,Mértola,Temperate,mediterranean
+210,1840210,Moura,Temperate,mediterranean
+212,1840212,Ourique,Temperate,mediterranean
+213,1840213,Serpa,Temperate,mediterranean
+214,1840214,Vidigueira,Temperate,mediterranean
+1103,1851103,Azambuja,Temperate,mediterranean
+1403,1851403,Almeirim,Temperate,mediterranean
+1404,1851404,Alpiarça,Temperate,mediterranean
+1405,1851405,Benavente,Temperate,mediterranean
+1406,1851406,Cartaxo,Temperate,mediterranean
+1407,1851407,Chamusca,Temperate,mediterranean
+1409,1851409,Coruche,Temperate,mediterranean
+1412,1851412,Golegã,Temperate,mediterranean
+1414,1851414,Rio Maior,Cool,temperate
+1415,1851415,Salvaterra de Magos,Temperate,mediterranean
+1416,1851416,Santarém,Temperate,mediterranean
+16A,16A,Cova da Beira,Cool,temperate
+501,16A0501,Belmonte,Cool,temperate
+503,16A0503,Covilhã,Cool,temperate
+504,16A0504,Fundão,Cool,temperate
+16B,16B,Oeste,Cool,temperate
+1001,16B1001,Alcobaça,Cool,temperate
+1005,16B1005,Bombarral,Temperate,mediterranean
+1006,16B1006,Caldas da Rainha,Temperate,mediterranean
+1011,16B1011,Nazaré,Cool,temperate
+1012,16B1012,Óbidos,Temperate,mediterranean
+1014,16B1014,Peniche,Temperate,mediterranean
+1101,16B1101,Alenquer,Temperate,mediterranean
+1102,16B1102,Arruda dos Vinhos,Temperate,mediterranean
+1104,16B1104,Cadaval,Temperate,mediterranean
+1108,16B1108,Lourinhã,Temperate,mediterranean
+1112,16B1112,Sobral de Monte Agraço,Temperate,mediterranean
+1113,16B1113,Torres Vedras,Temperate,mediterranean
+16C,16C,Médio Tejo,Cool,temperate
+1401,16C1401,Abrantes,Temperate,mediterranean
+1402,16C1402,Alcanena,Cool,temperate
+1408,16C1408,Constância,Temperate,mediterranean
+1410,16C1410,Entroncamento,Temperate,mediterranean
+1411,16C1411,Ferreira do Zêzere,Cool,temperate
+1417,16C1417,Sardoal,Cool,temperate
+1418,16C1418,Tomar,Temperate,mediterranean
+1419,16C1419,Torres Novas,Temperate,mediterranean
+1420,16C1420,Vila Nova da Barquinha,Temperate,mediterranean
+1421,16C1421,Ourém,Cool,temperate

@@ -206,46 +206,6 @@ compute_FomValidated_LULCC_NUTS2 <- function(admin = 'NUTS2', spatial_res, model
 }
 
 
-create_mainland_annual_NUTS2_raster_mosaic <- function(spatial_res, year) {
-  # creates a raster mosaic based on the annual LULC map for each NUTS2 region
-  
-  nuts2_id <- c(18,15,16,11,17)
-  r_list <- list()
-  
-  for (i in 1:length(nuts2_id)) {
-    
-    
-    file_yr <- get_dir_files(module = 'LULCC', folder = 'Output', param_pattern = 'LULC', subfolder = 'NUTS2', subfolderX2 = nuts2_id[i], mainfolder = spatial_res, file_pattern = year)
-    r_file <- raster(file_yr)
-    r_list <- append(r_file, r_list)
-  }
-  r_list$fun = sum
-  r_list <- do.call(mosaic, r_list)
-  clc_mask <- get_activity_data(module = 'LULCC', folder = 'CLC', pattern = '1990', subfolder = '500')
-  r_list <- mask(crop(r_list, extent(clc_mask)), clc_mask)
-  
-  return(r_list)
-  rm(list=c('file_yr','r_file','clc_mask'))
-}
-
-loop_mainland_NUTS2_raster_mosaic <- function(spatial_res, mosaic = FALSE) {
-  
-  
-  yr <- as.character(seq(1990,2018))
-  
-  if (mosaic == TRUE) { r_list <- list() }
-
-  for (i in yr) {
-    
-    lulc_yr <- create_mainland_annual_NUTS2_raster_mosaic(spatial_res = spatial_res, year = i)
-    export_file(module = 'LULCC', file = lulc_yr, folder = 'LULC', filename = paste0('Mainland_glm_', i), 
-                subfolder = 'PT', subfolderX2 = spatial_res)
-    if (mosaic == TRUE) { r_list <- append(lulc_yr, r_list) }
-  }
-  
-  if (mosaic == TRUE) { return(r_list)}
-}
-
 
 
 

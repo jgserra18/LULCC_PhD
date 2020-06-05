@@ -35,6 +35,7 @@ compute_IFASTAT_total_fert = function(nutrient) {
 general_func_fertiliser_FAN = function(nutrient, fert_mainland_df) {
   # REQUIREMENT: fert_mainland_df must be in kg nutrient yr-1
   
+  yrs = paste0('X', seq(1987,2017))
   IFASTAT = compute_IFASTAT_total_fert(nutrient)
   fert_mainland_df = sapply(yrs, function(x) round(sum(fert_mainland_df[, x]/1000000), 0))
   
@@ -48,7 +49,7 @@ general_func_fertiliser_FAN = function(nutrient, fert_mainland_df) {
 
 ## COMPUTE MAINLAND UNADJUSTED FERTILISERT NUTRIENT DEMAND ----------------------------------------------------------------- 
 
-compute_crop_fertiliser_nutrient_demand = function(nutrient, main_param, param, manure_method = 'Method I') {
+compute_crop_fertiliser_nutrient_demand = function(nutrient, main_param, param, manure_method = 'Method 1') {
   # **** BY DEFAULT IT IS APPLIED THE MANURE DISTRIBUTION METHOD I
   # Horticulture and Industry crops fert demand = nutrient demand
   # for the remaining, fert demand correspond to the nutrient demand following the applcation of manure and biosolids
@@ -70,7 +71,7 @@ compute_crop_fertiliser_nutrient_demand = function(nutrient, main_param, param, 
   return(crop_fert)
 }
 
-compute_total_unadjusted_fertiliser_nutrient_demand = function(nutrient, manure_method = 'Method I') {
+compute_total_unadjusted_fertiliser_nutrient_demand = function(nutrient, manure_method = 'Method 1') {
     # computes the total nutrient demand from inorganic fertilisers to satisfy demand
     # default: method I manure approach
     # unit: kg nutrient yr-1
@@ -123,7 +124,7 @@ compute_fertiliser_FAN = function(nutrient) {
                                           folder = 'Fertilisation', 
                                           subfolder = nutrient, 
                                           subfolderX2 = 'Inorganic_fertiliser',
-                                          subfolderX3 = 'Method I', 
+                                          subfolderX3 = 'Method 1', 
                                           subfolderX4 = 'Total', 
                                           subfolderX5 = 'Unadjusted', 
                                           pattern = 'Unadjusted')
@@ -142,7 +143,7 @@ get_annual_fertiliser_FAN = function(FAN_df, year) {
 }
 
 
-compute_adjusted_fertiliser_crop_app_rates = function(nutrient, main_param, param, manure_method='Method I') {
+compute_adjusted_fertiliser_crop_app_rates = function(nutrient, main_param, param, manure_method='Method 1') {
   
   FAN = compute_fertiliser_FAN(nutrient)
   crop_fert = compute_crop_fertiliser_nutrient_demand(nutrient, main_param, param, manure_method)
@@ -163,7 +164,7 @@ compute_adjusted_fertiliser_crop_app_rates = function(nutrient, main_param, para
 }
 
 
-loop_adjusted_fertiliser_crop_app_rates = function(nutrient, manure_method = 'Method I') {
+loop_adjusted_fertiliser_crop_app_rates = function(nutrient, manure_method = 'Method 1') {
   
   standard_params <- get_standard_params_list(main_param = 'Crops')
   
@@ -192,15 +193,15 @@ loop_adjusted_fertiliser_crop_app_rates = function(nutrient, manure_method = 'Me
 
 
 # COMPILE SUPPORT DATA --------------------------------
-write_fert_mainland_dataset('N')
-write_fert_mainland_dataset = function(nutrient) {
+
+write_fert_mainland_dataset = function(nutrient, manure_method = 'Method 1') {
   
   unadj_fert_mainland = get_activity_data(module = 'Nutrients', 
                                           mainfolder =  'Output', 
                                           folder = 'Fertilisation', 
                                           subfolder = nutrient, 
                                           subfolderX2 = 'Inorganic_fertiliser',
-                                          subfolderX3 = 'Method I', 
+                                          subfolderX3 = manure_method, 
                                           subfolderX4 = 'Total', 
                                           subfolderX5 = 'Unadjusted', 
                                           pattern = 'Unadjusted')

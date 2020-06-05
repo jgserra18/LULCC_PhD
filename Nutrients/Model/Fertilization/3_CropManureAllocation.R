@@ -418,7 +418,8 @@ loop_fodder_crops_manure_application_rate = function(nutrient) {
                 folder = 'Fertilisation', 
                 subfolder = nutrient, 
                 subfolderX2 = 'Manure_application_rates',
-                subfolderX3 = main_param)
+                subfolderX3 = 'Method 1',
+                subfolderX4 = main_param)
   }
   
   # export manure surplus
@@ -428,7 +429,7 @@ loop_fodder_crops_manure_application_rate = function(nutrient) {
               folder = 'Fertilisation', 
               subfolder = nutrient, 
               subfolderX2 = 'Manure_surplus', 
-              subfolderX3 = 'Method I',
+              subfolderX3 = 'Method 1',
               subfolderX4 = main_param)
 }
 
@@ -454,7 +455,7 @@ loop_nonfodder_crops__manure_application_rate = function(nutrient) {
                   folder = 'Fertilisation', 
                   subfolder = nutrient, 
                   subfolderX2 = 'Manure_application_rates',
-                  subfolderX3 = 'Method I',
+                  subfolderX3 = 'Method 1',
                   subfolderX4 = main_param)
     }
   }
@@ -629,7 +630,7 @@ loop_methodII_nutrient_flows = function(nutrient) {
                   folder = 'Fertilisation', 
                   subfolder = nutrient, 
                   subfolderX2 = 'Manure_application_rates',
-                  subfolderX3 = 'Method II',
+                  subfolderX3 = 'Method 2',
                   subfolderX4 = main_param)
       
       export_file(module = 'Nutrients', 
@@ -638,7 +639,7 @@ loop_methodII_nutrient_flows = function(nutrient) {
                   folder = 'Fertilisation', 
                   subfolder = nutrient, 
                   subfolderX2 = 'Nutrient_demand_afterManure',
-                  subfolderX3 = 'Method II',
+                  subfolderX3 = 'Method 2',
                   subfolderX4 = main_param)
       
     }
@@ -660,7 +661,7 @@ loop_methodII_nutrient_flows = function(nutrient) {
                   folder = 'Fertilisation', 
                   subfolder = nutrient, 
                   subfolderX2 = 'Manure_application_rates',
-                  subfolderX3 = 'Method II',
+                  subfolderX3 = 'Method 2',
                   subfolderX4 = main_param)
       export_file(module = 'Nutrients', 
                   file = nut_req, 
@@ -668,7 +669,7 @@ loop_methodII_nutrient_flows = function(nutrient) {
                   folder = 'Fertilisation', 
                   subfolder = nutrient, 
                   subfolderX2 = 'Nutrient_demand_afterManure',
-                  subfolderX3 = 'Method II',
+                  subfolderX3 = 'Method 2',
                   subfolderX4 = main_param)
     }
   }
@@ -680,12 +681,12 @@ loop_methodII_nutrient_flows = function(nutrient) {
               folder = 'Fertilisation', 
               subfolder = nutrient, 
               subfolderX2 = 'Manure_surplus', 
-              subfolderX3 = 'Method II')
+              subfolderX3 = 'Method 2')
   export_file(module = 'Nutrients', 
               file = nonFodder_gross_man, 
               filename = 'Non_ruminant_manure_surplus', 
               folder = 'Fertilisation', 
               subfolder = nutrient, 
               subfolderX2 = 'Manure_surplus', 
-              subfolderX3 = 'Method II')
+              subfolderX3 = 'Method 2')
 }

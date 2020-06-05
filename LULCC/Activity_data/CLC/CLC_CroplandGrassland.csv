@@ -1,0 +1,16 @@
+recl_from,recl_to,category_id,category
+0,1,0,urban
+1,2,0,forest
+2,3,0,wetlands
+3,223,1,cropland
+223,231,2,grassland
+231,243,1,cropland
+243,244,2,grassland
+244,313,0,forest
+313,321,0,forest
+321,324,0,forest
+324,331,0,forest
+331,335,0,forest
+335,522,0,NA
+522,523,0,NA
+523,999,0,NA

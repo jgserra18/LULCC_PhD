@@ -69,7 +69,7 @@ compute_biosolid_crop_application = function(nutrient, main_param, param) {
 
 select_RemNutrientRequirements_manure_method_approach = function(nutrient, main_param, param, manure_method) {
   
-  if (manure_method == 'Method I') {
+  if (manure_method == 'Method 1') {
     
     rem_nutrient_req = calc1_crop_nutrientReq_minus_Man(nutrient, main_param, param)[[1]]
   }
@@ -80,7 +80,7 @@ select_RemNutrientRequirements_manure_method_approach = function(nutrient, main_
                                           folder = 'Fertilisation', 
                                           subfolder = nutrient, 
                                           subfolderX2 = 'Nutrient_demand_afterManure',
-                                          subfolderX3 = 'Method II', 
+                                          subfolderX3 = 'Method 2', 
                                           subfolderX4 = main_param, 
                                           pattern = param)
 
@@ -206,7 +206,7 @@ allocate_crop_biosolid_1teraction = function(nutrient, manure_method) {
 
 loop_crop_biosolid_1teraction_ManureMethod = function(nutrient) {
   
-  method = c('Method I', 'Method II')
+  method = c('Method 1', 'Method 2')
   sapply(method, function(x) allocate_crop_biosolid_1teraction(nutrient, x))
 }
 

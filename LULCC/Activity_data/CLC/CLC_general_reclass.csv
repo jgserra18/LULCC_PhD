@@ -1,6 +1,5 @@
 recl_from,recl_to,category_id,category
-1,124,1,urban
-124,142,1,urban
+1,142,1,urban
 142,223,2,cropland
 223,231,3,grassland
 231,243,2,cropland
@@ -10,6 +9,6 @@ recl_from,recl_to,category_id,category
 321,324,4,forest
 324,331,4,forest
 331,335,4,forest
-335,522,NA,NA
-522,523,NA,NA
-523,999,NA,NA
+335,522,5,NA
+522,523,5,NA
+533,999,5,NA

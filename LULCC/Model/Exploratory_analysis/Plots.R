@@ -66,7 +66,7 @@ p <- ordered_model_plot(clues_model)
 tmap_save(tm = p, './Historical_TVZ_LULC.pdf',dpi=600)
 
 
-dmd
+
 plot_LULCC_demand <- function(demand_df) {
   # plots land use demand
   
