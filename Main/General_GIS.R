@@ -2,12 +2,6 @@ source('./Main/Global_functions.R')
 
 
 
-crop_fert_product = downscale_crop_fert_product_app_rates('Cereals','Irrigated_maize','Urea')
-names(crop_fert_product)[1] = 'Admin_id'
-
-d = fasterize_admin_statistical(module = 'LULCC', admin_res = 'Municipality', file = crop_fert_product, name_id = 'Admin_id', name_field = 'X1987', spatial_res = 500)
-4
-
 
 fasterize_admin_statistical <- function(module, admin_res, file, name_id, name_field, spatial_res) {
   # fasterizes a given column of a specified file based on administrative boundaries

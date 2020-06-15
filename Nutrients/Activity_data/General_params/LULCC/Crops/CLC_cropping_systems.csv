@@ -1,0 +1,17 @@
+clc_id,label,LULCC_label,allow_grazing
+1,urban,urban,FALSE
+2,forest,forest,FALSE
+3,wetlands,wetlands,FALSE
+211,Non-irrigated arable land,Non_irrigated,TRUE
+212,Permanently irrigated land,Permanently_irrigated,TRUE
+213,Rice fields,Rice,TRUE
+221,Vineyards,Vineyards,TRUE
+222,Fruit trees and berry plantations,Fruit_trees,TRUE
+223,Olive groves,Olive_groves,TRUE
+231,Pastures,Pastures,FALSE
+241,Annual crops associated with permanent crops,Annuals_permanents,TRUE
+242,Complex cultivation patterns,Complex_patterns,TRUE
+243,Land principally occupied by agriculture with significant areas of natural vegetation,Agriculture_naturalVeg,FALSE
+244,Agro-forestry areas,AgroForestry,TRUE
+321,Natural grasslands,Natural_grasslands,FALSE
+512,Water bodies,Water_bodies,FALSE

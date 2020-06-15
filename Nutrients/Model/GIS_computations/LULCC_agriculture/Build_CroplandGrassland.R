@@ -26,20 +26,30 @@ create_mainland_annual_NUTS2_raster_mosaic <- function(spatial_res, year) {
 }
 
 
-compute_annual_LULC_cropland = function(year, spatial_res = '500') {
+
+compute_annual_LULC_cropland = function(year, spatial_res = '500', LULC) {
   # computes the annual cropland at a default spatial resolution of 500m
   
   year = gsub('X','', year)
   
   yr_clc = create_mainland_annual_NUTS2_raster_mosaic(spatial_res, year)
   clc_cropland = get_activity_data(module = 'LULCC', folder = 'CLC', pattern = 'CLC_CroplandGrassland')
-  clc_cropland[which(clc_cropland$category_id != 1), 'category_id'] = 0
-  clc_cropland = clc_cropland[, -4]
   
+  if (missing(LULC)==TRUE | LULC == 'Cropland') {
+    
+    clc_cropland[which(clc_cropland$category_id != 1), 'category_id'] = 0
+  }
+  else if (LULC == 'Grassland') {
+    
+    clc_cropland[which(clc_cropland$category_id != 2), 'category_id'] = 0
+  }
+  
+  clc_cropland = clc_cropland[, -4]
   yr_cropland = reclassify(yr_clc, rcl = as.matrix(clc_cropland))
   
   return(yr_cropland)
   rm(list=c('year','yr_clc','clc_cropland'))
 }
-
-
+d = compute_annual_LULC_cropland('2000','500','Cropland')
+cellStats(d, 'sum') * 5 / 1e6
+plot(d)

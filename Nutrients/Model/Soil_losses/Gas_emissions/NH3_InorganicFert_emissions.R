@@ -122,11 +122,12 @@ get_annual_FRAC_fert_product_total = function(fert_product, year, nutrient = 'N'
 }
 
 
-
 # COMPUTE CROP FERTILISER NH3 EMISSIONS PER FERTILISER PRODUCT  --------------------------------------------------------------------
 
-compute_total_crop_fert_N = function(main_param, param, nutrient = 'N', manure_method = 'Method I') {
+compute_total_crop_fert_N = function(main_param, param, nutrient = 'N', manure_surplus_fills_nutDemand = FALSE, manure_method = 'Method 1') {
   # unit: kg N yr-1
+  
+  if (manure_surplus_fills_nutDemand == TRUE) { folder_div = 'With_ManSurplus'} else { folder_div = 'Without_ManSurplus'}
   
   crop_fert = get_activity_data(module = 'Nutrients', 
                                 mainfolder =  'Output', 
@@ -134,7 +135,8 @@ compute_total_crop_fert_N = function(main_param, param, nutrient = 'N', manure_m
                                 subfolder = nutrient, 
                                 subfolderX2 = 'Fertiliser_application_rates',
                                 subfolderX3 = manure_method, 
-                                subfolderX4 = main_param, 
+                                subfolderX4 = folder_div,
+                                subfolderX5 = main_param, 
                                 pattern = param)
   crop_area = get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Areas', subfolderX2 = main_param, pattern = param)
   
@@ -147,13 +149,13 @@ compute_total_crop_fert_N = function(main_param, param, nutrient = 'N', manure_m
 
 
 
-downscale_crop_fert_product_app_rates = function(main_param, param, fert_product, nutrient = 'N', manure_method = 'Method I') {
+downscale_crop_fert_product_app_rates = function(main_param, param, fert_product, nutrient = 'N',  manure_surplus_fills_nutDemand = FALSE, manure_method = 'Method 1') {
   # downscale crop fertilization application rates (adjusted) based on the fraction of a given fert_product 
   # unit: kg nutrient yr-1
 
   
   yrs = paste0('X', seq(1987,2017))
-  crop_fert_N = compute_total_crop_fert_N(main_param, param, nutrient, manure_method)
+  crop_fert_N = compute_total_crop_fert_N(main_param, param, nutrient, manure_surplus_fills_nutDemand, manure_method)
   
 
   crop_fert_N[, yrs] = sapply(yrs, function(x) {
@@ -167,17 +169,17 @@ downscale_crop_fert_product_app_rates = function(main_param, param, fert_product
 }
 
 
-downscale_crop_fert_product_app_NH3 = function(main_param, param, fert_product, nutrient = 'N', manure_method = 'Method I') {
+downscale_crop_fert_product_app_NH3 = function(main_param, param, fert_product, nutrient = 'N', manure_surplus_fills_nutDemand = FALSE, manure_method = 'Method 1') {
   
   # prepare crop fert product for further rasterization
-  crop_fert_product = downscale_crop_fert_product_app_rates(main_param, param, fert_product)
+  crop_fert_product = downscale_crop_fert_product_app_rates(main_param, param, manure_surplus_fills_nutDemand, fert_product)
   names(crop_fert_product)[1] = 'Admin_id'
   
   EF_NH3 = get_spatial_explicit_fert_product_NH3_EF(fert_prod)
   
   yrs = paste0('X', seq(1987,2017))
   
-  for 
+   
   crop_fert_product = fasterize_admin_statistical(module = 'LULCC', admin_res = 'Municipality', file = crop_fert_product, name_id = 'Admin_id', name_field = yr, spatial_res = 500)
   EF_NH3 = get_spatial_explicit_fert_product_NH3_EF(fert_prod)
   
@@ -202,7 +204,9 @@ compute_annual_ph_cropland = function(year, muni_shp, r_pH) {
   avg_ph_cropland_muni = exactextractr::exact_extract(r_pH, muni_shp, 'mean', include_cell = TRUE)
   
   return(avg_ph_cropland_muni)
+  rm(list='yr_cropland')
 }
+
 
 
 loop_annual_ph_cropland = function() {
@@ -222,6 +226,7 @@ loop_annual_ph_cropland = function() {
   store_ph[store_ph$avg_ph<=7, 'avg_ph'] = 'normal_ph'
   
   return(store_ph)
+  rm(list=c('muni','ph'))
 }
 
 
@@ -240,24 +245,28 @@ select_statistical_muni_fert_product_EF_NH3 = function(fert_product, muni_shp) {
 
 
 
-compute_statistical_muni_crop_fert_NH3 = function(main_param, param, fert_product, muni_EF, nutrient = 'N', manure_method = 'Method I') {
+compute_statistical_muni_crop_fert_NH3 = function(main_param, param, fert_product, muni_EF, nutrient = 'N', manure_surplus_fills_nutDemand = FALSE, manure_method = 'Method 1') {
   # computes NH3 emissions following crop fertiliser application using the statistical approach
   # unit: kg N-NH3 yr-1
   
-  crop_fert_prod_N = downscale_crop_fert_product_app_rates(main_param, param, fert_product, nutrient, manure_method)
+  crop_fert_prod_N = downscale_crop_fert_product_app_rates(main_param, param, fert_product, nutrient, manure_surplus_fills_nutDemand, manure_method)
   crop_fert_prod_NH3 = crop_fert_prod_N
-  
+
   yrs = paste0('X', seq(1987,2017))
   crop_fert_prod_NH3[, yrs] = sapply(yrs, function(x) round(crop_fert_prod_N[, x] / 1000 * muni_EF, 1))
-  
+
   return(crop_fert_prod_NH3)
   rm(list=c('crop_fert_prod_N','yrs'))
 }
 
+downscale_crop_fert_product_app_rates('Cereals','Wheat','Urea','N',F,'Method 1')
 
-loop_statistical_muni_fert_NH3 = function(fert_product, nutrient = 'N', manure_method = 'Method I') {
+
+loop_statistical_muni_fert_NH3 = function(fert_product, nutrient = 'N', manure_surplus_fills_nutDemand = FALSE, manure_method = 'Method 1') {
   # for a given fertiliser product (e.g., Urea) compute Nh3 emissions from all crops!
   # unit: kg N-NH3 yr-1
+  
+  if (manure_surplus_fills_nutDemand == TRUE) { folder_div = 'With_ManSurplus'} else { folder_div = 'Without_ManSurplus'}
   
   standard_params <- get_standard_params_list(main_param = 'Crops')
   muni = get_activity_data('LULCC','Admin','Municipality')
@@ -267,34 +276,43 @@ loop_statistical_muni_fert_NH3 = function(fert_product, nutrient = 'N', manure_m
     
     main_param = standard_params[i, 'Main_crop']
     param = standard_params[i, 'Crop']
-    
+
     if (param == 'Extensive_pasture') {
       next
     }
-    crop_fert_prod_NH3 = compute_statistical_muni_crop_fert_NH3(main_param, param, fert_product, EF_prod)
-    export_file(module = 'Nutrients', 
-                file = crop_fert_prod_NH3, 
-                filename = param, 
-                folder = 'Gas_N_emissions', 
-                subfolder = 'NH3', 
-                subfolderX2 = 'Inorganic_fertiliser',
-                subfolderX3 = fert_product, 
-                subfolderX4 = main_param)
+    else {
+      print(main_param)
+      crop_fert_prod_NH3 = compute_statistical_muni_crop_fert_NH3(main_param, param, fert_product, EF_prod, nutrient, manure_surplus_fills_nutDemand, manure_method)
+      export_file(module = 'Nutrients', 
+                  file = crop_fert_prod_NH3, 
+                  filename = param, 
+                  folder = 'Gas_N_emissions', 
+                  subfolder = 'NH3', 
+                  subfolderX2 = 'Inorganic_fertiliser',
+                  subfolderX3 = manure_method, 
+                  subfolderX4 = folder_div,
+                  subfolderX5 = fert_product, 
+                  subfolderX6 = main_param)
+    }
   }
   rm(list=c('standard_params','muni','EF_prod','main_param','param','crop_fert_prod_NH3'))
 }
 
 
-loop_all_fert_prod_NH3 = function(nutrient = 'N', manure_method = 'Method I') {
+loop_all_fert_prod_NH3 = function(nutrient = 'N', manure_surplus_fills_nutDemand = F, manure_method = 'Method 1') {
   
   fert_prod = c('AAN','CAN','AS','N_solutions','Other_Nstraight', 'Urea','AP','NK_compound','NPK_compound','Other_NP')
-  sapply(fert_prod, function(x) loop_statistical_muni_fert_NH3(x))
+  sapply(fert_prod, function(x) loop_statistical_muni_fert_NH3(x, nutrient, manure_surplus_fills_nutDemand, manure_method))
 }
 
 
 
-compute_total_crop_fert_prod_NH3 = function(nutrient = 'N', manure_method = 'Method I') {
+
+
+
+compute_total_crop_fert_prod_NH3 = function(nutrient = 'N', manure_surplus_fills_nutDemand = F, manure_method = 'Method 1') {
   
+  if (manure_surplus_fills_nutDemand == TRUE) { folder_div = 'With_ManSurplus'} else { folder_div = 'Without_ManSurplus'}
   standard_params <- get_standard_params_list(main_param = 'Crops')
   
   for (i in 1:nrow(standard_params)) {
@@ -305,26 +323,35 @@ compute_total_crop_fert_prod_NH3 = function(nutrient = 'N', manure_method = 'Met
     if (param == 'Extensive_pasture') {
       next
     }
-    
-    yrs = paste0('X', seq(1987,2017))
-    store_crop_nh3 = get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
-    store_crop_nh3[, yrs] = sapply(yrs, function(x) store_crop_nh3[,x] = 0)
-    
-    fert_prod = c('AAN','CAN','AS','N_solutions','Other_Nstraight', 'Urea','AP','NK_compound','NPK_compound','Other_NP')
-    
-    for (fert in fert_prod) {
+    else {
       
-      crop_fert_prod_nh3 = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Gas_N_emissions', subfolder = 'NH3', subfolderX2 = 'Inorganic_fertiliser', subfolderX3 = fert, subfolderX4 = main_param, pattern = param)
-      store_crop_nh3[, yrs] = sapply(yrs, function(x) round(store_crop_nh3[,x] + crop_fert_prod_nh3[, x], 1))
+      yrs = paste0('X', seq(1987,2017))
+      store_crop_nh3 = get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+      store_crop_nh3[, yrs] = sapply(yrs, function(x) store_crop_nh3[,x] = 0)
+      
+      fert_prod = c('AAN','CAN','AS','N_solutions','Other_Nstraight', 'Urea','AP','NK_compound','NPK_compound','Other_NP')
+      
+      for (fert in fert_prod) {
+        
+        crop_fert_prod_nh3 = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Gas_N_emissions', subfolder = 'NH3', subfolderX2 = 'Inorganic_fertiliser', subfolderX3 =manure_method, subfolderX4 = folder_div, subfolderX5 = fert, subfolderX6 = main_param, pattern = param)
+        store_crop_nh3[, yrs] = sapply(yrs, function(x) round(store_crop_nh3[,x] + crop_fert_prod_nh3[, x], 1))
+      }
+      # export totals
+      export_file(module = 'Nutrients', 
+                  file = store_crop_nh3, 
+                  filename = param, 
+                  folder = 'Gas_N_emissions', 
+                  subfolder = 'NH3', 
+                  subfolderX2 = 'Inorganic_fertiliser',
+                  subfolderX3 = manure_method, 
+                  subfolderX4 = folder_div,
+                  subfolderX5 = 'Total', 
+                  subfolderX6 = main_param)
     }
-    # export totals
-    export_file(module = 'Nutrients', 
-                file = store_crop_nh3, 
-                filename = param, 
-                folder = 'Gas_N_emissions', 
-                subfolder = 'NH3', 
-                subfolderX2 = 'Inorganic_fertiliser',
-                subfolderX3 = 'Total', 
-                subfolderX4 = main_param)
   }
 }
+
+
+
+
+

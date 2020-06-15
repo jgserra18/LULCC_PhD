@@ -1,5 +1,5 @@
 source('./Main/Global_functions.R')
-source('./Nutrients/Model/Fertilization/3_CropManureAllocation.R')
+source('./Nutrients/Model/Fertilization/3_1_CropManureAllocation.R')
 source('./Nutrients/Model/Fertilization/2_Biosolids.R')
 
 # /// CURRENTLY ONLY METHOD I IS PROPERLY IMPLEMENTED
@@ -67,11 +67,16 @@ compute_biosolid_crop_application = function(nutrient, main_param, param) {
 # COMPUTE BIOSOLID CROP APPLICATION RATE, REMAINING NUTRIENT DEMAND AND BIOSOLID SURPLUS---------------------------------------------------------------------
 
 
-select_RemNutrientRequirements_manure_method_approach = function(nutrient, main_param, param, manure_method) {
+select_RemNutrientRequirements_manure_method_approach = function(nutrient, main_param, param, manure_surplus_fills, manure_method) {
+  # selects nutrient demand following solid manure applciation (calc2)
+  #unit: kg nutrient yr-1
+  
+  
+  if (manure_surplus_fills == TRUE) { folder_div = 'With_ManSurplus'} else { folder_div = 'Without_ManSurplus'}
   
   if (manure_method == 'Method 1') {
     
-    rem_nutrient_req = calc1_crop_nutrientReq_minus_Man(nutrient, main_param, param)[[1]]
+    rem_nutrient_req = calc2_nutrientDemand_solid_application(nutrient, main_param, param)[[1]]
   }
   else {
     
@@ -81,7 +86,8 @@ select_RemNutrientRequirements_manure_method_approach = function(nutrient, main_
                                           subfolder = nutrient, 
                                           subfolderX2 = 'Nutrient_demand_afterManure',
                                           subfolderX3 = 'Method 2', 
-                                          subfolderX4 = main_param, 
+                                          subfolderX4 = folder_div, 
+                                          subfolderX5 = main_param, 
                                           pattern = param)
 
   }
@@ -89,7 +95,7 @@ select_RemNutrientRequirements_manure_method_approach = function(nutrient, main_
 }
 
 
-crop_nutrientReq_minus_Biosolid = function(nutrient, main_param, param, manure_method) {
+crop_nutrientReq_minus_Biosolid = function(nutrient, main_param, param, manure_surplus_fills, manure_method) {
   # computes the remaining nutrient demand following biosolid
   # 1 - calls the remaining nutrient demand after manure application, corredcted to 0s
   # 2 - allocates nutrient biosolid application for a given crop
@@ -99,7 +105,7 @@ crop_nutrientReq_minus_Biosolid = function(nutrient, main_param, param, manure_m
   #* unit: kg nutrient yr-1
   #* 
 
-  rem_nutrient_req = select_RemNutrientRequirements_manure_method_approach(nutrient, main_param, param, manure_method)
+  rem_nutrient_req = select_RemNutrientRequirements_manure_method_approach(nutrient, main_param, param, manure_surplus_fills, manure_method)
   biosolid_crop_app = compute_biosolid_crop_application(nutrient, main_param, param)
   
   yrs = paste0('X', seq(1987,2017))
@@ -134,15 +140,16 @@ crop_nutrientReq_minus_Biosolid = function(nutrient, main_param, param, manure_m
 }
 
 
-compute_biosolid_crop_application_rate = function(nutrient, main_param, param, manure_method, nutrientReq_minus_Biosolid_df) {
+
+compute_biosolid_crop_application_rate = function(nutrient, main_param, param, manure_surplus_fills, manure_method, nutrientReq_minus_Biosolid_df) {
   # computes the biosolid crop application rate for a given crop
   # the nutrientReq_minus_Biosolid_df can be specified when updating biosolid crop application rate following biosolid surplus
   # unit: kg nturient yr-1
   
-  man_nutrient_req = calc1_crop_nutrientReq_minus_Man(nutrient, main_param, param)[[1]]
+  man_nutrient_req = calc2_nutrientDemand_solid_application(nutrient, main_param, param)[[1]]
   
   if (missing(nutrientReq_minus_Biosolid_df)==TRUE) {
-    rem_nutrient_req = crop_nutrientReq_minus_Biosolid(nutrient, main_param, param, manure_method)[[1]]
+    rem_nutrient_req = crop_nutrientReq_minus_Biosolid(nutrient, main_param, param, manure_surplus_fills, manure_method)[[1]]
   }
   else {
     rem_nutrient_req = nutrientReq_minus_Biosolid_df
@@ -159,12 +166,13 @@ compute_biosolid_crop_application_rate = function(nutrient, main_param, param, m
 
 
 
-allocate_crop_biosolid_1teraction = function(nutrient, manure_method) {
+allocate_crop_biosolid_1teraction = function(nutrient, manure_method, manure_surplus_fills) {
   #* 1 --> Allocates biosolid nutrient content for the different crops and years
   #* 2 --> Iterates the biosolid surplus (if it exists) following application and stores it into a dataframe
   #* 3 --> Computes biosolid crop application WITHOUT further allocation of the biosolid surplus
   #* unit: kg nutrient yr-1
   
+  if (manure_surplus_fills == TRUE) { folder_div = 'With_ManSurplus'} else { folder_div = 'Without_ManSurplus'}
   biosolid_crops = get_sludge_distribution_crops()
   
   # store main dataframe to update biosolid_surplus after crop application
@@ -177,9 +185,9 @@ allocate_crop_biosolid_1teraction = function(nutrient, manure_method) {
     main_param = biosolid_crops[i, 'Main_crop']
     param = biosolid_crops[i, 'Crop']
     
-    crop_rem_nutrient = crop_nutrientReq_minus_Biosolid(nutrient, main_param, param, manure_method)[[1]]
-    biosolid_surplus = crop_nutrientReq_minus_Biosolid(nutrient, main_param, param, manure_method)[[2]]
-    crop_biosolid_rate = compute_biosolid_crop_application_rate(nutrient, main_param, param, manure_method, crop_rem_nutrient)
+    crop_rem_nutrient = crop_nutrientReq_minus_Biosolid(nutrient, main_param, param, manure_surplus_fills, manure_method)[[1]]
+    biosolid_surplus = crop_nutrientReq_minus_Biosolid(nutrient, main_param, param, manure_surplus_fills, manure_method)[[2]]
+    crop_biosolid_rate = compute_biosolid_crop_application_rate(nutrient, main_param, param, manure_surplus_fills, manure_method, crop_rem_nutrient)
     
     export_file(module = 'Nutrients', 
                 file = crop_biosolid_rate, 
@@ -188,7 +196,8 @@ allocate_crop_biosolid_1teraction = function(nutrient, manure_method) {
                 subfolder = nutrient, 
                 subfolderX2 = 'Biosolids_application_rates', 
                 subfolderX3 = manure_method, 
-                subfolderX4 = main_param)
+                subfolderX4 = folder_div, 
+                subfolderX5 = main_param)
     
     # update biosolid surplus
     main_biosolid_surplus[, yrs] = sapply(yrs, function(x) round(main_biosolid_surplus[, x] + biosolid_surplus[, x], 1))
@@ -199,15 +208,16 @@ allocate_crop_biosolid_1teraction = function(nutrient, manure_method) {
               folder = 'Fertilisation', 
               subfolder = nutrient, 
               subfolderX2 = 'Biosolids_surplus',
-              subfolderX3 = manure_method)
+              subfolderX3 = manure_method, 
+              subfolderX4 = folder_div)
 }
 
 
 
-loop_crop_biosolid_1teraction_ManureMethod = function(nutrient) {
+loop_crop_biosolid_1teraction_ManureMethod = function(nutrient, manure_surplus_fills) {
   
   method = c('Method 1', 'Method 2')
-  sapply(method, function(x) allocate_crop_biosolid_1teraction(nutrient, x))
+  sapply(method, function(x) allocate_crop_biosolid_1teraction(nutrient, x, manure_surplus_fills))
 }
 
 

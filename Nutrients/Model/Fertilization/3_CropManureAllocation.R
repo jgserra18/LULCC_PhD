@@ -206,7 +206,6 @@ allocate_crop_animalType_totalManure = function(nutrient, param) {
 }
 
 
-
 # CALCULATION 1 -- CROP NUTRIENT REQUIREMENTS MINUS ALLOCATED MANURE ---------------------------------------------- 
 
 compute_manure_surplus = function(calculation_df) {
