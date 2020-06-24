@@ -1,0 +1,30 @@
+Main_animals,Animals,Housed/stall,Pasture/flat,GrazingLarge/hilly,Unit,Source
+Bovine,Male_calf_2,0,0.17,0.36,(-),GLEAMS
+Bovine,Male_calf_1-2,0,0.17,0.36,(-),GLEAMS
+Bovine,Non_dairy,0,0.17,0.36,(-),APA 
+Bovine,Other_calf,0,0.17,0.36,(-),GLEAMS
+Bovine,Beef_calf,0,0.17,0.36,(-),GLEAMS
+Bovine,Dairy_cows,0,0.17,0.36,(-),APA 
+Bovine,Female_calf_2,0,0.17,0.36,(-),GLEAMS
+Bovine,Female_calf_1-2,0,0.17,0.36,(-),GLEAMS
+Bovine,Female_calf-1,0,0.17,0.36,(-),GLEAMS
+Equides,Horses,,,,,assumed
+Equides,Other_equidae,,,,,assumed
+Goats,Goats,0.009,0.0107,0.024,Mj kg-1 day-1,APA 
+Goats,Doeling,0.009,0.0107,0.024,Mj kg-1 day-1,APA 
+Goats,Buck,0.009,0.0107,0.024,Mj kg-1 day-1,APA 
+Sheep,Ewes_dairy,0.009,0.0107,0.024,Mj kg-1 day-1,APA 
+Sheep,Ewes_other,0.009,0.0107,0.024,Mj kg-1 day-1,APA 
+Sheep,Ram,0.009,0.0107,0.024,Mj kg-1 day-1,APA 
+Rabbits,Rabbits,,,,,assumed
+Pigs,Pregnant_sows,,,,,GLEAMS
+Pigs,Other_swine,,,,,GLEAMS
+Pigs,Pigs_50,,,,,GLEAMS
+Pigs,Pigs_20,,,,,GLEAMS
+Pigs,Non_pregnant_sows,,,,,GLEAMS
+Poultry,Broilers,,,,,GLEAMS
+Poultry,Ducks,,,,,assumed
+Poultry,Geese,,,,,assumed
+Poultry,Rep_hens,,,,,GLEAMS
+Poultry,Turkeys,,,,,assumed
+Poultry,Laying_hens,,,,,GLEAMS

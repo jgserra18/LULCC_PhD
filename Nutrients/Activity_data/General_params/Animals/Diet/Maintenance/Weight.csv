@@ -1,0 +1,30 @@
+Main_animals,Animals,Weight,Unit,Source
+Bovine,Male_calf_2,35,kg head-1,GLEAMS
+Bovine,Male_calf_1-2,35,kg head-1,GLEAMS
+Bovine,Non_dairy,416.4,kg head-1,APA 
+Bovine,Other_calf,35,kg head-1,GLEAMS
+Bovine,Beef_calf,35,kg head-1,GLEAMS
+Bovine,Dairy_cows,600,kg head-1,APA 
+Bovine,Female_calf_2,531,kg head-1,GLEAMS
+Bovine,Female_calf_1-2,35,kg head-1,GLEAMS
+Bovine,Female_calf-1,35,kg head-1,GLEAMS
+Equides,Horses,700,kg head-1,assumed
+Equides,Other_equidae,350,kg head-1,assumed
+Goats,Goats,28.2,kg head-1,APA 
+Goats,Doeling,4.1,,GLEAMS
+Goats,Buck,41.6,,Adapted from APA and GLEAMS
+Sheep,Ewes_dairy,51.0,kg head-1,APA 
+Sheep,Ewes_other,4.5,,GLEAMS
+Sheep,Ram,64.4,,Adapted from APA and GLEAMS
+Rabbits,Rabbits,3.5,kg head-1,assumed
+Pigs,Pregnant_sows,225,kg head-1,GLEAMS
+Pigs,Other_swine,225,kg head-1,GLEAMS
+Pigs,Pigs_50,265,kg head-1,GLEAMS
+Pigs,Pigs_20,7,kg head-1,GLEAMS
+Pigs,Non_pregnant_sows,105,kg head-1,GLEAMS
+Poultry,Broilers,2.6,kg head-1,GLEAMS
+Poultry,Ducks,1.5,kg head-1,assumed
+Poultry,Geese,5,kg head-1,assumed
+Poultry,Rep_hens,1.63,kg head-1,GLEAMS
+Poultry,Turkeys,13.5,kg head-1,assumed
+Poultry,Laying_hens,1.9,kg head-1,GLEAMS

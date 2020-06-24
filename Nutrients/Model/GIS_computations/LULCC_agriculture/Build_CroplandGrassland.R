@@ -9,6 +9,11 @@ create_mainland_annual_NUTS2_raster_mosaic <- function(spatial_res, year) {
   nuts2_id <- c(18,15,16,11,17)
   r_list <- list()
   
+  if (as.integer(year)<1990) {
+    
+    year = '1990'
+  }
+  
   for (i in 1:length(nuts2_id)) {
     
     
@@ -16,6 +21,7 @@ create_mainland_annual_NUTS2_raster_mosaic <- function(spatial_res, year) {
     r_file <- raster(file_yr)
     r_list <- append(r_file, r_list)
   }
+  
   r_list$fun = sum
   r_list <- do.call(mosaic, r_list)
   clc_mask <- get_activity_data(module = 'LULCC', folder = 'CLC', pattern = '1990', subfolder = '500')
@@ -50,6 +56,5 @@ compute_annual_LULC_cropland = function(year, spatial_res = '500', LULC) {
   return(yr_cropland)
   rm(list=c('year','yr_clc','clc_cropland'))
 }
-d = compute_annual_LULC_cropland('2000','500','Cropland')
-cellStats(d, 'sum') * 5 / 1e6
-plot(d)
+
+

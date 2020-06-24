@@ -21,7 +21,8 @@ compute_grazing_NH3_emissions <- function(main_param, param) {
   return(graz_TAN)
 }
 
-loop_grazing_NH3_emissions()
+
+
 loop_grazing_NH3_emissions <- function() {
   
   standard_params <- get_standard_params_list('Animals')
@@ -60,7 +61,7 @@ compute_grazing_N2O_emissions <- function(main_param, param) {
   return(graz_TAN)
 }
 
-loop_grazing_N2O_emissions()
+
 loop_grazing_N2O_emissions <- function() {
   
   standard_params <- get_standard_params_list('Animals')

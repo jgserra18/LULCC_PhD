@@ -88,7 +88,7 @@ compute_municipality_annual_arableLand <- function(year) {
   rm(list=c('standard_params','param_col','main_param_col','main_param','param','crop_df'))
 }
 
-loop_municipality_AaableLand()
+
 loop_municipality_AaableLand <- function() {
   
   

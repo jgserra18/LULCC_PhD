@@ -52,6 +52,10 @@ get_INE_data <- function(INE_param_id, year, muni_id, var_id, other_params) {
       }
   }
   
+  else if (other_params == 'Wool') {
+    
+    json_df <- json_df[[7]][[1]][[1]][[3]][[1]]
+  }
   else {
     json_df <- json_df[[7]][[1]][[1]]
     json_df <- subset(json_df, dim_4=='T' & dim_5 =='T')[ncol(json_df)]
@@ -59,6 +63,7 @@ get_INE_data <- function(INE_param_id, year, muni_id, var_id, other_params) {
   
   return(json_df)
 }
+
 
 get_agrarian_region_INE <- function(INE_param_id, var_id, 
                                     year = seq(1987,2017), 

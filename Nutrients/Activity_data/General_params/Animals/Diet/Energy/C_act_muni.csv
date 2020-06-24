@@ -1,0 +1,279 @@
+Muni_ID,ID,Muni,agrarian_region,agrarian_region_id,Pasture_largeRuminants,Pasture_smallRuminants,House_largeRuminants,House_smallRuminants
+1601,1111601,Arcos de Valdevez,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1602,1111602,Caminha,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1603,1111603,Melgaço,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1604,1111604,Monção,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1605,1111605,Paredes de Coura,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1606,1111606,Ponte da Barca,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1607,1111607,Ponte de Lima,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1608,1111608,Valença,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1609,1111609,Viana do Castelo,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1610,1111610,Vila Nova de Cerveira,Entre Douro e Minho,1,0.17,0.024,0,0.009
+301,1120301,Amares,Entre Douro e Minho,1,0.17,0.024,0,0.009
+302,1120302,Barcelos,Entre Douro e Minho,1,0.17,0.024,0,0.009
+303,1120303,Braga,Entre Douro e Minho,1,0.17,0.024,0,0.009
+306,1120306,Esposende,Entre Douro e Minho,1,0.17,0.024,0,0.009
+310,1120310,Terras de Bouro,Entre Douro e Minho,1,0.17,0.024,0,0.009
+313,1120313,Vila Verde,Entre Douro e Minho,1,0.17,0.024,0,0.009
+307,1130307,Fafe,Entre Douro e Minho,1,0.17,0.024,0,0.009
+308,1130308,Guimarães,Entre Douro e Minho,1,0.17,0.024,0,0.009
+309,1130309,Póvoa de Lanhoso,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1314,1131314,Santo Tirso,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1318,1131318,Trofa,Entre Douro e Minho,1,0.17,0.024,0,0.009
+311,1130311,Vieira do Minho,Entre Douro e Minho,1,0.17,0.024,0,0.009
+312,1130312,Vila Nova de Famalicão,Entre Douro e Minho,1,0.17,0.024,0,0.009
+314,1130314,Vizela,Entre Douro e Minho,1,0.17,0.024,0,0.009
+107,1140107,Espinho,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1304,1141304,Gondomar,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1306,1141306,Maia,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1308,1141308,Matosinhos,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1312,1141312,Porto,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1313,1141313,Póvoa de Varzim,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1315,1141315,Valongo,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1316,1141316,Vila do Conde,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1317,1141317,Vila Nova de Gaia,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1301,1151301,Amarante,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1302,1151302,Baião,Entre Douro e Minho,1,0.17,0.024,0,0.009
+304,1150304,Cabeceiras de Basto,Entre Douro e Minho,1,0.17,0.024,0,0.009
+106,1150106,Castelo de Paiva,Entre Douro e Minho,1,0.17,0.024,0,0.009
+305,1150305,Celorico de Basto,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1804,1151804,Cinfães,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1303,1151303,Felgueiras,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1305,1151305,Lousada,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1307,1151307,Marco de Canaveses,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1705,1151705,Mondim de Basto,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1309,1151309,Paços de Ferreira,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1310,1151310,Paredes,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1311,1151311,Penafiel,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1813,1151813,Resende,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1709,1151709,Ribeira de Pena,Entre Douro e Minho,1,0.17,0.024,0,0.009
+104,1160104,Arouca,Entre Douro e Minho,1,0.17,0.024,0,0.009
+113,1160113,Oliveira de Azeméis,Entre Douro e Minho,1,0.17,0.024,0,0.009
+109,1160109,Santa Maria da Feira,Entre Douro e Minho,1,0.17,0.024,0,0.009
+116,1160116,São João da Madeira,Entre Douro e Minho,1,0.17,0.024,0,0.009
+119,1160119,Vale de Cambra,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1701,1171701,Alijó,Trás-os-Montes,2,0.17,0.024,0,0.009
+1801,1171801,Armamar,Trás-os-Montes,2,0.17,0.024,0,0.009
+403,1170403,Carrazeda de Ansiães,Trás-os-Montes,2,0.17,0.024,0,0.009
+404,1170404,Freixo de Espada à Cinta,Trás-os-Montes,2,0.17,0.024,0,0.009
+1805,1171805,Lamego,Trás-os-Montes,2,0.17,0.024,0,0.009
+1704,1171704,Mesão Frio,Entre Douro e Minho,1,0.17,0.024,0,0.009
+1807,1171807,Moimenta da Beira,Trás-os-Montes,2,0.17,0.024,0,0.009
+1812,1171812,Penedono,Trás-os-Montes,2,0.17,0.024,0,0.009
+1708,1171708,Peso da Régua,Trás-os-Montes,2,0.17,0.024,0,0.009
+1710,1171710,Sabrosa,Trás-os-Montes,2,0.17,0.024,0,0.009
+1711,1171711,Santa Marta de Penaguião,Trás-os-Montes,2,0.17,0.024,0,0.009
+1815,1171815,São João da Pesqueira,Trás-os-Montes,2,0.17,0.024,0,0.009
+1818,1171818,Sernancelhe,Trás-os-Montes,2,0.17,0.024,0,0.009
+1819,1171819,Tabuaço,Trás-os-Montes,2,0.17,0.024,0,0.009
+1820,1171820,Tarouca,Trás-os-Montes,2,0.17,0.024,0,0.009
+409,1170409,Torre de Moncorvo,Trás-os-Montes,2,0.17,0.024,0,0.009
+410,1170410,Vila Flor,Trás-os-Montes,2,0.17,0.024,0,0.009
+914,1170914,Vila Nova de Foz Côa,Trás-os-Montes,2,0.17,0.024,0,0.009
+1714,1171714,Vila Real,Trás-os-Montes,2,0.17,0.024,0,0.009
+401,1180401,Alfândega da Fé,Trás-os-Montes,2,0.17,0.024,0,0.009
+1702,1181702,Boticas,Trás-os-Montes,2,0.17,0.024,0,0.009
+402,1180402,Bragança,Trás-os-Montes,2,0.17,0.024,0,0.009
+1703,1181703,Chaves,Trás-os-Montes,2,0.17,0.024,0,0.009
+405,1180405,Macedo de Cavaleiros,Trás-os-Montes,2,0.17,0.024,0,0.009
+406,1180406,Miranda do Douro,Trás-os-Montes,2,0.17,0.024,0,0.009
+407,1180407,Mirandela,Trás-os-Montes,2,0.17,0.024,0,0.009
+408,1180408,Mogadouro,Trás-os-Montes,2,0.17,0.024,0,0.009
+1706,1181706,Montalegre,Trás-os-Montes,2,0.17,0.024,0,0.009
+1707,1181707,Murça,Trás-os-Montes,2,0.17,0.024,0,0.009
+1712,1181712,Valpaços,Trás-os-Montes,2,0.17,0.024,0,0.009
+1713,1181713,Vila Pouca de Aguiar,Trás-os-Montes,2,0.17,0.024,0,0.009
+411,1180411,Vimioso,Trás-os-Montes,2,0.17,0.024,0,0.009
+412,1180412,Vinhais,Trás-os-Montes,2,0.17,0.024,0,0.009
+101,1610101,Águeda,Beira Litoral,3,0.17,0.024,0,0.009
+102,1610102,Albergaria-a-Velha,Beira Litoral,3,0.17,0.024,0,0.009
+103,1610103,Anadia,Beira Litoral,3,0.17,0.024,0,0.009
+105,1610105,Aveiro,Beira Litoral,3,0.17,0.024,0,0.009
+108,1610108,Estarreja,Beira Litoral,3,0.17,0.024,0,0.009
+110,1610110,Ílhavo,Beira Litoral,3,0.17,0.024,0,0.009
+111,1610111,Mealhada,Beira Litoral,3,0.17,0.024,0,0.009
+112,1610112,Murtosa,Beira Litoral,3,0.17,0.024,0,0.009
+114,1610114,Oliveira do Bairro,Beira Litoral,3,0.17,0.024,0,0.009
+115,1610115,Ovar,Beira Litoral,3,0.17,0.024,0,0.009
+117,1610117,Sever do Vouga,Beira Litoral,3,0.17,0.024,0,0.009
+118,1610118,Vagos,Beira Litoral,3,0.17,0.024,0,0.009
+602,1620602,Cantanhede,Beira Litoral,3,0.17,0.024,0,0.009
+603,1620603,Coimbra,Beira Litoral,3,0.17,0.024,0,0.009
+604,1620604,Condeixa-a-Nova,Beira Litoral,3,0.17,0.024,0,0.009
+605,1620605,Figueira da Foz,Beira Litoral,3,0.17,0.024,0,0.009
+608,1620608,Mira,Beira Litoral,3,0.17,0.024,0,0.009
+610,1620610,Montemor-o-Velho,Beira Litoral,3,0.17,0.024,0,0.009
+613,1620613,Penacova,Beira Litoral,3,0.17,0.024,0,0.009
+615,1620615,Soure,Beira Litoral,3,0.17,0.024,0,0.009
+1004,1631004,Batalha,Beira Litoral,3,0.17,0.024,0,0.009
+1009,1631009,Leiria,Beira Litoral,3,0.17,0.024,0,0.009
+1010,1631010,Marinha Grande,Beira Litoral,3,0.17,0.024,0,0.009
+1015,1631015,Pombal,Beira Litoral,3,0.17,0.024,0,0.009
+1016,1631016,Porto de Mós,Beira Litoral,3,0.17,0.024,0,0.009
+1002,1641002,Alvaiázere,Beira Litoral,3,0.17,0.024,0,0.009
+1003,1641003,Ansião,Beira Litoral,3,0.17,0.024,0,0.009
+601,1640601,Arganil,Beira Litoral,3,0.17,0.024,0,0.009
+1007,1641007,Castanheira de Pêra,Beira Litoral,3,0.17,0.024,0,0.009
+1008,1641008,Figueiró dos Vinhos,Beira Litoral,3,0.17,0.024,0,0.009
+606,1640606,Góis,Beira Litoral,3,0.17,0.024,0,0.009
+607,1640607,Lousã,Beira Litoral,3,0.17,0.024,0,0.009
+609,1640609,Miranda do Corvo,Beira Litoral,3,0.17,0.024,0,0.009
+611,1640611,Oliveira do Hospital,Beira Litoral,3,0.17,0.024,0,0.009
+612,1640612,Pampilhosa da Serra,Beira Litoral,3,0.17,0.024,0,0.009
+1013,1641013,Pedrógão Grande,Beira Litoral,3,0.17,0.024,0,0.009
+614,1640614,Penela,Beira Litoral,3,0.17,0.024,0,0.009
+616,1640616,Tábua,Beira Litoral,3,0.17,0.024,0,0.009
+617,1640617,Vila Nova de Poiares,Beira Litoral,3,0.17,0.024,0,0.009
+901,1650901,Aguiar da Beira,Beira Litoral,3,0.17,0.024,0,0.009
+1802,1651802,Carregal do Sal,Beira Litoral,3,0.17,0.024,0,0.009
+1803,1651803,Castro Daire,Beira Litoral,3,0.17,0.024,0,0.009
+1806,1651806,Mangualde,Beira Litoral,3,0.17,0.024,0,0.009
+1808,1651808,Mortágua,Beira Litoral,3,0.17,0.024,0,0.009
+1809,1651809,Nelas,Beira Litoral,3,0.17,0.024,0,0.009
+1810,1651810,Oliveira de Frades,Beira Litoral,3,0.17,0.024,0,0.009
+1811,1651811,Penalva do Castelo,Beira Litoral,3,0.17,0.024,0,0.009
+1814,1651814,Santa Comba Dão,Beira Litoral,3,0.17,0.024,0,0.009
+1816,1651816,São Pedro do Sul,Beira Litoral,3,0.17,0.024,0,0.009
+1817,1651817,Sátão,Beira Litoral,3,0.17,0.024,0,0.009
+1821,1651821,Tondela,Beira Litoral,3,0.17,0.024,0,0.009
+1822,1651822,Vila Nova de Paiva,Beira Litoral,3,0.17,0.024,0,0.009
+1823,1651823,Viseu,Beira Litoral,3,0.17,0.024,0,0.009
+1824,1651824,Vouzela,Beira Litoral,3,0.17,0.024,0,0.009
+1413,1661413,Mação,Beira Interior,4,0.17,0.024,0,0.009
+506,1660506,Oleiros,Beira Interior,4,0.17,0.024,0,0.009
+508,1660508,Proença-a-Nova,Beira Interior,4,0.17,0.024,0,0.009
+509,1660509,Sertã,Beira Interior,4,0.17,0.024,0,0.009
+510,1660510,Vila de Rei,Beira Interior,4,0.17,0.024,0,0.009
+905,1670905,Fornos de Algodres,Beira Interior,4,0.17,0.024,0,0.009
+906,1670906,Gouveia,Beira Interior,4,0.17,0.024,0,0.009
+912,1670912,Seia,Beira Interior,4,0.17,0.024,0,0.009
+902,1680902,Almeida,Beira Interior,4,0.17,0.024,0,0.009
+903,1680903,Celorico da Beira,Beira Interior,4,0.17,0.024,0,0.009
+904,1680904,Figueira de Castelo Rodrigo,Beira Interior,4,0.17,0.024,0,0.009
+907,1680907,Guarda,Beira Interior,4,0.17,0.024,0,0.009
+908,1680908,Manteigas,Beira Interior,4,0.17,0.024,0,0.009
+909,1680909,Mêda,Beira Interior,4,0.17,0.024,0,0.009
+910,1680910,Pinhel,Beira Interior,4,0.17,0.024,0,0.009
+911,1680911,Sabugal,Beira Interior,4,0.17,0.024,0,0.009
+913,1680913,Trancoso,Beira Interior,4,0.17,0.024,0,0.009
+502,1690502,Castelo Branco,Beira Interior,4,0.17,0.024,0,0.009
+505,1690505,Idanha-a-Nova,Beira Interior,4,0.17,0.024,0,0.009
+507,1690507,Penamacor,Beira Interior,4,0.17,0.024,0,0.009
+511,1690511,Vila Velha de Ródão,Beira Interior,4,0.17,0.024,0,0.009
+501,16A0501,Belmonte,Beira Interior,4,0.17,0.024,0,0.009
+503,16A0503,Covilhã,Beira Interior,4,0.17,0.024,0,0.009
+504,16A0504,Fundão,Beira Interior,4,0.17,0.024,0,0.009
+1001,16B1001,Alcobaça,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1101,16B1101,Alenquer,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1102,16B1102,Arruda dos Vinhos,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1005,16B1005,Bombarral,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1104,16B1104,Cadaval,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1006,16B1006,Caldas da Rainha,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1108,16B1108,Lourinhã,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1011,16B1011,Nazaré,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1012,16B1012,Óbidos,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1014,16B1014,Peniche,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1112,16B1112,Sobral de Monte Agraço,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1113,16B1113,Torres Vedras,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1401,16C1401,Abrantes,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1402,16C1402,Alcanena,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1408,16C1408,Constância,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1410,16C1410,Entroncamento,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1411,16C1411,Ferreira do Zêzere,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1421,16C1421,Ourém,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1417,16C1417,Sardoal,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1418,16C1418,Tomar,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1419,16C1419,Torres Novas,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1420,16C1420,Vila Nova da Barquinha,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1115,1711115,Amadora,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1105,1711105,Cascais,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1106,1711106,Lisboa,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1107,1711107,Loures,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1109,1711109,Mafra,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1116,1711116,Odivelas,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1110,1711110,Oeiras,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1111,1711111,Sintra,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1114,1711114,Vila Franca de Xira,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1502,1721502,Alcochete,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1503,1721503,Almada,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1504,1721504,Barreiro,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1506,1721506,Moita,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1507,1721507,Montijo,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1508,1721508,Palmela,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1510,1721510,Seixal,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1511,1721511,Sesimbra,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1512,1721512,Setúbal,Ribatejo e Oeste,5,0.36,0.0107,0,0.009
+1501,1811501,Alcácer do Sal,Alentejo,6,0.36,0.0107,0,0.009
+1505,1811505,Grândola,Alentejo,6,0.36,0.0107,0,0.009
+211,1810211,Odemira,Alentejo,6,0.36,0.0107,0,0.009
+1509,1811509,Santiago do Cacém,Alentejo,6,0.36,0.0107,0,0.009
+1513,1811513,Sines,Alentejo,6,0.36,0.0107,0,0.009
+1201,1821201,Alter do Chão,Alentejo,6,0.36,0.0107,0,0.009
+1202,1821202,Arronches,Alentejo,6,0.36,0.0107,0,0.009
+1203,1821203,Avis,Alentejo,6,0.36,0.0107,0,0.009
+1204,1821204,Campo Maior,Alentejo,6,0.36,0.0107,0,0.009
+1205,1821205,Castelo de Vide,Alentejo,6,0.36,0.0107,0,0.009
+1206,1821206,Crato,Alentejo,6,0.36,0.0107,0,0.009
+1207,1821207,Elvas,Alentejo,6,0.36,0.0107,0,0.009
+1208,1821208,Fronteira,Alentejo,6,0.36,0.0107,0,0.009
+1209,1821209,Gavião,Alentejo,6,0.36,0.0107,0,0.009
+1210,1821210,Marvão,Alentejo,6,0.36,0.0107,0,0.009
+1211,1821211,Monforte,Alentejo,6,0.36,0.0107,0,0.009
+707,1820707,Mora,Alentejo,6,0.36,0.0107,0,0.009
+1212,1821212,Nisa,Alentejo,6,0.36,0.0107,0,0.009
+1213,1821213,Ponte de Sor,Alentejo,6,0.36,0.0107,0,0.009
+1214,1821214,Portalegre,Alentejo,6,0.36,0.0107,0,0.009
+701,1830701,Alandroal,Alentejo,6,0.36,0.0107,0,0.009
+702,1830702,Arraiolos,Alentejo,6,0.36,0.0107,0,0.009
+703,1830703,Borba,Alentejo,6,0.36,0.0107,0,0.009
+704,1830704,Estremoz,Alentejo,6,0.36,0.0107,0,0.009
+705,1830705,Évora,Alentejo,6,0.36,0.0107,0,0.009
+706,1830706,Montemor-o-Novo,Alentejo,6,0.36,0.0107,0,0.009
+708,1830708,Mourão,Alentejo,6,0.36,0.0107,0,0.009
+709,1830709,Portel,Alentejo,6,0.36,0.0107,0,0.009
+710,1830710,Redondo,Alentejo,6,0.36,0.0107,0,0.009
+711,1830711,Reguengos de Monsaraz,Alentejo,6,0.36,0.0107,0,0.009
+1215,1831215,Sousel,Alentejo,6,0.36,0.0107,0,0.009
+712,1830712,Vendas Novas,Alentejo,6,0.36,0.0107,0,0.009
+713,1830713,Viana do Alentejo,Alentejo,6,0.36,0.0107,0,0.009
+714,1830714,Vila Viçosa,Alentejo,6,0.36,0.0107,0,0.009
+201,1840201,Aljustrel,Alentejo,6,0.36,0.0107,0,0.009
+202,1840202,Almodôvar,Alentejo,6,0.36,0.0107,0,0.009
+203,1840203,Alvito,Alentejo,6,0.36,0.0107,0,0.009
+204,1840204,Barrancos,Alentejo,6,0.36,0.0107,0,0.009
+205,1840205,Beja,Alentejo,6,0.36,0.0107,0,0.009
+206,1840206,Castro Verde,Alentejo,6,0.36,0.0107,0,0.009
+207,1840207,Cuba,Alentejo,6,0.36,0.0107,0,0.009
+208,1840208,Ferreira do Alentejo,Alentejo,6,0.36,0.0107,0,0.009
+209,1840209,Mértola,Alentejo,6,0.36,0.0107,0,0.009
+210,1840210,Moura,Alentejo,6,0.36,0.0107,0,0.009
+212,1840212,Ourique,Alentejo,6,0.36,0.0107,0,0.009
+213,1840213,Serpa,Alentejo,6,0.36,0.0107,0,0.009
+214,1840214,Vidigueira,Alentejo,6,0.36,0.0107,0,0.009
+1403,1851403,Almeirim,Ribatejo e Oeste,5,0.17,0.0107,0,0.009
+1404,1851404,Alpiarça,Ribatejo e Oeste,5,0.17,0.0107,0,0.009
+1103,1851103,Azambuja,Ribatejo e Oeste,5,0.17,0.0107,0,0.009
+1405,1851405,Benavente,Ribatejo e Oeste,5,0.17,0.0107,0,0.009
+1406,1851406,Cartaxo,Ribatejo e Oeste,5,0.17,0.0107,0,0.009
+1407,1851407,Chamusca,Ribatejo e Oeste,5,0.17,0.0107,0,0.009
+1409,1851409,Coruche,Ribatejo e Oeste,5,0.17,0.0107,0,0.009
+1412,1851412,Golegã,Ribatejo e Oeste,5,0.17,0.0107,0,0.009
+1414,1851414,Rio Maior,Ribatejo e Oeste,5,0.17,0.0107,0,0.009
+1415,1851415,Salvaterra de Magos,Ribatejo e Oeste,5,0.17,0.0107,0,0.009
+1416,1851416,Santarém,Ribatejo e Oeste,5,0.17,0.0107,0,0.009
+801,1500801,Albufeira,Algarve,7,0.17,0.0107,0,0.009
+802,1500802,Alcoutim,Algarve,7,0.17,0.0107,0,0.009
+803,1500803,Aljezur,Algarve,7,0.17,0.0107,0,0.009
+804,1500804,Castro Marim,Algarve,7,0.17,0.0107,0,0.009
+805,1500805,Faro,Algarve,7,0.17,0.0107,0,0.009
+806,1500806,Lagoa,Algarve,7,0.17,0.0107,0,0.009
+807,1500807,Lagos,Algarve,7,0.17,0.0107,0,0.009
+808,1500808,Loulé,Algarve,7,0.17,0.0107,0,0.009
+809,1500809,Monchique,Algarve,7,0.17,0.0107,0,0.009
+810,1500810,Olhão,Algarve,7,0.17,0.0107,0,0.009
+811,1500811,Portimão,Algarve,7,0.17,0.0107,0,0.009
+812,1500812,São Brás de Alportel,Algarve,7,0.17,0.0107,0,0.009
+813,1500813,Silves,Algarve,7,0.17,0.0107,0,0.009
+814,1500814,Tavira,Algarve,7,0.17,0.0107,0,0.009
+815,1500815,Vila do Bispo,Algarve,7,0.17,0.0107,0,0.009
+816,1500816,Vila Real de Santo António,Algarve,7,0.17,0.0107,0,0.009

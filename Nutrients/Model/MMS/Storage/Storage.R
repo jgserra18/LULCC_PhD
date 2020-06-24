@@ -279,10 +279,20 @@ general_func_compute_storage_Nemissions <- function(N_gas, main_param, param, ma
 
 loop_slurry_solid_storage_Nemissions <- function(N_gas) {
   
-  standard_params <- get_standard_params_list(main_param = 'Animals')
-  man_type <- c('Slurry','Solid')
+  standard_params <- get_standard_params_list('Animals')
+  
+  yrs <- paste0('X', seq(1987,2017))
+  store_total <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  store_total[, yrs] <- sapply(yrs, function(x) store_total[,x] = 0)
+  
+  store_individual = store_total
+  
+  man_type = c('Solid','Slurry')
   
   for (j in man_type) {
+    
+    store_man_type = store_individual
+    
     
     for (i in 1:nrow(standard_params)) {
       
@@ -290,6 +300,7 @@ loop_slurry_solid_storage_Nemissions <- function(N_gas) {
       param <- standard_params[i, 'Animals']
 
       storage_Nemissions <- general_func_compute_storage_Nemissions(N_gas = N_gas, main_param = main_param, param = param, manure_type = j)
+      storage_Nemissions = data_cleaning(storage_Nemissions)
       export_file(module = 'Nutrients', 
                   file = storage_Nemissions, 
                   filename = param, 
@@ -298,8 +309,30 @@ loop_slurry_solid_storage_Nemissions <- function(N_gas) {
                   subfolderX2 = 'Storage',
                   subfolderX3 = j,
                   subfolderX4 = main_param)
+      
+      # add to the total df
+      store_total[, yrs] = sapply(yrs, function(x) round(storage_Nemissions[,x] + store_total[, x], 1))
+      
+      # add to individual dt
+      store_man_type[, yrs] = sapply(yrs, function(x) round(storage_Nemissions[,x] + store_man_type[, x], 1))
     }
+    export_file(module = 'Nutrients', 
+                file = store_man_type, 
+                filename = 'Total', 
+                folder = 'Gas_N_emissions', 
+                subfolder = N_gas, 
+                subfolderX2 = 'Storage',
+                subfolderX3 = j,
+                subfolderX4 = 'Total')
   }
+  export_file(module = 'Nutrients', 
+              file = store_total, 
+              filename = 'Total', 
+              folder = 'Gas_N_emissions', 
+              subfolder = N_gas, 
+              subfolderX2 = 'Storage',
+              subfolderX3 = 'Total',
+              subfolderX4 = 'Total')
 }
 
 
@@ -308,7 +341,7 @@ loop_slurry_solid_storage_all_N_emissions <- function() {
   N_gases <- c('NH3','N2O','NOx','NN2')
   sapply(N_gases, function(x) loop_slurry_solid_storage_Nemissions(N_gas = x))
 }
-
+loop_slurry_solid_storage_all_N_emissions()
 
 
 ## COMPUTE TOTAL STORAGE EMISSIONS (E_STORAGE_SLURRY/SOLID) -----------------

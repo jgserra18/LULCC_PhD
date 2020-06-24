@@ -1,0 +1,30 @@
+Main_animals,Animals,Cmain,Unit,Source
+Bovine,Male_calf_2,0.37,MJ kg-0.75 day-1,GLEAMS
+Bovine,Male_calf_1-2,0.37,MJ kg-0.75 day-1,GLEAMS
+Bovine,Non_dairy,416.4,MJ kg-0.75 day-1,GLEAMS
+Bovine,Other_calf,0.322,MJ kg-0.75 day-1,GLEAMS
+Bovine,Beef_calf,0.322,MJ kg-0.75 day-1,GLEAMS
+Bovine,Dairy_cows,0.386,MJ kg-0.75 day-1,GLEAMS
+Bovine,Female_calf_2,0.322,MJ kg-0.75 day-1,GLEAMS
+Bovine,Female_calf_1-2,0.322,MJ kg-0.75 day-1,GLEAMS
+Bovine,Female_calf-1,0.322,MJ kg-0.75 day-1,GLEAMS
+Equides,Horses,,,
+Equides,Other_equidae,,,
+Goats,Goats,0.217,MJ kg-0.75 day-1,GLEAMS
+Goats,Doeling,0.236,MJ kg-0.75 day-1,GLEAMS
+Goats,Buck,0.25,MJ kg-0.75 day-1,GLEAMS
+Sheep,Ewes_dairy,0.217,MJ kg-0.75 day-1,GLEAMS
+Sheep,Ewes_other,0.236,MJ kg-0.75 day-1,GLEAMS
+Sheep,Ram,0.25,MJ kg-0.75 day-1,GLEAMS
+Rabbits,Rabbits,,,
+Pigs,Pregnant_sows,,,
+Pigs,Other_swine,,,
+Pigs,Pigs_50,,,
+Pigs,Pigs_20,,,
+Pigs,Non_pregnant_sows,,,
+Poultry,Broilers,,,
+Poultry,Ducks,,,
+Poultry,Geese,,,
+Poultry,Rep_hens,,,
+Poultry,Turkeys,,,
+Poultry,Laying_hens,,,

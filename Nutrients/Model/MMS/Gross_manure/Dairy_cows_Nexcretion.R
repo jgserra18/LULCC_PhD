@@ -5,18 +5,33 @@ source('./Main/Data_operations.R')
 
 ##  MILK PRODUCTION PER COw EXTRAPOLATION ---------------------------------------------------------------------------
 
+milk_production_INE_var_id_mainParam = function(main_param) {
+  
+  df = data.frame(main_param = c('Bovine','Sheep','Goats'),
+                  var_id = c('1','2','3'))
+  df = df[which(df[, 1] == main_param), 2]
+  
+  return(df)
+}
 
-get_historical_dairy_milk_production <- function() {
+
+
+get_historical_dairy_milk_production <- function(main_param = 'Bovine') {
   # gets milk production for the yperiod 2003-2017@NUTS2 scale
   # unit: tonnes milk yr-1
   
-  milk_nuts2 <- get_agrarian_region_INE(INE_param_id = '0008608', var_id = '1', year = seq(2003,2017), muni_id = c('11','16','17','18','15'))
+  set_var_id = milk_production_INE_var_id_mainParam(main_param)
+  
+  milk_nuts2 <- get_agrarian_region_INE(INE_param_id = '0008608', var_id = set_var_id, year = seq(2003,2017), muni_id = c('11','16','17','18','15'))
   milk_nuts2 <- sapply(milk_nuts2, as.numeric)
   milk_nuts2 <- as.data.frame(milk_nuts2)
   names(milk_nuts2) <- c('nuts2_ID', paste0('X', seq(2003,2017)))
   
-  export_file(module = 'Nutrients', file = milk_nuts2, filename = 'Dairy__NUTS2', folder = 'Activity_data', subfolder = 'General_params', subfolderX2 = 'Animals', subfolderX3 = 'Milk_production')
+  file_name = ifelse(main_param=='Bovine', 'Dairy_NUTS2', paste0(main_param, '_NUTS2'))
+  
+  export_file(module = 'Nutrients', file = milk_nuts2, filename = file_name, folder = 'Activity_data', subfolder = 'General_params', subfolderX2 = 'Animals', subfolderX3 = 'Milk_production')
 }
+
 
 
 compute_milk_per_cow <- function() {
@@ -38,7 +53,7 @@ compute_milk_per_cow <- function() {
   return(milk_prod)
   rm(list=c('calc_cols','dairy_pop'))
 }
-
+milk_cow
 
 compute_linear_extrapolation_milkPerCow_historical <- function() {
   

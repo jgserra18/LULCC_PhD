@@ -67,12 +67,32 @@ disaggregate_admin <- function(admin, INE_param, main_param, param, df) {
 
 
 
+
+general_sumIF_NUTS2 = function(admin, data_df) {
+  
+  disagg_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Spatial_disaggregation')
+  df <- data.frame(nuts2_ID = c('11','16','17','18','15'))
+  
+  for (i in 1:nrow(df)) {
+    
+    new_df <- subset(disagg_df, nuts2_ID == df[i,1])
+    new_df <- new_df[, c(1,2)]
+    new_df <- merge(new_df, data_df, by='Muni_ID')
+    
+    yrs <- paste0('X', seq(1987,2017))
+    df[i, yrs] <- sapply(yrs, function(x) round(sum(new_df[, x]), 0))
+  }
+  return(df)
+}
+
+
 ## implement NUTS2 or NUTS3 --------------
 
 sumIf_admin_regions <- function(admin, INE_param, main_param, param) {
   
   disagg_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Spatial_disaggregation')
-  data_df <- disaggregate_admin(admin, INE_param, main_param, param)
+  
+  store_df = disaggregate_admin(admin, INE_param, main_param, param)
 
   df <- data.frame(nuts2_ID = c('11','16','17','18','15'))
 
@@ -80,7 +100,7 @@ sumIf_admin_regions <- function(admin, INE_param, main_param, param) {
     
     new_df <- subset(disagg_df, nuts2_ID == df[i,1])
     new_df <- new_df[, c(1,2)]
-    new_df <- merge(new_df, data_df, 'Muni_ID')
+    new_df <- merge(new_df, store_df, by='Muni_ID')
     
     yrs <- paste0('X', seq(1987,2017))
     df[i, yrs] <- sapply(yrs, function(x) round(sum(new_df[, x]), 0))
@@ -88,6 +108,68 @@ sumIf_admin_regions <- function(admin, INE_param, main_param, param) {
   
   return(df)
 }
+
+
+
+
+
+general_func_sumIF_admin_df = function(admin, merge_df, merge_col) {
+  # general function to aggregate statistics to a higher resolution
+  
+  disagg_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Spatial_disaggregation')
+  
+  if (missing(merge_col)==TRUE) {
+    
+    disagg_df = plyr::join(disagg_df, merge_df)
+  }
+  else {
+    
+    disagg_df = plyr::join(disagg_df, merge_df, 'Muni_ID')
+  }
+
+  
+  admin_shp = get_activity_data(module = 'LULCC', folder = 'Admin', pattern = admin)
+  store_df = data.frame(Admin_id = unique(admin_shp$Admin_id))
+  
+  for (i in 1:nrow(store_df)) {
+    
+    
+    sb_df = subset(disagg_df, select = merge_col)
+    store_df[i, merge_col] = sum(sb_df)
+  }
+  return(store_df)
+}
+
+
+
+
+compute_temporal_sumIF_admin_df = function(admin, merge_df) {
+  # USE FOR INSTANCE TO SCALE ATMOSPHERIC DEPOSITION
+  # to be applied to dfs with temporal data
+  
+  disagg_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Spatial_disaggregation')
+  disagg_df = plyr::join(disagg_df, merge_df, 'Muni_ID')
+  
+  admin_shp = get_activity_data(module = 'LULCC', folder = 'Admin', pattern = admin)
+  store_df = data.frame(Admin_id = unique(admin_shp$Admin_id))
+  
+  yrs = paste0('X', seq(1987,2017))
+  
+  if (admin=='NUTS3') { col_patt = 'nuts3_ID' } else if ( admin=='NUTS2') { col_patt = 'nuts2_ID' } else if (admin=='AR') { col_patt = 'agrarian_region_id'}
+  
+  for (i in 1:nrow(store_df)) {
+    
+    for (yr in yrs) {
+      
+      find_admin_id = which(disagg_df[, col_patt] == store_df[i, 1])
+      sb_df = disagg_df[find_admin_id, yr]
+      store_df[i, yr] = sum(sb_df)
+    }
+  }
+  return(store_df)
+}
+
+
 
 
 ## SUM NATIONAL VALUES ----------------------------------------

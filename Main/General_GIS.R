@@ -59,6 +59,8 @@ resample_to_CLC <- function(module='LULCC', raster_file, mask_CLC, spatial_res, 
   rm(list='clc')
 }
 
+
+
 general_RasterCrop_admin <- function(module, r_file, admin, admin_id) {
   
   admin_shp <- get_activity_data(module, folder = 'Admin', pattern = admin)
@@ -74,5 +76,42 @@ general_RasterCrop_admin <- function(module, r_file, admin, admin_id) {
   return(r_file)
   rm(list='admin_shp')
 }
+
+
+
+statistical_downscaling = function(r_file, r_exp_vars, spatial_res) {
+  
+  r_file = resample_to_CLC('LULCC', r_file, T, spatial_res)
+  
+  clc <- get_activity_data('LULCC', 'CLC', '2000', spatial_res)
+  lon = init(clc, 'x')
+  lat = init(clc, 'y')
+  
+  exp_vars = stack(lon, lat, r_exp_vars)
+  
+  
+  downscaling = spatialEco::raster.downscale(x = exp_vars, y = r_file, scatter = T)
+  
+  return(downscaling)
+  rm(list=c('r_file','clc', 'exp_vars'))
+}
+
+compute_raster_corr = function(r_stack, names_r_stack, formula) {
+  # for raster predict
+  # r_pred = predict(r_stack, model, progress =)
+  
+  
+  fm = as.formula(formula)
+  names(r_stack) = names_r_stack
+  df = as.data.frame(r_stack, xy=T, na.rm=T)
+  
+  model = lm(formula, data = df)
+  r2 = summary(model)$r.squared
+  
+  return(r2)
+}
+
+
+
 
 

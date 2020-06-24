@@ -19,10 +19,14 @@ compute_yards_NH3_emissions <- function(main_param, param, manure_type) {
   return(yards_TAN)
 }
 
-
+loop_yards_NH3_emissions()
 loop_yards_NH3_emissions <- function() {
   
   standard_params <- get_standard_params_list('Animals')
+  
+  yrs <- paste0('X', seq(1987,2017))
+  store_total <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  store_total[, yrs] <- sapply(yrs, function(x) store_total[,x] = 0)
   
 
     for (i in 1:nrow(standard_params)) {
@@ -39,7 +43,18 @@ loop_yards_NH3_emissions <- function() {
                   subfolderX2 = 'Yards',
                   subfolderX3 = 'Total',
                   subfolderX4 = main_param)
+      
+      store_total[, yrs] = sapply(yrs, function(x) round(yards_NH3[,x] + store_total[, x], 1))
     }
+  export_file(module = 'Nutrients', 
+              file = store_total, 
+              filename = 'Total', 
+              folder = 'Gas_N_emissions', 
+              subfolder = 'NH3', 
+              subfolderX2 = 'Yards',
+              subfolderX3 = 'Total',
+              subfolderX4 = 'Total')
+  
   rm(list=c('standard_params','man_type','main_param','param','yards_NH3'))
 }
 
@@ -62,33 +77,66 @@ compute_housing_NH3_emissions <- function(main_param, param, manure_type) {
 }
 
 
-loop_housing_NH3_emissions <- function() {
+loop_housing_NH3_emissions = function() {
   
   standard_params <- get_standard_params_list('Animals')
   
-  man_type <- c('Solid','Slurry')
+  yrs <- paste0('X', seq(1987,2017))
+  store_total <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  store_total[, yrs] <- sapply(yrs, function(x) store_total[,x] = 0)
+  
+  store_individual = store_total
+  
+  man_type = c('Solid','Slurry')
   
   for (j in man_type) {
     
-    for (i in 1:nrow(standard_params)) {
+      store_man_type = store_individual
       
-      main_param <- standard_params[i, 'Main_animals']
-      param <- standard_params[i, 'Animals']
-      
-      house_NH3 <- compute_housing_NH3_emissions(main_param = main_param, param = param, manure_type = j)
+      for (i in 1:nrow(standard_params)) {
+        
+        main_param <- standard_params[i, 'Main_animals']
+        param <- standard_params[i, 'Animals']
+        
+        house_NH3 <- compute_housing_NH3_emissions(main_param = main_param, param = param, manure_type = j)
+        house_NH3 = data_cleaning(house_NH3)
+        export_file(module = 'Nutrients', 
+                    file = house_NH3, 
+                    filename = param, 
+                    folder = 'Gas_N_emissions', 
+                    subfolder = 'NH3', 
+                    subfolderX2 = 'Housing',
+                    subfolderX3 = j,
+                    subfolderX4 = main_param)
+        
+        # add to the total df
+        store_total[, yrs] = sapply(yrs, function(x) round(house_NH3[,x] + store_total[, x], 1))
+        
+        # add to individual dt
+        store_man_type[, yrs] = sapply(yrs, function(x) round(house_NH3[,x] + store_man_type[, x], 1))
+      }
+      # export totala sum of a given a manure type
       export_file(module = 'Nutrients', 
-                  file = house_NH3, 
-                  filename = param, 
+                  file = store_man_type, 
+                  filename = 'Total', 
                   folder = 'Gas_N_emissions', 
                   subfolder = 'NH3', 
                   subfolderX2 = 'Housing',
                   subfolderX3 = j,
-                  subfolderX4 = main_param)
-    }
+                  subfolderX4 = 'Total')
+      
   }
-  rm(list=c('standard_params','man_type','main_param','param','house_NH3'))
+  export_file(module = 'Nutrients', 
+              file = store_total, 
+              filename = 'Total', 
+              folder = 'Gas_N_emissions', 
+              subfolder = 'NH3', 
+              subfolderX2 = 'Housing',
+              subfolderX3 = 'Total',
+              subfolderX4 = 'Total')
+  
+  rm(list=c('standard_params','man_type','main_param','param','house_NH3', 'store_total', 'store_man_type'))
 }
-
 
 
 

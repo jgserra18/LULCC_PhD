@@ -5,7 +5,10 @@
 
 source('./Nutrients/Model/MMS/Grazing/Grazing_Nemissions.R')
 
-loop_grazing_NH3_emissions()
+loop_NH3_grazing = function() {
+  
+  loop_grazing_NH3_emissions()
+}
 
 
 
@@ -73,7 +76,7 @@ loop_update_crop_manure_spreading_NH3_emission = function(manure_type, manure_su
     param = standard_params[i, 'Crop']
     
     
-    if (main_param == 'Pastures' | main_param == 'Forage' | param == 'Tomato' | main_param == 'Horticulture') {
+    if (param == 'Extensive_pasture' | param == 'Tomato' | main_param == 'Horticulture') {
       next
     }
     else {
@@ -100,7 +103,6 @@ loop_update_crop_manure_spreading_NH3_emission_ManType = function(manure_surplus
 }
 
 
-
 compute_total_manure_spreading_NH3 = function(manure_surplus_fills_nutDemand = F, manure_method = 'Method 1', nutrient = 'N') {
   
   if (manure_surplus_fills_nutDemand == TRUE) { folder_div = 'With_ManSurplus'} else { folder_div = 'Without_ManSurplus'}
@@ -112,7 +114,7 @@ compute_total_manure_spreading_NH3 = function(manure_surplus_fills_nutDemand = F
     param = standard_params[i, 'Crop']
     
     
-    if (main_param == 'Pastures' | main_param == 'Forage' | param == 'Tomato' | main_param == 'Horticulture') {
+    if (param == 'Extensive_pasture'  | param == 'Tomato' | main_param == 'Horticulture') {
       next
     }
     else {
@@ -157,6 +159,76 @@ compute_total_manure_spreading_NH3 = function(manure_surplus_fills_nutDemand = F
   }
   rm(list=c('crop_man_app_solid_NH3','crop_man_app_slurry_NH3'))
 }
+
+
+compute_total_manure_app_NH3_per_mainParam = function(manure_surplus_fills_nutDemand = F, manure_method = 'Method 1', nutrient = 'N') {
+  
+  if (manure_surplus_fills_nutDemand == TRUE) { folder_div = 'With_ManSurplus'} else { folder_div = 'Without_ManSurplus'}
+  standard_params <- get_standard_params_list(main_param = 'Crops')
+  
+  yrs <- paste0('X', seq(1987,2017))
+  store_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  store_df[, yrs] <- sapply(yrs, function(x) store_df[,x] <- 0)
+  
+  main_params = unique(biosolid_crops[, 'Main_crop'])
+  
+  for (i in main_params) {
+    
+    param_df = subset(biosolid_crops, Main_crop == i)
+    main_param_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+    main_param_df[, yrs] <- sapply(yrs, function(x) main_param_df[,x] <- 0)
+    
+    for (j in 1:nrow(param_df)) {
+      
+      param = param_df[j, 'Crop']
+      
+      if (i == 'Pastures' | i == 'Forage' | param == 'Tomato' | i == 'Horticulture') {
+        next
+      }
+      else {
+        
+        crop_tot_man_NH3 = get_activity_data(module = 'Nutrients', 
+                                                          mainfolder =  'Output', 
+                                                          folder = 'Gas_N_emissions', 
+                                                          subfolder = 'NH3', 
+                                                          subfolderX2 = 'Manure_application',
+                                                          subfolderX3 = manure_method, 
+                                                          subfolderX4 = folder_div,
+                                                          subfolderX5 = 'Total', 
+                                                          subfolderX6 = i, 
+                                                          pattern = param)
+  
+        # store in main_param_df
+        main_param_df[, yrs] = sapply(yrs, function(x) round(main_param_df[,x] + crop_tot_man_NH3[,x], 1))
+        
+        # store in TOTAL df
+        store_df[, yrs] = sapply(yrs, function(x) round(store_df[,x] + crop_tot_man_NH3[,x], 1))
+      }
+    }
+    export_file(module = 'Nutrients', 
+                file = main_param_df, 
+                filename = i, 
+                folder = 'Gas_N_emissions', 
+                subfolder = 'NH3', 
+                subfolderX2 = 'Manure_application',
+                subfolderX3 = manure_method, 
+                subfolderX4 = folder_div,
+                subfolderX5 = 'Total', 
+                subfolderX6 = 'Total')
+  }
+  export_file(module = 'Nutrients', 
+              file = store_df, 
+              filename = 'Total', 
+              folder = 'Gas_N_emissions', 
+              subfolder = 'NH3', 
+              subfolderX2 = 'Manure_application',
+              subfolderX3 = manure_method, 
+              subfolderX4 = folder_div,
+              subfolderX5 = 'Total', 
+              subfolderX6 = 'Total')
+}
+
+
 
 
 
@@ -211,8 +283,15 @@ compute_all_crop_residues_burnt_NH3 <- function() {
   main_crops <- c('Cereals','Vineyard', 'Olive_grove','Citrus','Dried_fruits','Fresh_fruits')
   standard_params <- get_standard_params_list(main_param = 'Crops')
   
+  yrs <- paste0('X', seq(1987,2017))
+  store_total <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  store_total[, yrs] <- sapply(yrs, function(x) store_total[,x] = 0)
+  
+  store_others  = store_total
   
   for (i in main_crops) {
+    
+    store_main_param = store_others
     
     crops <- standard_params[which(standard_params$Main_crop==i), 'Crop']
     
@@ -226,8 +305,25 @@ compute_all_crop_residues_burnt_NH3 <- function() {
                   subfolder = 'NH3', 
                   subfolderX2 = 'Crop_residues_burnt',
                   subfolderX3 = i)
+      
+      store_main_param[, yrs] = sapply(yrs, function(x) round(crop_res_burnt_NH3[,x] + store_main_param[, x], 1))
+      store_total[, yrs] = sapply(yrs, function(x) round(crop_res_burnt_NH3[,x] + store_total[, x], 1))
     }
+    export_file(module = 'Nutrients', 
+                file = store_main_param, 
+                filename = i, 
+                folder = 'Gas_N_emissions', 
+                subfolder = 'NH3', 
+                subfolderX2 = 'Crop_residues_burnt',
+                subfolderX3 = 'Total')
   }
+  export_file(module = 'Nutrients', 
+              file = store_total, 
+              filename = 'Total', 
+              folder = 'Gas_N_emissions', 
+              subfolder = 'NH3', 
+              subfolderX2 = 'Crop_residues_burnt',
+              subfolderX3 = 'Total')
 }
 
 
@@ -246,7 +342,7 @@ set_NH3_biosolid = function() {
 
 
 compute_crop_biosolid_app_NH3 = function(main_param, param, manure_surplus_fills_nutDemand = F, manure_method = 'Method 1', nutrient = 'N') {
-  # unit: kg N-NH3 yr-1
+  # unit: kg N-NH3 crop area-1 yr-1
   
   if (manure_surplus_fills_nutDemand == TRUE) { folder_div = 'With_ManSurplus'} else { folder_div = 'Without_ManSurplus'}
   
@@ -260,15 +356,15 @@ compute_crop_biosolid_app_NH3 = function(main_param, param, manure_surplus_fills
                                         subfolderX4 = folder_div,
                                         subfolderX5 = main_param, 
                                         pattern = param)
+  crop_area = get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Areas', subfolderX2 = main_param, pattern = param)
   
   yrs = paste0('X',seq(1987,2017))
   crop_biosolid_app_NH3 = crop_biosolid_app
-  crop_biosolid_app_NH3[, yrs] = sapply(yrs, function(x) round(crop_biosolid_app[, x] * ef, 1))
+  crop_biosolid_app_NH3[, yrs] = sapply(yrs, function(x) round(crop_biosolid_app[, x] * crop_area[,x] * ef, 1))
   
   return(crop_biosolid_app_NH3)
   rm(list=c('ef','crop_biosolid_app'))
 }
-
 
 loop_crop_biosolid_app_NH3 = function(manure_surplus_fills_nutDemand = F, manure_method = 'Method 1', nutrient = 'N') {
   
@@ -294,7 +390,9 @@ loop_crop_biosolid_app_NH3 = function(manure_surplus_fills_nutDemand = F, manure
   }
 }
 
+
 compute_total_biosolid_app_NH3 = function(manure_surplus_fills_nutDemand = F, manure_method = 'Method 1', nutrient = 'N') {
+  # unit: kg N-NH3 yr-1
   
   if (manure_surplus_fills_nutDemand == TRUE) { folder_div = 'With_ManSurplus'} else { folder_div = 'Without_ManSurplus'}
   
@@ -304,13 +402,36 @@ compute_total_biosolid_app_NH3 = function(manure_surplus_fills_nutDemand = F, ma
   store_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
   store_df[, yrs] <- sapply(yrs, function(x) store_df[,x] <- 0)
   
-  for (i in 1:nrow(biosolid_crops)) {
+  main_params = unique(biosolid_crops[, 'Main_crop'])
+  
+  for (i in main_params) {
     
-    main_param = biosolid_crops[i, 'Main_crop']
-    param = biosolid_crops[i, 'Crop']
+    param_df = subset(biosolid_crops, Main_crop == i)
+    main_param_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+    main_param_df[, yrs] <- sapply(yrs, function(x) main_param_df[,x] <- 0)
     
-    crop_biosolid_app_NH3 = compute_crop_biosolid_app_NH3(main_param, param, manure_method)
-    store_df[, yrs] = sapply(yrs, function(x) round(store_df[,x] + crop_biosolid_app_NH3[,x], 1))
+    for (j in 1:nrow(param_df)) {
+      
+      param = param_df[j, 'Crop']
+      crop_biosolid_app_NH3 = compute_crop_biosolid_app_NH3(i, param, manure_method)
+      
+      # store in main_param_df
+      main_param_df[, yrs] = sapply(yrs, function(x) round(main_param_df[,x] + crop_biosolid_app_NH3[,x], 1))
+  
+      # store in TOTAL df
+      store_df[, yrs] = sapply(yrs, function(x) round(store_df[,x] + crop_biosolid_app_NH3[,x], 1))
+      
+    }
+    # export main param df
+    export_file(module = 'Nutrients', 
+                file = main_param_df, 
+                filename = i, 
+                folder = 'Gas_N_emissions', 
+                subfolder = 'NH3', 
+                subfolderX2 = 'Biosolid_application',
+                subfolderX3 = manure_method, 
+                subfolderX4 = folder_div,
+                subfolderX5 = 'Total')
   }
   export_file(module = 'Nutrients', 
               file = store_df, 
@@ -322,3 +443,4 @@ compute_total_biosolid_app_NH3 = function(manure_surplus_fills_nutDemand = F, ma
               subfolderX4 = folder_div,
               subfolderX5 = 'Total')
 }
+

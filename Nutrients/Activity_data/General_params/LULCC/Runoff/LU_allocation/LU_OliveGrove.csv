@@ -1,0 +1,5 @@
+recl_from,recl_to,allow_runoff
+0,223,0
+223,241,1
+241,244,1
+244,999,0

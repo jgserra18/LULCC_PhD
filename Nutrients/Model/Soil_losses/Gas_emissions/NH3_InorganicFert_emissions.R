@@ -352,6 +352,63 @@ compute_total_crop_fert_prod_NH3 = function(nutrient = 'N', manure_surplus_fills
 }
 
 
-
+compute_total_crop_fert_prod_NH3_per_mainParam = function(nutrient = 'N', manure_surplus_fills_nutDemand = F, manure_method = 'Method 1') {
+  
+  
+  if (manure_surplus_fills_nutDemand == TRUE) { folder_div = 'With_ManSurplus'} else { folder_div = 'Without_ManSurplus'}
+  standard_params <- get_standard_params_list(main_param = 'Crops')
+  
+  yrs <- paste0('X', seq(1987,2017))
+  store_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  store_df[, yrs] <- sapply(yrs, function(x) store_df[,x] <- 0)
+  
+  main_params = unique(biosolid_crops[, 'Main_crop'])
+  
+  for (i in main_params) {
+    
+    param_df = subset(biosolid_crops, Main_crop == i)
+    main_param_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+    main_param_df[, yrs] <- sapply(yrs, function(x) main_param_df[,x] <- 0)
+    
+    for (j in 1:nrow(param_df)) {
+      
+      param = param_df[j, 'Crop']
+      
+      if (param == 'Extensive_pasture') {
+        next 
+      }
+      else {
+        
+        crop_fert_prod_nh3 = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Gas_N_emissions', subfolder = 'NH3', subfolderX2 = 'Inorganic_fertiliser', subfolderX3 =manure_method, subfolderX4 = folder_div, subfolderX5 = 'Total', subfolderX6 = i, pattern = param)
+        
+        # store in main_param_df
+        main_param_df[, yrs] = sapply(yrs, function(x) round(main_param_df[,x] + crop_fert_prod_nh3[,x], 1))
+        
+        # store in TOTAL df
+        store_df[, yrs] = sapply(yrs, function(x) round(store_df[,x] + crop_fert_prod_nh3[,x], 1))
+      }
+    }
+    export_file(module = 'Nutrients', 
+                file = main_param_df, 
+                filename = i, 
+                folder = 'Gas_N_emissions', 
+                subfolder = 'NH3', 
+                subfolderX2 = 'Inorganic_fertiliser',
+                subfolderX3 = manure_method, 
+                subfolderX4 = folder_div,
+                subfolderX5 = 'Total', 
+                subfolderX6 = 'Total')
+  }
+  export_file(module = 'Nutrients', 
+              file = store_df, 
+              filename = 'Total', 
+              folder = 'Gas_N_emissions', 
+              subfolder = 'NH3', 
+              subfolderX2 = 'Inorganic_fertiliser',
+              subfolderX3 = manure_method, 
+              subfolderX4 = folder_div,
+              subfolderX5 = 'Total', 
+              subfolderX6 = 'Total')
+}
 
 
