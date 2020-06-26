@@ -23,7 +23,7 @@ aggregate_INE_muni_agrarian <- function(AR_id, df_merge, year_sum) {
   
   # subset based on the AR_id
   sb_df <- subset(disagg_df, agrarian_region_id == AR_id)
-  sb_df <- plyr::join(sb_df, df_merge)
+  sb_df <- plyr::join(sb_df, df_merge, 'agrarian_region_id')
   # compute the Muni_sum within the AR
   AR_sum <- sum(sb_df[, paste0('X', year_sum)])
   

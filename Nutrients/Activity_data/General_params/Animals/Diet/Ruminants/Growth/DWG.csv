@@ -10,10 +10,10 @@ Bovine,Female_calf_1-2,0.75,kg head-1 day-1,GLEAMS,
 Bovine,Female_calf-1,0.75,kg head-1 day-1,GLEAMS,
 Equides,Horses,,,GLEAMS,
 Equides,Other_equidae,,,GLEAMS,
-Goats,Goats,,,,
+Goats,Goats,0,,,
 Goats,Doeling,0.2,kg head-1 day-1,Assumed,Assumed
 Goats,Buck,0.2,kg head-1 day-1,Assumed,Assumed
-Sheep,Ewes_dairy,,,,
+Sheep,Ewes_dairy,0,,,
 Sheep,Ewes_other,0.3,kg head-1 day-1,GLEAMS,Assumed
 Sheep,Ram,0.3,kg head-1 day-1,GLEAMS,Assumed
 Rabbits,Rabbits,,,GLEAMS,

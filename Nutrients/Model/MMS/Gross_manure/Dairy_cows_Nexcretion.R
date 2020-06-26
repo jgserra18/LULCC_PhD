@@ -53,7 +53,7 @@ compute_milk_per_cow <- function() {
   return(milk_prod)
   rm(list=c('calc_cols','dairy_pop'))
 }
-milk_cow
+
 
 compute_linear_extrapolation_milkPerCow_historical <- function() {
   
