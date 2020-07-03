@@ -347,11 +347,11 @@ get_milk_protein_content = function() {
   return(milk_prot)
 }
 
-
 loop_milk_fat_protein_dairy_ruminants = function() {
   
+  # fat
   df = data.frame(animals = c('Dairy_cows','Sheep','Goats'),
-                  INE_param_id = c('0008605', '0008606','0008607'))
+                  INE_param_id = c('0008604', '0008606','0008607'))
   
   for (i in 1:nrow(df)) {
     
@@ -362,8 +362,8 @@ loop_milk_fat_protein_dairy_ruminants = function() {
                 folder = 'Activity_data',
                 subfolder = 'General_params', 
                 subfolderX2 = 'Animals', 
-                subfolderX3 = 'Ruminants',
-                subfolderX4 = 'Diet', 
+                subfolderX3 = 'Diet',
+                subfolderX4 = 'Ruminants', 
                 subfolderX5 = 'Milk')
     
     if (df[i,1] == 'Dairy_cows') {
@@ -375,8 +375,8 @@ loop_milk_fat_protein_dairy_ruminants = function() {
                   folder = 'Activity_data',
                   subfolder = 'General_params', 
                   subfolderX2 = 'Animals',
-                  subfolderX3 = 'Ruminants',
-                  subfolderX4 = 'Diet', 
+                  subfolderX3 = 'Diet',
+                  subfolderX4 = 'Ruminants', 
                   subfolderX5 = 'Nutrient_retention')
     }
   }
@@ -416,7 +416,6 @@ compute_egg_HATCH_frac = function() {
 # GET EGG PRODUCTION OF CHICKEN ----------------------------------------------------
 
 
-get_chicken_no_eggs = function()
 
 
 get_chicken_egg_production = function(INE_param_id = '0008954') {
@@ -450,7 +449,7 @@ get_chicken_egg_production = function(INE_param_id = '0008954') {
 compute_eggs_perLayingHens = function(main_param, param) {
   # unit: g eggs head-1 yr-1
   
-  eggs = get_activity_data(module = 'Nutrients', mainfolder = 'Activity_data', subfolder = 'General_params', subfolderX2 = 'Animals', subfolderX3 = 'Diet', subfolderX4 = 'Chicken_eggs', pattern = 'Egg')
+  eggs = get_activity_data(module = 'Nutrients', mainfolder = 'Activity_data', subfolder = 'General_params', subfolderX2 = 'Animals', subfolderX3 = 'Diet', subfolderX4 = 'Chicken', subfolderX5 = 'Eggs', pattern = 'Egg')
   tot_pop_muni =get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Animals', subfolderX2 = 'Poultry', pattern = 'Laying_hens')
   tot_pop_muni = general_sumIF_NUTS2('NUTS2', tot_pop_muni)
   

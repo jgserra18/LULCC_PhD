@@ -1,0 +1,5 @@
+Crop_product,Roughage,FRAC,Source
+Residues,Pulses,0.05,GLEAMS
+Harvest,Pulses,0.05,GLEAMS
+Harvest,forage_maize,0.2,GLEAMS
+Harvest,forage_sorghum,0.1,GLEAMS

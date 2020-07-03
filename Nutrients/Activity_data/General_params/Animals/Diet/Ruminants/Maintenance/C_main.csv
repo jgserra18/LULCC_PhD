@@ -1,7 +1,7 @@
 Main_animals,Animals,Cmain,Unit,Source
 Bovine,Male_calf_2,0.37,MJ kg-0.75 day-1,GLEAMS
 Bovine,Male_calf_1-2,0.37,MJ kg-0.75 day-1,GLEAMS
-Bovine,Non_dairy,416.4,MJ kg-0.75 day-1,GLEAMS
+Bovine,Non_dairy,0.322,MJ kg-0.75 day-1,GLEAMS
 Bovine,Other_calf,0.322,MJ kg-0.75 day-1,GLEAMS
 Bovine,Beef_calf,0.322,MJ kg-0.75 day-1,GLEAMS
 Bovine,Dairy_cows,0.386,MJ kg-0.75 day-1,GLEAMS
