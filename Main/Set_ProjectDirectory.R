@@ -27,7 +27,5 @@ load_dir <- function(module) {
   }
 }
 
-set_proj_dir(set_wd = T)
-
-
+load_dir('Main')
 

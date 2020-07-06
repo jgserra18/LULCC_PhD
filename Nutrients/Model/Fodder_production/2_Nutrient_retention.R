@@ -7,7 +7,6 @@ source('./Nutrients/Model/MMS/Gross_manure/Compute_Nutrient_excretion.R')
 #* Nut retention is assumed to be 0 for:
 #* --> Adult males for ruminants, pigs
 
-
 get_animal_subclass = function(main_param, totals) {
   
   if (main_param == 'Goats') {

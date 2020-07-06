@@ -1,0 +1,7 @@
+Main_crop,Crop,Crop_product,Roughage,FRAC,Source
+Pastures,Extensive_pasture,Harvest,Fresh_grass,0.55,GLEAMS
+Pastures,Extensive_pasture,Residues,Hay,0.2,GLEAMS
+Forage,Annual_mixtures,Harvest,Annual_mixtures,0.1,GLEAMS
+Cereals,Cereals,Residues,Crop_residues,0.05,GLEAMS
+Forage,other_forage,Harvest,other_forage,0.05,GLEAMS
+Forage,Annual_mixtures,Harvest,Annual_mixtures,0.05,GLEAMS

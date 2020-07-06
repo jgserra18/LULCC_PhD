@@ -3,7 +3,6 @@ source('./Nutrients/Model/Fodder_production/2_Nutrient_retention.R')
 
 ## N EXCRETION INDUSTRIAL SYSTEMS (HOUSING + YARDS) ---------------------------------------
 
-
 compute_nutrient_excretion_Industrial = function(main_param, param, management, nutrient = 'N') {
   # computes the N excreted in industry farming (i.e., non-grazing systems)
   #unit: kg nutrient yr-1
