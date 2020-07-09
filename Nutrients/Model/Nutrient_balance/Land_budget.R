@@ -189,7 +189,7 @@ get_crop_offtake = function(reference_area, nutrient = 'N') {
 
 
 
-set_total_output_params = function(reference_area, nutrient = 'N') {
+set_total_output_params = function(reference_area, export = FALSE, nutrient = 'N') {
   # burnt residues are not included
   
   crop_res = get_crop_residues(reference_area, nutrient)
@@ -202,6 +202,12 @@ set_total_output_params = function(reference_area, nutrient = 'N') {
   
   tot_out = crop_offtake
   tot_out[, yrs] = sapply(yrs, function(x) round(crop_res[,x] + fodder_res[,x] + fodder_offtake[,x] + crop_offtake[,x], 0))
+  
+  if (export == TRUE) {
+    
+    store_params = list(crop_residues = crop_res, fodder_residues = fodder_res, fodder_offtake = fodder_offtake, crop_offtake = crop_offtake)
+    export_param_in_list(list_with_params = store_params, reference_area, is_input = FALSE, nutrient)
+  }
   
   return(tot_out)
 }
