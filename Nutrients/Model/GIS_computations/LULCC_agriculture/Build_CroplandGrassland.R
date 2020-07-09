@@ -32,7 +32,6 @@ create_mainland_annual_NUTS2_raster_mosaic <- function(spatial_res, year) {
 }
 
 
-
 compute_annual_LULC_cropland = function(year, spatial_res = '500', LULC) {
   # computes the annual cropland at a default spatial resolution of 500m
   

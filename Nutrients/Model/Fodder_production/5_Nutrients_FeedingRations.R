@@ -269,6 +269,7 @@ compute_all_nutrient_roughage_feed_nonDairy_animals= function(main_param, param,
     main_param = roughage_ration[i, 1]
     param = roughage_ration[i, 2]
     crop_product = roughage_ration[i, 3]
+    if (crop_product == 'Harvest') { crop_product = 'Main_crop' }
     roughage_feed = roughage_ration[i, 4]
     
     Nutrient_roughage_feed = compute_nutrient_roughage_individualFeed_nonDairy_animals(main_param, param, roughage_feed, management, nutrient)
@@ -280,12 +281,13 @@ compute_all_nutrient_roughage_feed_nonDairy_animals= function(main_param, param,
                 subfolder = 'Nutrient_ration', 
                 subfolderX2 = nutrient,
                 subfolderX3 = system,
-                subfolderX4 = 'Roughage',
+                subfolderX4 = crop_product,
                 subfolderX5 = management,
                 subfolderX6 = main_param)
     
   }
 }
+
 
 
 loop_nutrient_roughage_feed_nonDairy_Animalsl = function(nutrient='N') {
@@ -309,6 +311,7 @@ loop_nutrient_roughage_feed_nonDairy_Animalsl = function(nutrient='N') {
           main_crop = roughage_ration[i, 1]
           crop = roughage_ration[i, 2]
           crop_product = roughage_ration[i, 3]
+          if (crop_product == 'Harvest') { crop_product = 'Main_crop' }
           roughage_feed = roughage_ration[i, 4]
           
           # prepare total df (industrial + grazing)
@@ -337,7 +340,7 @@ loop_nutrient_roughage_feed_nonDairy_Animalsl = function(nutrient='N') {
                           subfolder = 'Nutrient_ration', 
                           subfolderX2 = nutrient,
                           subfolderX3 = system,
-                          subfolderX4 = 'Roughage',
+                          subfolderX4 = crop_product,
                           subfolderX5 = main_param,
                           subfolderX6 = param)
             }
@@ -349,7 +352,7 @@ loop_nutrient_roughage_feed_nonDairy_Animalsl = function(nutrient='N') {
                         subfolder = 'Nutrient_ration', 
                         subfolderX2 = nutrient,
                         subfolderX3 = 'Total',
-                        subfolderX4 = 'Roughage',
+                        subfolderX4 = crop_product,
                         subfolderX5 = main_param,
                         subfolderX6 = param)
             
@@ -359,20 +362,12 @@ loop_nutrient_roughage_feed_nonDairy_Animalsl = function(nutrient='N') {
   }
 }
 
-// melhorar rações + forrageiras/resíduos
+# --> Annual_mixtures - very high
+# --> oat/maize - a bit high
+# --> forage roots ok
+# --> other_forage old data is weird (areas), results in distortion
 
-
-d = compute_total_nutrient_roughage_feed_ForagePasturesFlows('forage_maize')
-s1 = sapply(yrs, function(x) sum(d[, x]))
-
-d2 = read.csv('./Nutrients/Activity_data/Correct_data_Municipality/Areas/Forage/forage_maize.csv')
-s2 = sapply(yrs, function(x) sum(d2[, x]))
-(s1/s2)
-dd = d
-dd[, yrs] = d[,yrs] / d2[,yrs]
-dd = data_cleaning(dd)
-dd
-compute_total_nutrient_roughage_feed_ForagePasturesFlows = function(roughage_feed, nutrient = 'N') {
+compute_total_nutrient_roughage_feed_ForagePasturesFlows = function(crop_product = 'Main_crop', roughage_feed, nutrient = 'N') {
   # calculates the total nutrient flows of a given roughage feed (e.g., Fresh_hay)
   # needed to calculate fodder production of the main crop products and crop residues (e.g., Pastures, Fodder)
   # unit: kg nutrient yr-
@@ -392,13 +387,22 @@ compute_total_nutrient_roughage_feed_ForagePasturesFlows = function(roughage_fee
     for (param in params) {
       
       roughage_ration = select_animal_roughage_feed_ration(main_param, param)
-      
+
       if (length(which(roughage_ration[, 4] == roughage_feed)) == 0) {
         next 
       }
       else {
-        Nut_roughage = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Fodder_production', subfolder = 'Nutrient_ration', subfolderX2 = nutrient, subfolderX3 = 'Total', subfolderX4 = 'Roughage', subfolderX5 = main_param, subfolderX6 = param, pattern = roughage_feed)
-        total[, yrs] <- sapply(yrs, function(x) total[,x] + Nut_roughage[,x])
+        
+        file_exists = list_all_files_folder(module = 'Nutrients', mainfolder = 'Output', folder = 'Fodder_production', subfolder = 'Nutrient_ration', subfolderX2 = nutrient, subfolderX3 = 'Total', subfolderX4 = crop_product, subfolderX5 = main_param, subfolderX6 = param)
+        file_exists = gsub('.csv','',file_exists)
+        if (length(which(file_exists==roughage_feed)) == 0) {
+          next 
+        }
+        else {
+          
+          Nut_roughage = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Fodder_production', subfolder = 'Nutrient_ration', subfolderX2 = nutrient, subfolderX3 = 'Total', subfolderX4 = crop_product, subfolderX5 = main_param, subfolderX6 = param, pattern = roughage_feed)
+          total[, yrs] <- sapply(yrs, function(x) total[,x] + Nut_roughage[,x])
+        }
       }
     }
   }
@@ -408,3 +412,64 @@ compute_total_nutrient_roughage_feed_ForagePasturesFlows = function(roughage_fee
 }
 
 
+
+
+compute_admin_nutrient_roughage_feed_ForagePasturesFlows = function(admin = 'PT', crop_product = 'Main_crop', roughage_feed, nutrient = 'N', convert_to_DM = FALSE) {
+  # compute nutrient flows on a crop area basis for the given admin region
+  # can be converted to DM as well
+  # unit: kg nutrient ha-1 yr-1 or kg DM ha-1 yr-1
+  
+  yrs = paste0('X',seq(1987,2017))
+  total_flows_muni = compute_total_nutrient_roughage_feed_ForagePasturesFlows(crop_product, roughage_feed, nutrient)
+  
+  if (roughage_feed == 'Fresh_grass') { main_param = 'Pastures'; param = 'Extensive_pasture' } else { main_param = 'Forage'; param = roughage_feed }
+  crop_area <- get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Areas', subfolderX2 = main_param, pattern = param)
+
+
+  if (admin == 'PT') {
+    # compute total nutrient flows at the mainland level (kg nutrient ha-1 yr-1)
+    total_flows_muni = sapply(yrs, function(x) sum(total_flows_muni[, x]))
+    crop_area = sapply(yrs, function(x) sum(crop_area[, x]))
+    total_flows_muni= round(total_flows_muni / crop_area, 1)
+  }
+  else {
+    
+    total_flows_muni = compute_temporal_sumIF_admin_df(admin = admin,merge_df = total_flows_muni)
+    crop_area = compute_temporal_sumIF_admin_df(admin = admin, merge_df = crop_area)
+    total_flows_muni[,yrs] = sapply(yrs, function(x) round(total_flows_muni[,x] / crop_area[, x], 1))
+  }
+  
+  
+  if (convert_to_DM == TRUE) {
+    # using a typical DM content of 0.8
+    # kg GM  ha-1 yr-1
+    total_flows_muni[, yrs]= sapply(yrs, function(x) round(total_flows_muni[,x]/(0.80 * (18 / 1000)), 1))
+    
+  }
+  
+  total_flows_muni = data_cleaning(total_flows_muni)
+  
+  return(total_flows_muni)
+  rm(list=c('crop_area','yrs'))
+}
+
+
+
+#ar = read_sf('./LULCC/Activity_data/Admin/Agrarian_region.shp')
+#ar = merge(ar, d, 'Admin_id')
+#tm_shape(ar) + tm_polygons(col='Admin_id', palette = 'Set1')
+
+#require(tmap)
+
+#d = compute_total_nutrient_roughage_feed_ForagePasturesFlows('Main_crop', 'other_forage')
+#s1 = sapply(yrs, function(x) sum(d[, x]))
+
+#d2 = read.csv('./Nutrients/Activity_data/Correct_data_Municipality/Areas/Forage/other_forage.csv')
+#s2 = sapply(yrs, function(x) sum(d2[, x]))
+#s2
+#maizeNa = (s1/s2)/0.9 * 1000
+
+#df = reshape2::melt(as.data.frame(maizeNa))
+#df[, 'yrs'] = seq(1987,2017)
+
+#ggplot(df, aes(yrs,value/1000)) + geom_line() #+ scale_y_continuous(limits=c(0,70))

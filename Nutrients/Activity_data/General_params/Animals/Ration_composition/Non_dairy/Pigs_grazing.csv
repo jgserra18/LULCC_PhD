@@ -1,6 +1,7 @@
 Main_crop,Crop,Crop_product,Roughage,FRAC,Source
 Pulses,Pulses,Residues,Pulses,0.05,GLEAMS
 Forage,Annual_mixtures,Residues,Annual_mixtures,0.05,GLEAMS
-Forage,forage_roots,Harvest,forage_roots,0.2,GLEAMS
-Forage,forage_sorghum,Harvest,forage_sorghum,0.1,GLEAMS
-Forage,forage_sorghum,Harvest,forage_sorghum,0.1,GLEAMS
+Forage,forage_roots,Harvest,forage_roots,0.075,GLEAMS
+Forage,forage_roots,Residues,forage_roots,0.025,
+Forage,forage_sorghum,Harvest,forage_sorghum,0.05,GLEAMS
+Forage,forage_sorghum,Residues,forage_sorghum,0.05,GLEAMS

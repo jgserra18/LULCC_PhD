@@ -111,8 +111,6 @@ sumIf_admin_regions <- function(admin, INE_param, main_param, param) {
 
 
 
-
-
 general_func_sumIF_admin_df = function(admin, merge_df, merge_col) {
   # general function to aggregate statistics to a higher resolution
   
@@ -155,7 +153,7 @@ compute_temporal_sumIF_admin_df = function(admin, merge_df) {
   
   yrs = paste0('X', seq(1987,2017))
   
-  if (admin=='NUTS3') { col_patt = 'nuts3_ID' } else if ( admin=='NUTS2') { col_patt = 'nuts2_ID' } else if (admin=='AR') { col_patt = 'agrarian_region_id'}
+  if (admin=='NUTS3') { col_patt = 'nuts3_ID' } else if ( admin=='NUTS2') { col_patt = 'nuts2_ID' } else if (admin=='AR' | admin == 'Agrarian_region') { col_patt = 'agrarian_region_id'}
   
   for (i in 1:nrow(store_df)) {
     

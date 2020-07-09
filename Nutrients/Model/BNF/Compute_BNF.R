@@ -234,3 +234,31 @@ compute_total_BFN <- function() {
               subfolder = 'N', 
               subfolderX2 = 'Total')
 }
+
+
+compute_BNF_in_arableLand = function() {
+  
+  standard_params <- get_standard_params_list(main_param = 'Crops')
+  standard_params <- standard_params[which(standard_params[, 'Main_crop'] == 'Pulses' | standard_params[, 'Main_crop'] == 'Pastures'), ]
+  
+  # create store df
+  yrs <- paste0('X', seq(1987,2017))
+  BNF_arable <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  BNF_arable[, yrs] <- sapply(yrs, function(x) BNF_arable[,x] <- 0)
+  
+  
+  for (i in 1:nrow(standard_params)) {
+    
+    main_param <- standard_params[i, 'Main_crop']
+    param <- standard_params[i, 'Crop']
+    
+    if (param == 'Extensive_pasture') { next }
+    else {
+      crop_BNF <- get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'BNF', subfolder = 'N', subfolderX2 = main_param,  pattern = param)
+      BNF_arable[, yrs] <- sapply(yrs, function(x) round(BNF_arable[,x] + crop_BNF[, x], 1))
+    }
+  } 
+  
+  return(BNF_arable)
+  rm(list='crop_BNF')
+}

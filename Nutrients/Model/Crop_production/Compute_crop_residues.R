@@ -512,6 +512,9 @@ compute_all_crop_residues_burnt_N <- function() {
 ## TOTALS ----------------------------
 
 compute_total_crop_residues <- function(nutrient) {
+  # calculate only after the implementation of the "Fodder_production" module
+  # currently excludes fodder crops !!!!
+  # unit: kg nutrient yr-1
   
   standard_params <- get_standard_params_list(main_param = 'Crops')
   
@@ -537,21 +540,24 @@ compute_total_crop_residues <- function(nutrient) {
       store_main_param <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
       store_main_param[, yrs] <- sapply(yrs, function(x) store_main_param[,x] <- 0)
       
-      for (z in params) {
+      if (j == 'Pastures' | j == 'Forage') { next } else {
         
-        res_param <- get_activity_data(module = 'Nutrients',mainfolder = 'Output', folder = 'Crop_residues', subfolder = i, subfolderX2 = nutrient, subfolderX3 = j,  pattern = z) 
-        
-        store_main_param[, yrs] <- sapply(yrs, function(x) round( store_main_param[, x] + res_param[,x], 1))
-        store_manag[, yrs] <- sapply(yrs, function(x) round( store_manag[, x] + res_param[,x], 1))
+        for (z in params) {
+          
+          res_param <- get_activity_data(module = 'Nutrients',mainfolder = 'Output', folder = 'Crop_residues', subfolder = i, subfolderX2 = nutrient, subfolderX3 = j,  pattern = z) 
+          
+          store_main_param[, yrs] <- sapply(yrs, function(x) round( store_main_param[, x] + res_param[,x], 1))
+          store_manag[, yrs] <- sapply(yrs, function(x) round( store_manag[, x] + res_param[,x], 1))
+        }
+        # export main param
+        export_file(module = 'Nutrients', 
+                    file = store_main_param, 
+                    filename =j, 
+                    folder = 'Crop_residues', 
+                    subfolder =  i, 
+                    subfolderX2 = nutrient,
+                    subfolderX3 = 'Total')
       }
-      # export main param
-      export_file(module = 'Nutrients', 
-                  file = store_main_param, 
-                  filename =j, 
-                  folder = 'Crop_residues', 
-                  subfolder =  i, 
-                  subfolderX2 = nutrient,
-                  subfolderX3 = 'Total')
     }
     # export manag
     export_file(module = 'Nutrients', 

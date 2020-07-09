@@ -40,7 +40,7 @@ general_func_fertiliser_FAN = function(nutrient, fert_mainland_df) {
   fert_mainland_df = sapply(yrs, function(x) round(sum(fert_mainland_df[, x]/1000000), 0))
   
   IFASTAT$Estimated_Fert_ktN = fert_mainland_df      
-  IFASTAT$FAN = round(IFASTAT$Estimated_Fert_ktN/IFASTAT$Fert_ktN, 2)
+  IFASTAT$FAN = round(IFASTAT$Fert_ktN/IFASTAT$Estimated_Fert_ktN, 2)
   IFASTAT$Fert_excess = IFASTAT$Estimated_Fert_ktN - IFASTAT$Fert_ktN 
   
   return(IFASTAT)
@@ -229,4 +229,57 @@ write_fert_mainland_dataset = function(nutrient, manure_surplus_fills = FALSE, m
               subfolderX4 = folder_div,
               subfolderX5 = 'Total',
               subfolderX6= 'Fert_dataset')
+}
+
+
+compute_municipality_total_corrected_fertiliser = function(nutrient, manure_surplus_fills = FALSE, manure_method = 'Method 1') {
+  
+  if (manure_surplus_fills == TRUE) { folder_div = 'With_ManSurplus'} else { folder_div = 'Without_ManSurplus'}
+  standard_params <- get_standard_params_list(main_param = 'Crops')
+  
+  yrs = paste0('X',seq(1987,2017))
+  main_fert = get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  main_fert[, yrs] = sapply(yrs, function(x) main_fert[,x] = 0)
+  
+  
+  
+  for (i in 1:nrow(standard_params)) {
+    
+    main_param = standard_params[i, 'Main_crop']
+    param = standard_params[i, 'Crop']
+    print(param)
+    
+    if (param == 'Extensive_pasture') {
+      next
+    }
+    else {
+      
+      crop_fert_rate = get_activity_data(module = 'Nutrients', 
+                                         mainfolder =  'Output', 
+                                         folder = 'Fertilisation', 
+                                         subfolder = nutrient, 
+                                         subfolderX2 = 'Fertiliser_application_rates',
+                                         subfolderX3 = manure_method, 
+                                         subfolderX4 = folder_div,
+                                         subfolderX5 = main_param, 
+                                         pattern = param)
+      crop_area = get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Areas', subfolderX2 = main_param, pattern = param)
+      
+      # compute adjusted crop fertiliser nutrient (kg N-P yr-1)
+      crop_fert_rate[, yrs] = sapply(yrs, function(x) round(crop_fert_rate[, x] * crop_area[, x], 0))
+      
+      # add to the main_fert df
+      main_fert[, yrs] = sapply(yrs, function(x) round(main_fert[, x] + crop_fert_rate[, x], 0))
+    }
+  }
+  export_file(module = 'Nutrients', 
+              file = main_fert, 
+              filename = 'Adjusted_fert_mainland', 
+              folder = 'Fertilisation', 
+              subfolder = 'N', 
+              subfolderX2 = 'Inorganic_fertiliser',
+              subfolderX3 = manure_method,
+              subfolderX4 = folder_div,
+              subfolderX5 = 'Total',
+              subfolderX6= 'Adjusted')
 }

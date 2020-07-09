@@ -1,7 +1,7 @@
 source('./Main/Global_functions.R')
 source('./Main/General_GIS.R')
 source('./Main/Data_operations.R')
-
+source('./Nutrients/Model/GIS_computations/LULCC_agriculture/Build_CroplandGrassland.R')
 
 
 # EMEP ATMOSPHERIC N DEPOSITION 2000-2017 --------------------------------------------------------------------------------------------
@@ -135,5 +135,63 @@ compute_ALL_atmospheric_deposition = function(manure_surplus_fills_nutDemand = F
 }
 
 
+
+# compute deposition on UAA -------------------------------
+
+
+compute_avg_atmN = function(reference_area = 'Cropland', manure_method = 'Method 1') {
+  # calculates avg deposition rate at the municipality scale for 1987-2017
+  # ref area: Cropland or Grassland
+  # unit: kg N ha-1 yr-1 @ municipality
+  
+  if (manure_surplus_fills_nutDemand == TRUE) { folder_div = 'With_ManSurplus'} else { folder_div = 'Without_ManSurplus'}
+  
+  yrs = as.character(seq(1987,2017))
+  atmN_muni = get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  atmN_muni[, paste0('X', yrs)] = sapply(paste0('X', yrs), function(x) atmN_muni[,x] = 0)
+  
+  muni <- get_activity_data(module = 'LULCC', folder = 'Admin', pattern = 'Municipality')
+  
+  for (yr in yrs) {
+    
+    ref_area = compute_annual_LULC_cropland(yr, '500', reference_area)
+    
+    atmN = get_activity_data(module = 'Nutrients', mainfolder = 'Output', subfolder = 'Atmospheric_deposition', subfolderX2 = 'N', subfolderX3 = 'Method 1', subfolderX4 = 'Without_ManSurplus', pattern = yr)
+    atmN = aggregate(atmN, 5)
+    atmN = atmN * ref_area
+    atmN[atmN==0] = NA
+    
+    muni[, paste0('X', yr)] = exactextractr::exact_extract(atmN, muni, 'mean')
+  }
+  
+   muni = as.data.frame(muni)
+   atmN_muni[, paste0('X', yrs)] = sapply(paste0('X', yrs), function(x) round(muni[, x], 2))
+  
+   export_file(module = 'Nutrients', 
+               file = atmN_muni, 
+               filename = 'Average_atmN_municipality', 
+               folder = 'Atmospheric_deposition', 
+               subfolder = 'N', 
+               subfolderX2 = manure_method, 
+               subfolderX3 = folder_div)
+  rm(list=c('muni','ref_area'))
+}
+
+
+compute_total_atmN_muni = function(reference_area = 'Cropland', manure_method = 'Method 1') {
+  # computes total N deposited onto a municipality
+  # unit: kg N yr-1
+  
+  yrs = paste0('X',seq(1987,2017))
+  
+  if (reference_area== 'Cropland') { ref_area = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Reference_areas', subfolder = 'Arable_land', pattern = 'Arable_land') }
+      else { ref_area = get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Areas', subfolderX2 = 'Pastures', pattern = 'Extensive_pasture') }
+
+  avg_atmN_muni = get_activity_data(module = 'Nutrients', mainfolder = 'Output', subfolder = 'Atmospheric_deposition', subfolderX2 = 'N', subfolderX3 = 'Method 1', subfolderX4 = 'Without_ManSurplus', pattern = 'Average_atmN_municipality')
+  
+  avg_atmN_muni[,yrs] = sapply(yrs, function(x) round(avg_atmN_muni[, x] * ref_area[,x], 0))
+
+  return(avg_atmN_muni)
+}
 
 
