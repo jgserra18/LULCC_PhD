@@ -70,6 +70,7 @@ compute_avg_LU_erosion_AR = function() {
   export_file(module = 'Nutrients', folder = 'Activity_data', subfolder = 'General_params', subfolderX2 = 'LULCC', subfolderX3 = 'Erosion', file = AR_df, filename = 'AR_LU_erosion')
 }
 
+
 create_AR_LU_erosion_rate = function(lu_name, spatial_res = 500) {
   
   AR_LU_rates = get_activity_data(module = 'Nutrients', subfolder = 'General_params', subfolderX2 = 'LULCC', subfolderX3 = 'Erosion', pattern = 'AR_LU_erosion')

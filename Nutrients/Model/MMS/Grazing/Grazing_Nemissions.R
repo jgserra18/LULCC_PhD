@@ -83,3 +83,18 @@ loop_grazing_N2O_emissions <- function() {
   }
 }
 
+st_prec = raster
+prec = raster('./Nutrients/Output/Environmental_params/Climatic/Prec/1x1km/X2009.tif')
+et0 = raster('./Nutrients/Output/Environmental_params/Climatic/ET0/1x1km/X2009.tif')
+
+wet_climate = prec/et0>1
+dry_climate = prec/et0<1
+
+muni = read_sf('./LULCC/Activity_data/Admin/Municipality.shp')
+
+require(tmap)
+
+
+  tm_shape(wet_climate) + tm_raster() + 
+  tm_shape(muni) + tm_borders(col='black') 
+  

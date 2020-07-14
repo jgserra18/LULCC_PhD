@@ -1,59 +1,45 @@
 source('./Main/Global_functions.R')
+source('./Nutrients/Model/Soil_losses/Gas_emissions/N2O_emissions_IPCC.R')
 
 
-compute_manure_spreading_soil_NO_emissions <- function(manure_surplus_fills_nutDemand = F, manure_method = 'Method 1', nutrient = 'N') {
-  # using EMEP 2019 emission factor of 0.04 kg NO2 kg N-1 yr-1
-  # computes soil NO2 emissions from manure spreading after NH3 emissions (NET N returned)
-  # unit: kg N-NO2 yr-1
+# using EMEP 2019 ------------------------
+# uses the calculations for N2O but adapted to account for NOX emission factor
+
+# set calculation method for the gas --- 
+set_gas_Nloss = "NOx"
+
+
+compute_total_direct_NOX_emissions = function(write = FALSE,
+                                              manure_surplus_fills = FALSE, 
+                                              manure_method = 'Method 1', 
+                                              nutrient = 'N') {
   
-  if (manure_surplus_fills_nutDemand == TRUE) { folder_div = 'With_ManSurplus'} else { folder_div = 'Without_ManSurplus'}
+  # computes the NOX emissions from all direct N sources (grazing, fertilisers)
+  if (manure_surplus_fills == TRUE) { folder_div = 'With_ManSurplus'} else { folder_div = 'Without_ManSurplus'}
+  yrs = paste0('X',seq(1987,2017))
   
-  # convert emission factor to N compound
-  EF_NO2 <- 0.04 
-  EF_NO2 <- EF_NO2 / 3.28443
+  grazing = compute_grazing_N2O_emissions(write = write)
+  biosolid = compute_other_Ninputs_N2O_emissions('Biosolid', write, manure_surplus_fills, manure_method)
+  man = compute_other_Ninputs_N2O_emissions('Manure', write, manure_surplus_fills, manure_method)
+  fert = compute_synthetic_fertiliser_N2O_emissions(write = write, manure_surplus_fills = manure_surplus_fills, manure_method = manure_method)
   
-  standard_params <- get_standard_params_list(main_param = 'Crops')
-  man_type <- c('Slurry','Solid', 'Total')
+  tot_NOx = fert
+  tot_NOx[, yrs] = sapply(yrs, function(x) fert[,x] + man[, x] +  biosolid[,x] + grazing[,x])
   
-  for (j in man_type) {
-    
-    for (i in 1:nrow(standard_params)) {
-      
-      main_param <- standard_params[i, 'Main_crop']
-      param <- standard_params[i, 'Crop']
-      
-      if (param == 'Extensive_pasture' | main_param == 'Horticulture' | param == 'Tomato') {
-        next 
-      }
-      else {
-        
-        man_net_spreadN <- get_activity_data(module = 'Nutrients',
-                                             mainfolder = 'Output',  
-                                             folder = 'Fertilisation', 
-                                             subfolder = nutrient, 
-                                             subfolderX2 = 'Manure_application_rates', 
-                                             subfolderX3 = manure_method, 
-                                             subfolderX4 = folder_div, 
-                                             subfolderX5 = j, 
-                                             subfolderX6 = main_param, 
-                                             pattern = param)
-        crop_area = get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Areas', subfolderX2 = main_param, pattern = param)
-        
-        # calculation
-        yrs <- paste0('X', seq(1987,2017))
-        man_net_spreadN[, yrs] <- sapply(yrs, function(x) round(man_net_spreadN[,x] * crop_area[, x] * EF_NO2, 1))
-        export_file(module = 'Nutrients', 
-                    file = man_net_spreadN, 
-                    filename = param, 
-                    folder = 'Gas_N_emissions', 
-                    subfolder = 'NOx', 
-                    subfolderX2 = 'Spreading',
-                    subfolderX3 = manure_method, 
-                    subfolderX4 = folder_div,
-                    subfolderX5 = j,
-                    subfolderX6 = main_param)
-      }
-    }
+  
+  if (write == TRUE) {
+    export_file(module = 'Nutrients', 
+                file = tot_NOx, 
+                filename = 'Total', 
+                folder = 'Gas_N_emissions', 
+                subfolder = set_gas_Nloss, 
+                subfolderX2 = 'Total',
+                subfolderX3 = manure_method, 
+                subfolderX4 = folder_div,
+                subfolderX5 = 'Total')
   }
-  rm(list='man_net_spreadN')
+  
+  return(tot_NOx)
+  rm(list=c('grazing','biosolid','man','fert'))
 }
+
