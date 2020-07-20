@@ -42,10 +42,13 @@ modifier_get_animal_population = function(main_param, param) {
 }
 
 
+
 get_population_pathway_MMS = function(param, management) {
   # gets the population allocation
   # divides into industrial (1- grazing) and grazing
   # unit: % pop
+  
+  
   
   if (management == 'Grazing') {
     
@@ -58,7 +61,7 @@ get_population_pathway_MMS = function(param, management) {
     }
   }
   
-  else {
+  else if (management == 'Industrial') {
     
     yrs = paste0('X',seq(1987,2017))
     FRAC_pathway_animal = correct_share_MMS_pathway(pathway = 'Grazing', param = param)
@@ -74,6 +77,24 @@ get_population_pathway_MMS = function(param, management) {
   return(FRAC_pathway_animal)
 }
 
+
+get_population_pathway_MMS = function(main_param, param, management) {
+  # gets the population allocation
+  # divides into industrial (1- grazing) and grazing
+  # unit: % pop
+  
+  if (management == 'Grazing') {
+    
+    FRAC_pathway_animal = get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Animals', subfolderX2 = 'Downscaled_distribution', subfolderX3 = management, subfolderX4 = main_param, pattern = param)
+  }
+  else {
+    yrs = paste0('X',seq(1987,2017))
+    FRAC_pathway_animal = get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Animals', subfolderX2 = 'Downscaled_distribution', subfolderX3 = 'Grazing', subfolderX4 = main_param, pattern = param)
+    FRAC_pathway_animal[, yrs] = sapply(yrs, function(x) round( 1- FRAC_pathway_animal[, x], 2))
+  }
+  
+  return(FRAC_pathway_animal)
+}
 
 
 # RUMINANTS N RETENTION ----------------------------------------------------------------------------------
@@ -237,6 +258,7 @@ compute_other_ruminants_Nretention = function(main_param, param, goats_dairy = F
 }
 
 
+
 compute_goats_Nretention = function(animal_pop_df, management) {
   # compute the N retained in dairy and non_dairy goats
   # assumption: 10% of goats population is dairy
@@ -275,6 +297,7 @@ compute_goats_Nretention = function(animal_pop_df, management) {
 }
 
 
+
 general_func_N_retained_ruminants = function(main_param, param,  management, goats_dairy = FALSE) {
   # general function to compute the N retained in ruminants
   # unit: kg N yr-1
@@ -297,8 +320,9 @@ general_func_N_retained_ruminants = function(main_param, param,  management, goa
       N_retention = compute_other_ruminants_Nretention(main_param, param)
     }
     
-    if (main_param == 'Goats' ) { FRAC_management = get_population_pathway_MMS(main_param, management) } else if (main_param == 'Sheep') { FRAC_management = get_population_pathway_MMS('Ewes', management) }
-    else { FRAC_management = get_population_pathway_MMS(param, management) }
+    if (main_param == 'Goats' ) { FRAC_management = get_population_pathway_MMS(main_param, main_param, management) } 
+    else if (main_param == 'Sheep') { FRAC_management = get_population_pathway_MMS('Sheep','Ewes',management) }
+    else { FRAC_management = get_population_pathway_MMS(main_param, param, management) }
 
     yrs = paste0('X',seq(1987,2017))
     N_retained = pop
@@ -320,7 +344,7 @@ compute_all_ruminants_Nretention_manag = function(management) {
     animals = get_animal_subclass(ruminant)
     
     for (animal in animals) {
-
+      print(animal)
       if (animal == 'Goats') {
       
         # N retention for non_dairy goats is set to 0
@@ -347,7 +371,6 @@ loop_ruminants_Nretention = function() {
   manag = c('Grazing','Industrial')
   sapply(manag, function(x) compute_all_ruminants_Nretention_manag(x))
 }
-
 
 
 
@@ -488,7 +511,7 @@ general_func_Nretention_pigs = function(main_param = 'Pigs', param, management) 
   pop = modifier_get_animal_population(main_param, param)
 
   # get management fraction of the population parameters --------------------------------
-  FRAC_management = get_population_pathway_MMS(param, management)
+  FRAC_management = get_population_pathway_MMS(main_param, param, management)
   
   # adjust population to account for females in unspecifieid pop param --------
   if (param == 'Other_swine' | param == 'Pigs_20') {
@@ -552,7 +575,6 @@ compute_all_pigs_Nretention = function() {
       }
     }
 }
-
 
 
 
@@ -808,6 +830,4 @@ compute_all_poultry_Nretention = function() {
   }
 }
 
-
-## HORSES AND RABBITS --------------------------------------------------------------
 

@@ -2,7 +2,7 @@ source('./Main/Global_functions.R')
 source('./Nutrients/Model/Crop_production/get_fodder_crops_residues.R')
 source('./Nutrients/Model/Atmospheric_deposition/Compute_atmospheric_Ndeposition.R')
 source('./Nutrients/Model/BNF/Compute_BNF.R')
-
+source('./Nutrients/Model/Soil_losses/Runoff/1_Nutrient_runoff_recentApplication.R')
 
 
 # PREPARE INPUT-OUTPUT PARAMETERS TO CALCULATE NUTRIENT BALANCES ----------------------------------------------------------
@@ -57,6 +57,7 @@ export_param_in_list = function(list_with_params, reference_area, is_input = TRU
 }
 
 
+
 # CROPLAND -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # input parameters ----------------------------------------------------------------------------------------------------------------------------
@@ -76,6 +77,7 @@ get_total_BNF = function(reference_area, nutrient = 'N') {
   return(BNF)
 }
 
+
 get_gross_manure = function(reference_area, nutrient = 'N') {
   # Cropland = tot gross man excretion - gross man excretion onto pastures
   # Grassland = gross man excreted onto pastures
@@ -83,12 +85,16 @@ get_gross_manure = function(reference_area, nutrient = 'N') {
   if (reference_area == 'Grassland') {
     
     gross_man_grass  = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Gross_manure', subfolder = nutrient, subfolderX2 = 'Grazing', subfolderX3 = 'Total', subfolderX4 = 'Total', pattern = 'Total')
+    gross_man_grass = compute_FRAC_pastures_nutrient_flows(nutrient_flow_df = gross_man_grass,pasture_type = 'Extensive_pasture')
+    
     return(gross_man_grass)
   }
   else {
+    # man_cropland = tot_man - man_ext_pastures
     
     yrs = paste0('X',seq(1987,2017))
     gross_man_grass  = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Gross_manure', subfolder = nutrient, subfolderX2 = 'Grazing', subfolderX3 = 'Total', subfolderX4 = 'Total', pattern = 'Total')
+    gross_man_grass = compute_FRAC_pastures_nutrient_flows(nutrient_flow_df = gross_man_grass,pasture_type = 'Extensive_pasture')
     gross_man_tot = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Gross_manure', subfolder = nutrient, subfolderX2 = 'Total_Nexcretion', subfolderX3 = 'Total', pattern = 'Total')
     
     gross_man_crop = gross_man_tot
@@ -147,8 +153,14 @@ set_total_input_params = function(reference_area, export = 'FALSE', nutrient = '
     dep = get_atmospheric_deposition(reference_area, nutrient)
     bnf = get_total_BNF(reference_area, nutrient)
     
-    # sum total inputs
-    tot_input[, yrs] = sapply(yrs, function(x) round(gross_man[,x] + fert[,x] + sludge[,x] + dep[,x] + bnf[, x], 0))
+    if (reference_area == 'Cropland') {
+      # sum total inputs
+      tot_input[, yrs] = sapply(yrs, function(x) round(gross_man[,x] + fert[,x] + sludge[,x] + dep[,x] + bnf[, x], 0))
+    }
+    else {
+      # sum total inputs
+      tot_input[, yrs] = sapply(yrs, function(x) round(gross_man[,x] + dep[,x] + bnf[, x], 0))
+    }
     
     if (export == TRUE) {
       
@@ -158,10 +170,18 @@ set_total_input_params = function(reference_area, export = 'FALSE', nutrient = '
     
     return(tot_input)
   }
+  # grassland
   else {
     
-    # sum total inputs
-    tot_input[, yrs] = sapply(yrs, function(x) round(gross_man[,x] + fert[,x] + sludge[,x], 0))
+    
+    if (reference_area == 'Cropland') {
+      # sum total inputs
+      tot_input[, yrs] = sapply(yrs, function(x) round(gross_man[,x] + fert[,x] + sludge[,x], 0))
+    }
+    else {
+      # sum total inputs
+      tot_input[, yrs] = sapply(yrs, function(x) round(gross_man[,x], 0))
+    }
     
     if (export == TRUE) {
       
@@ -185,12 +205,14 @@ get_fodder_residues = function(reference_area, nutrient = 'N') {
 }
 
 
+
 get_fodder_offtake = function(reference_area, nutrient = 'N') {
   # from "get_fodder_crop_residues.R"
   
   fodder_off = allocation_forage_offtake_flows_per_referenceArea(reference_area, nutrient)
   return(fodder_off)
 }
+
 
 get_crop_residues = function(reference_area, nutrient = 'N') {
   # note: the total doesn't include fodder crops !
@@ -218,9 +240,16 @@ set_total_output_params = function(reference_area, export = FALSE, nutrient = 'N
   
   # sum total outputs
   yrs = paste0('X',seq(1987,2017))
-  
   tot_out = crop_offtake
-  tot_out[, yrs] = sapply(yrs, function(x) round(crop_res[,x] + fodder_res[,x] + fodder_offtake[,x] + crop_offtake[,x], 0))
+  
+  if (reference_area == 'Cropland') {
+    tot_out[, yrs] = sapply(yrs, function(x) round(crop_res[,x] + fodder_res[,x] + fodder_offtake[,x] + crop_offtake[,x], 0))
+  }
+  else {
+    tot_out[, yrs] = sapply(yrs, function(x) round(fodder_res[,x] + fodder_offtake[,x], 0))
+  }
+  
+
   
   if (export == TRUE) {
     
@@ -288,19 +317,43 @@ get_total_storage_emissions = function(manure_surplus_fills = FALSE,
 }
 
 
-get_total_grazing_emissions  =  function(manure_surplus_fills = FALSE, 
+get_total_grazing_emissions  =  function(reference_area, 
+                                         manure_surplus_fills = FALSE, 
                                          manure_method = 'Method 1', 
                                          nutrient = 'N') {
-  
   yrs = paste0('X',seq(1987,2017))
   
-  grazing_nh3 = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Gas_N_emissions', subfolder = 'NH3', subfolderX2 = 'Grazing', 
-                                  subfolderX3 = 'Total', subfolderX4 = 'Total', pattern = 'Total')
-  grazing_n2o = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Gas_N_emissions', subfolder = 'N2O', subfolderX2 = 'Grazing', 
-                                  subfolderX3 = 'Total', pattern = 'Total')
-  grazing_nox = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Gas_N_emissions', subfolder = 'NOx', subfolderX2 = 'Grazing', 
-                                  subfolderX3 = 'Total', pattern = 'Total')
+  if (reference_area == 'Cropland') {
+    
+    
+    grazing_nh3 = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Gas_N_emissions', subfolder = 'NH3', subfolderX2 = 'Grazing', 
+                                    subfolderX3 = 'Total', subfolderX4 = 'Total', pattern = 'Total')
+    grazing_nh3 = compute_FRAC_pastures_nutrient_flows(grazing_nh3, 'Intensive_pasture')
+    
+    grazing_n2o = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Gas_N_emissions', subfolder = 'N2O', subfolderX2 = 'Grazing', 
+                                    subfolderX3 = 'Total', pattern = 'Total')
+    grazing_n2o = compute_FRAC_pastures_nutrient_flows(grazing_n2o, 'Intensive_pasture')
+    
+    grazing_nox = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Gas_N_emissions', subfolder = 'NOx', subfolderX2 = 'Grazing', 
+                                    subfolderX3 = 'Total', pattern = 'Total')
+    grazing_nox = compute_FRAC_pastures_nutrient_flows(grazing_nox, 'Intensive_pasture')
+    
+  }
   
+  else {
+    grazing_nh3 = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Gas_N_emissions', subfolder = 'NH3', subfolderX2 = 'Grazing', 
+                                    subfolderX3 = 'Total', subfolderX4 = 'Total', pattern = 'Total')
+    grazing_nh3 = compute_FRAC_pastures_nutrient_flows(grazing_nh3, 'Extensive_pasture')
+    
+    grazing_n2o = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Gas_N_emissions', subfolder = 'N2O', subfolderX2 = 'Grazing', 
+                                    subfolderX3 = 'Total', pattern = 'Total')
+    grazing_n2o = compute_FRAC_pastures_nutrient_flows(grazing_n2o, 'Extensive_pasture')
+    
+    grazing_nox = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Gas_N_emissions', subfolder = 'NOx', subfolderX2 = 'Grazing', 
+                                    subfolderX3 = 'Total', pattern = 'Total')
+    grazing_nox = compute_FRAC_pastures_nutrient_flows(grazing_nox, 'Extensive_pasture')
+  }
+
   grazing = grazing_nox
   grazing[, yrs] = sapply(yrs, function(x) round(grazing_nh3[,x] + grazing_n2o[,x] + grazing_nox[,x] ,0))
   
@@ -383,6 +436,7 @@ get_biosolid_application_emissions = function(manure_surplus_fills = FALSE,
   rm(list=c('fert_nh3','fert_n2o','fert_nox'))
 }
 
+
 get_crop_residues_emissions = function(manure_surplus_fills = FALSE, 
                                        manure_method = 'Method 1', 
                                        nutrient = 'N') {
@@ -408,7 +462,7 @@ get_runoff_field_application = function(reference_area,
     
     rf_grazing = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Runoff', subfolder = 'Recent_memory', 
                                    subfolderX2 = nutrient, subfolderX3 =manure_method, subfolderX4 = folder_div, 
-                                   subfolderX5 = 'Grazing', pattern = 'Total')
+                                   subfolderX5 = 'Grazing', pattern = 'Extensive_pasture')
     rf_total = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Runoff', subfolder = 'Recent_memory', 
                                  subfolderX2 = nutrient, subfolderX3 =manure_method, subfolderX4 = folder_div, 
                                  subfolderX5 = 'Total', subfolderX6 = 'Total', pattern = 'Total')
@@ -421,7 +475,7 @@ get_runoff_field_application = function(reference_area,
     
     rf_grazing = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Runoff', subfolder = 'Recent_memory', 
                                    subfolderX2 = nutrient, subfolderX3 =manure_method, subfolderX4 = folder_div, 
-                                   subfolderX5 = 'Grazing', pattern = 'Total')
+                                   subfolderX5 = 'Grazing', pattern = 'Extensive_pasture')
     rf_total = rf_grazing
   }
   
@@ -452,16 +506,19 @@ set_total_environmental_losses = function(reference_area,
       res_n2o = get_crop_residues_emissions(manure_surplus_fills, manure_method, nutrient)
       runoff = get_runoff_field_application(reference_area, manure_surplus_fills, manure_method, nutrient)
       res_burnt = get_crop_residues_burnt(nutrient)
+      grazing = get_total_grazing_emissions(reference_area, manure_surplus_fills, manure_method, nutrient)
       
       tot_loss = housing
-      tot_loss[, yrs] = sapply(yrs, function(x) round(runoff[,x] + res_n2o[,x] + biosolid_app[,x] + man_app[,x] + fert_app[,x] + storage[,x] + housing[,x] + res_burnt[,x], 0))
+      tot_loss[, yrs] = sapply(yrs, function(x) round(runoff[,x] + res_n2o[,x] + biosolid_app[,x] + man_app[,x] + fert_app[,x] + storage[,x] + housing[,x] + res_burnt[,x] + grazing[,x], 0))
       
       rm(list=c('storage','housing','fert_app','man_app','biosolid_app','res_n2o','runoff', 'res_burnt'))
     }
     else {
       
-      grazing = get_total_grazing_emissions(manure_surplus_fills, manure_method, nutrient)
-      total_loss = grazing
+      runoff = get_runoff_field_application(reference_area, manure_surplus_fills, manure_method, nutrient)
+      grazing = get_total_grazing_emissions(reference_area, manure_surplus_fills, manure_method, nutrient)
+      tot_loss = grazing
+      tot_loss[, yrs] = sapply(yrs, function(x) round(runoff[,x] + grazing[,x], 0))
     }
   }
   return(tot_loss)

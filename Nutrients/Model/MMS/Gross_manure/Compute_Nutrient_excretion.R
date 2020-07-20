@@ -1,5 +1,8 @@
 source('./Main/Global_functions.R')
+source('./Nutrients/Model/MMS/Support_functions/TimeExtrapolation_MMSparams.R')
+source('./Nutrients/Model/MMS/Support_functions/Downscaling_animal_distribution.R')
 
+# dont include the updated grazing fractions here !!
 
 ## PHOSPHORUS AND NITROGEN IMPLEMENTATION -------------------------------------------------------------------------------------
 
@@ -79,62 +82,6 @@ loop_gross_manure_nutrient <- function() {
 
 ####  GROSS MANURE ALLOCATION (HOUSING, GRAZING, YARDS) ------------------------------------
 
-source('./Nutrients/Model/MMS/Support_functions/TimeExtrapolation_MMSparams.R')
-
-
-## dairy cow gross manure conditions -----------------------------------------------------------------
-
-grazing_dairy_cows_condition <- function(dairy_graz_frac) {
-  # assumption: no grazing in Agrarian Region Entre Douro e Minho
-  
-  disagg_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Spatial_disaggregation')
-  
-  rows_AR_1 <- which(disagg_df$agrarian_region_id == '1')
-  
-  calc_cols <- paste0('X', seq(1987,2017))
-  disagg_df[, calc_cols] <- sapply(calc_cols, function(x) disagg_df[,x] <- NA)
-  
-  disagg_df[-rows_AR_1, calc_cols] <- sapply(calc_cols, function(x) disagg_df[-rows_AR_1, x] <- dairy_graz_frac[, x])
-  disagg_df[rows_AR_1, calc_cols] <- sapply(calc_cols, function(x) disagg_df[rows_AR_1, x] <- 0)
-  
-  return(disagg_df)
-}
-
-
-housing_dairy_cows_condition <- function(dairy_other_frac) {
-  # rescales yard and housing frac for dairy cows based on the assumption that AR_region == 1 no grazing dairy
-  
-  ## get grazing FRAC timeseries (1987-2017)
-  FRAC_grazing <- correct_share_MMS_pathway('Grazing','Dairy_cows')
-
-  # rescale dairy_other_frac
-  calc_cols <- paste0('X', seq(1987,2017))
-  new_dairy_frac <- dairy_other_frac
-  new_dairy_frac[, calc_cols] <- sapply(calc_cols, function(x) round(dairy_other_frac[, x] + FRAC_grazing[, x], 2))
-  
-  
-  disagg_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Spatial_disaggregation')
-  
-  rows_AR_1 <- which(disagg_df$agrarian_region_id == '1')
-  
-  disagg_df[, calc_cols] <- sapply(calc_cols, function(x) disagg_df[,x] <- NA)
-  
-  disagg_df[-rows_AR_1, calc_cols] <- sapply(calc_cols, function(x) disagg_df[-rows_AR_1, x] <- dairy_other_frac[, x])
-  disagg_df[rows_AR_1, calc_cols] <- sapply(calc_cols, function(x) disagg_df[rows_AR_1, x] <- new_dairy_frac[, x])
-  
-  return(disagg_df)
-}
-
-
-compute_dairy_manure_pathway <- function(dairy_man_nutrient, dairy_pathway_frac) {
-  # calculates grazing manure N of dairy cattle
-  # unit: kg N yr-1
-  
-  calc_cols <- paste0('X', seq(1987,2017))
-  dairy_man_nutrient[, calc_cols] <- sapply(calc_cols, function(x) round(dairy_man_nutrient[, x] <- dairy_man_nutrient[, x] * dairy_pathway_frac[,x], 1))
-  
-  return(dairy_man_nutrient)
-}
 
 
 ## ALLOCATE GROSS MANURE ----------------------------------------------------------------------------------------------------------------------
@@ -151,28 +98,14 @@ general_func_gross_manure_allocation <- function(nutrient, pathway) {
     main_param <- standard_params[i, 'Main_animals']
     param <- standard_params[i, 'Animals']
 
-    FRAC_pathway_animal <- correct_share_MMS_pathway(pathway = pathway, param = param)
+    FRAC_pathway_animal = get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Animals', subfolderX2 = 'Downscaled_distribution', subfolderX3 = pathway, subfolderX4 = main_param, pattern = param)
     
     # get gross man N
     man_nutrient <- compute_animal_nutrient_excretion(nutrient, main_param, param)
     pathway_N <- man_nutrient
     
-    
-    if (param == 'Dairy_cows' && pathway == 'Grazing') {
-      
-      FRAC_pathway_animal <- grazing_dairy_cows_condition(dairy_graz_frac = FRAC_pathway_animal)
-      pathway_N <- compute_dairy_manure_pathway(man_nutrient, FRAC_pathway_animal)
-    }
-    else if (param == 'Dairy_cows' && pathway == 'Housing') {
-      
-      FRAC_pathway_animal <- housing_dairy_cows_condition(dairy_other_frac =  FRAC_pathway_animal)
-      pathway_N <- compute_dairy_manure_pathway(man_nutrient, FRAC_pathway_animal)
-    }
-    else {
-      
-      calc_cols <- paste0('X', seq(1987,2017))
-      pathway_N[, calc_cols] <- sapply(calc_cols, function(x) round(pathway_N[, x] * FRAC_pathway_animal[, x], 1))
-    }
+    yrs <- paste0('X', seq(1987,2017))
+    pathway_N[, yrs] <- sapply(yrs, function(x) round(pathway_N[, x] * FRAC_pathway_animal[, x], 1))
     
     export_file(module = 'Nutrients', 
                 file = pathway_N, 
@@ -184,6 +117,7 @@ general_func_gross_manure_allocation <- function(nutrient, pathway) {
                 subfolderX4 = main_param)
   }
 }
+
 
 loop_manure_allocation_pathway <- function() {
   
@@ -269,7 +203,7 @@ loop_disaggregate_gross_manure_type <- function() {
 
 compute_carbon_gross_manure <- function(pathway, manure_type) {
   
-  CN_manure <-  get_activity_data(module = 'Nutrients', folder = 'Nutrient_params', subfolder = 'C', subfolderX2 = 'MMS', subfolderX3 = 'Excretion_coefficients', pattern = 'CN')
+  CN_manure =  get_activity_data(module = 'Nutrients', folder = 'Nutrient_params', subfolder = 'C', subfolderX2 = 'MMS', subfolderX3 = 'Excretion_coefficients', pattern = 'CN')
   
   standard_params <- get_standard_params_list(main_param = 'Animals')
   
@@ -285,9 +219,9 @@ compute_carbon_gross_manure <- function(pathway, manure_type) {
       
     main_CN <- CN_manure[main_row, 'C_N']
     
-    pathway_maN_type <-  get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = 'N', subfolderX2 = pathway, subfolderX3 =manure_type, subfolderX4 = main_param, pattern = param)
+    pathway_maN_type =  get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = 'N', subfolderX2 = pathway, subfolderX3 =manure_type, subfolderX4 = main_param, pattern = param)
     
-    yrs <- paste0('X', seq(1987,2017))
+    yrs = paste0('X', seq(1987,2017))
     pathway_maN_type[, yrs] <- sapply(yrs, function(x) round(pathway_maN_type[, x] * main_CN, 1))
     
     export_file(module = 'Nutrients', 
@@ -300,6 +234,7 @@ compute_carbon_gross_manure <- function(pathway, manure_type) {
                 subfolderX4= main_param)
   }
 }
+
 
 loop_gross_manure_C_all_params <- function() {
   
@@ -339,8 +274,8 @@ compute_gross_manure_C_totals <- function(pathway) {
     main_param <- standard_params[i, 'Main_animals']
     param <- standard_params[i, 'Animals']
     
-    pathway_maN_slurry <- get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = 'C', subfolderX2 = pathway, subfolderX3 ='Slurry', subfolderX4 = main_param, pattern = param)
-    pathway_maN_solid <- get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = 'C', subfolderX2 = pathway, subfolderX3 ='Solid', subfolderX4 = main_param, pattern = param)
+    pathway_maN_slurry = get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = 'C', subfolderX2 = pathway, subfolderX3 ='Slurry', subfolderX4 = main_param, pattern = param)
+    pathway_maN_solid = get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = 'C', subfolderX2 = pathway, subfolderX3 ='Solid', subfolderX4 = main_param, pattern = param)
     
     yrs <- paste0('X', seq(1987,2017))
     
@@ -371,8 +306,8 @@ loop_gross_manure_C_totals <- function() {
 compute_gross_manure_Cexcretion <- function(main_param, param) {
   # computes the total C excretion for a given animal
   
-  graz_maN <- get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = 'C', subfolderX2 = 'Grazing', subfolderX3 ='Total', subfolderX4 = main_param, pattern = param)
-  housing_maN <- get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = 'C', subfolderX2 = 'Housing', subfolderX3 ='Total', subfolderX4 = main_param, pattern = param)
+  graz_maN = get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = 'C', subfolderX2 = 'Grazing', subfolderX3 ='Total', subfolderX4 = main_param, pattern = param)
+  housing_maN = get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = 'C', subfolderX2 = 'Housing', subfolderX3 ='Total', subfolderX4 = main_param, pattern = param)
   yards_maN <- get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = 'C', subfolderX2 = 'Yards', subfolderX3 ='Total', subfolderX4 = main_param, pattern = param)
   
   yrs <- paste0('X', seq(1988,2017))
@@ -410,10 +345,10 @@ compute_total_nutrient_flows_main_param_pathway <- function(nutrient, pathway, m
   standard_params <- get_standard_params_list(main_param = 'Animals')
   yrs <- paste0('X', seq(1987,2017))
   
-  main_params <- unique(standard_params$Main_animals)
+  main_params = unique(standard_params$Main_animals)
   
-  store_main_param <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
-  store_main_param[, yrs] <- sapply(yrs, function(x) store_main_param[,x] <- 0)
+  store_main_param = get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  store_main_param[, yrs] = sapply(yrs, function(x) store_main_param[,x] = 0)
 
   for (i in main_params) {
     

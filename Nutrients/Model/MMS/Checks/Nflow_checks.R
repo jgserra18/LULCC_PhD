@@ -276,5 +276,5 @@ Nflow_check9 <- function(main_param, param) {
   
   return(check)
 }
-
+loop_param_checker(Nflow_check9)
 

@@ -19,7 +19,7 @@ compute_yards_NH3_emissions <- function(main_param, param, manure_type) {
   return(yards_TAN)
 }
 
-loop_yards_NH3_emissions()
+
 loop_yards_NH3_emissions <- function() {
   
   standard_params <- get_standard_params_list('Animals')
@@ -162,7 +162,7 @@ general_func_animal_bedding <- function(main_param, param, bedding_param) {
   FRAC_MMS_solid <-  linearly_intrapolate_share_MMS(general_param = 'Share_MMS', param = 'Solid')
   FRAC_MMS_solid <- subset(FRAC_MMS_solid, Animals == param)
   
-  FRAC_housing <- correct_share_MMS_pathway(pathway = 'Housing', param = param)
+  FRAC_housing <- get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Animals', subfolderX2 = 'Downscaled_distribution', subfolderX3 = 'Housing', subfolderX4 = main_param, pattern = param)
   animal_pop <- get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Animals', subfolderX2 = main_param, pattern = param)
   
   yrs <- paste0('X', seq(1987,2017))

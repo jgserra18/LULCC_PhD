@@ -259,8 +259,6 @@ compute_statistical_muni_crop_fert_NH3 = function(main_param, param, fert_produc
   rm(list=c('crop_fert_prod_N','yrs'))
 }
 
-downscale_crop_fert_product_app_rates('Cereals','Wheat','Urea','N',F,'Method 1')
-
 
 loop_statistical_muni_fert_NH3 = function(fert_product, nutrient = 'N', manure_surplus_fills_nutDemand = FALSE, manure_method = 'Method 1') {
   # for a given fertiliser product (e.g., Urea) compute Nh3 emissions from all crops!
@@ -304,7 +302,6 @@ loop_all_fert_prod_NH3 = function(nutrient = 'N', manure_surplus_fills_nutDemand
   fert_prod = c('AAN','CAN','AS','N_solutions','Other_Nstraight', 'Urea','AP','NK_compound','NPK_compound','Other_NP')
   sapply(fert_prod, function(x) loop_statistical_muni_fert_NH3(x, nutrient, manure_surplus_fills_nutDemand, manure_method))
 }
-
 
 
 
@@ -362,11 +359,11 @@ compute_total_crop_fert_prod_NH3_per_mainParam = function(nutrient = 'N', manure
   store_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
   store_df[, yrs] <- sapply(yrs, function(x) store_df[,x] <- 0)
   
-  main_params = unique(biosolid_crops[, 'Main_crop'])
+  main_params = unique(standard_params[, 'Main_crop'])
   
   for (i in main_params) {
     
-    param_df = subset(biosolid_crops, Main_crop == i)
+    param_df = subset(standard_params, Main_crop == i)
     main_param_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
     main_param_df[, yrs] <- sapply(yrs, function(x) main_param_df[,x] <- 0)
     
@@ -410,5 +407,4 @@ compute_total_crop_fert_prod_NH3_per_mainParam = function(nutrient = 'N', manure
               subfolderX5 = 'Total', 
               subfolderX6 = 'Total')
 }
-
 

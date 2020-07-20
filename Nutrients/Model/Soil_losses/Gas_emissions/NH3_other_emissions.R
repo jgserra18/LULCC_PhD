@@ -11,7 +11,6 @@ loop_NH3_grazing = function() {
 }
 
 
-
 ## MANURE CROP APPLICATION NH3 EMISSIONS ---------------------------------------------------------------------
 
 source('./Nutrients/Model/Soil_losses/Gas_emissions/Support/Manure_spreading_EF.R')
@@ -103,6 +102,9 @@ loop_update_crop_manure_spreading_NH3_emission_ManType = function(manure_surplus
 }
 
 
+
+
+
 compute_total_manure_spreading_NH3 = function(manure_surplus_fills_nutDemand = F, manure_method = 'Method 1', nutrient = 'N') {
   
   if (manure_surplus_fills_nutDemand == TRUE) { folder_div = 'With_ManSurplus'} else { folder_div = 'Without_ManSurplus'}
@@ -170,11 +172,11 @@ compute_total_manure_app_NH3_per_mainParam = function(manure_surplus_fills_nutDe
   store_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
   store_df[, yrs] <- sapply(yrs, function(x) store_df[,x] <- 0)
   
-  main_params = unique(biosolid_crops[, 'Main_crop'])
+  main_params = unique(standard_params[, 'Main_crop'])
   
   for (i in main_params) {
     
-    param_df = subset(biosolid_crops, Main_crop == i)
+    param_df = subset(standard_params, Main_crop == i)
     main_param_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
     main_param_df[, yrs] <- sapply(yrs, function(x) main_param_df[,x] <- 0)
     
@@ -231,7 +233,6 @@ compute_total_manure_app_NH3_per_mainParam = function(manure_surplus_fills_nutDe
 
 
 
-
 ## CROP RESIDUES BURNT ON-SITE NH3 EMISSIONS -----------------------------------------------------------------
 
 source('./Nutrients/Model/Crop_production/Compute_crop_residues.R')
@@ -275,7 +276,6 @@ compute_crop_residue_burnt_NH3 = function(main_param, param, nutrient = 'N') {
   return(res_burnt_NH3)
   rm(list=c('ef','res_burnt_N','FRAC_res_N','yrs','res_burnt_DM'))
 }
-
 
 
 compute_all_crop_residues_burnt_NH3 <- function() {
@@ -443,4 +443,3 @@ compute_total_biosolid_app_NH3 = function(manure_surplus_fills_nutDemand = F, ma
               subfolderX4 = folder_div,
               subfolderX5 = 'Total')
 }
-

@@ -72,7 +72,7 @@ loop_gaseous_emissions = function(manure_surplus_fills_nutDemand = F, manure_met
   
   gas = c('NH3','N2O','NN2','NOx')
   for (i in gas) {
-    
+    print(i)
     tot_emissions = compute_total_gaseous_emissions(i, manure_surplus_fills_nutDemand, manure_method, nutrient)
     export_file(module = 'Nutrients', 
             file = tot_emissions, 
@@ -85,4 +85,5 @@ loop_gaseous_emissions = function(manure_surplus_fills_nutDemand = F, manure_met
             subfolderX5 = 'Total')
   }
 }
+loop_gaseous_emissions()
   

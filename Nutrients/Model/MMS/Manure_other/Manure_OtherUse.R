@@ -52,7 +52,12 @@ compute_manure_transported <- function(nutrient, main_param, param, manure_type,
   
   if (nutrient == 'N') {
     
-    ifelse(manure_type == 'Solid', man_transport <- allocate_solid_manure_spreading('N',main_param, param, manure_type, manure_use), man_transport <- allocate_slurry_spreading('N',main_param, param, manure_type, manure_use))
+    if (manure_type == 'Solid') {
+         man_transport = allocate_solid_manure_spreading('N',main_param, param, manure_type, manure_use)
+    }
+    else {
+         man_transport = allocate_slurry_spreading('N',main_param, param, manure_type, manure_use)
+    }
   }
   else if (nutrient == 'P') {
     print('IMPLEMENT THIS!')
@@ -86,4 +91,3 @@ loop_manure_transported <- function(nutrient) {
   }
   rm(list=c('man_type','man_transport'))
 }
-

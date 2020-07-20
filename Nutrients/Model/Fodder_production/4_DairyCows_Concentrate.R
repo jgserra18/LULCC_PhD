@@ -226,7 +226,7 @@ compute_all_necessary_concentrate_FRAC = function() {
   DMI_df = compute_total_DMI('Bovine','Dairy_cows')
   GE_df = compute_total_gross_energy_GE('Bovine','Dairy_cows')
   milk_per_cow_df = update_daily_milk_yield()
-  FRAC_fat_df = get_energy_requirement_params(animal_class, 'Milk', 'Dairy_cows')
+  FRAC_fat_df = get_energy_requirement_params('Ruminants', 'Milk', 'Dairy_cows')
   FRAC_protein_df = get_activity_data(module = 'Nutrients', subfolder = 'General_params', subfolderX2 = 'Animals', subfolderX3 = 'Diet', subfolderX4 = 'Ruminants', subfolderX5 = 'Nutrient_retention', pattern = 'Prot')
 
 
@@ -269,3 +269,4 @@ export_necessary_cocnentrate_FRAC = function() {
               subfolder = 'FRAC_concentrate', 
               subfolderX2 = 'Bovine')
 }
+

@@ -580,7 +580,6 @@ loop_manure_application_rates = function(nutrient, manure_surplus_fills_nutDeman
 }
 
 
-
 compute_total_crop_manure_app_rate = function(nutrient, manure_surplus_fills_nutDemand = FALSE) {
   
   

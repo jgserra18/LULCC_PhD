@@ -1,6 +1,6 @@
-Need to:
 
-8 April 2020
-- Finish Animal_ids in Raw_data_Municipality (pigs)
-- Develop a function to read and write municipality data
-- INE cats may change
+--> divide excreted manure onto pasture proportionally by intensive and extensive pastures
+--> correct NH3 emissions from N excreted onto pastures 
+--> correct runoff in intensive and extensive pastures
+--> correct atmospheric deposition
+--> correct nutrient balances

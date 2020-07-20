@@ -139,7 +139,7 @@ compute_ALL_atmospheric_deposition = function(manure_surplus_fills_nutDemand = F
 # compute deposition on UAA -------------------------------
 
 
-compute_avg_atmN = function(reference_area = 'Cropland', manure_method = 'Method 1') {
+compute_avg_atmN = function(reference_area = 'Cropland', manure_method = 'Method 1', manure_surplus_fills_nutDemand=F) {
   # calculates avg deposition rate at the municipality scale for 1987-2017
   # ref area: Cropland or Grassland
   # unit: kg N ha-1 yr-1 @ municipality
@@ -193,5 +193,4 @@ compute_total_atmN_muni = function(reference_area = 'Cropland', manure_method = 
 
   return(avg_atmN_muni)
 }
-
 

@@ -113,7 +113,7 @@ sumIf_admin_regions <- function(admin, INE_param, main_param, param) {
 
 general_func_sumIF_admin_df = function(admin, merge_df, merge_col) {
   # general function to aggregate statistics to a higher resolution
-  
+  head(disagg_df)
   disagg_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Spatial_disaggregation')
   
   if (missing(merge_col)==TRUE) {
@@ -164,6 +164,7 @@ compute_temporal_sumIF_admin_df = function(admin, merge_df) {
       store_df[i, yr] = sum(sb_df)
     }
   }
+  store_df = store_df[order(store_df$Admin_id), ]
   return(store_df)
 }
 

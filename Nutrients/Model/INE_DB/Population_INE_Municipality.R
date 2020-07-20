@@ -5,11 +5,10 @@ library(doParallel)
 
 ##  WEB SCRAPING FUNCTIONS -------------------------------------------------------------------------------------
 
-
 update_get_INE_data <- function(INE_param_id, year, muni_id, var_id, other_params) {
   # permanent grasslands have a different dimension within the JSON file
   
-  if (INE_param_id == '0004331' && missing(var_id)==TRUE) {
+  if (INE_param_id == '0004331' | missing(var_id)==TRUE ) {
     
     url <- paste0('https:/www.ine.pt/ine/json_indicador/pindica.jsp?op=2&varcd=', '0004331', 
                   '&Dim1=',year , '&Dim2=', muni_id,
@@ -42,17 +41,26 @@ get_municipality_INE <- function(INE_param_id, var_id,
                      .export = c('update_get_INE_data', 'get_INE_data', 'get_activity_data'),
                      .combine = 'rbind',
                      .packages = 'jsonlite') %dopar% {
-                      
-                       INE_value <- update_get_INE_data(INE_param_id = INE_param_id, 
-                                                        year = js_year, 
-                                                        muni_id = as.character(df[i, 'ID']), 
-                                                        var_id = var_id, 
-                                                        other_params = other_params)
+                       
+                       if (missing(var_id)==TRUE | missing(other_params)==TRUE) {
+                         INE_value <- update_get_INE_data(INE_param_id = INE_param_id, 
+                                                          year = js_year, 
+                                                          muni_id = as.character(df[i, 'ID']))
+                       }
+                       else {
+                         INE_value <- update_get_INE_data(INE_param_id = INE_param_id, 
+                                                          year = js_year, 
+                                                          muni_id = as.character(df[i, 'ID']), 
+                                                          var_id = var_id, 
+                                                          other_params = other_params)
+                       }
                        data.frame(val = INE_value,
                                   i = i)
                      }
     df[, j] <- store[, 'val']
   }
+  stopImplicitCluster()
+  
   return(df)
 }
 

@@ -135,7 +135,6 @@ general_func_nutrient_intake = function(main_param, param, management, nutrient 
 
 
 
-
 compute_nutrient_feed_intake = function(nutrient = 'N') {
   
   standard_params <- get_standard_params_list(main_param = 'Animals')

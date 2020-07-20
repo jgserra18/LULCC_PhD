@@ -243,7 +243,7 @@ allocation_forage_offtake_flows_per_referenceArea = function(reference_area, nut
     
     extensive_past_offtake =  get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Crop_offtake', subfolder = nutrient, subfolderX2 = 'Pastures', pattern = 'Extensive_pasture')
     
-    return(extensive)
+    return(extensive_past_offtake)
   }
 }
 
@@ -269,7 +269,7 @@ allocation_forage_residues_flows_per_referenceArea = function(reference_area, nu
     
     extensive_past_offtake =  get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Crop_residues', subfolder = 'Removed', subfolderX2 = nutrient, subfolderX3 = 'Pastures', pattern = 'Extensive_pasture')
     
-    return(extensive)
+    return(extensive_past_offtake)
   }
 }
 

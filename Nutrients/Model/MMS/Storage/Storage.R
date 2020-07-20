@@ -341,11 +341,10 @@ loop_slurry_solid_storage_all_N_emissions <- function() {
   N_gases <- c('NH3','N2O','NOx','NN2')
   sapply(N_gases, function(x) loop_slurry_solid_storage_Nemissions(N_gas = x))
 }
-loop_slurry_solid_storage_all_N_emissions()
 
 
 ## COMPUTE TOTAL STORAGE EMISSIONS (E_STORAGE_SLURRY/SOLID) -----------------
-
+## NOT NEEDED ANYMORE ----- SEE FUNCTION ABOVE
 general_func_compute_total_storage_emissions <- function(main_param, param, manure_type) {
   # general function to compute the sum of N emissions from manure storage
   # unit: kg N yr-1
@@ -387,3 +386,4 @@ compute_all_total_storage_emissions <- function() {
     }
   }
 }
+

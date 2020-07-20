@@ -216,7 +216,8 @@ allocate_crop_biosolid_1teraction = function(nutrient, manure_method, manure_sur
 
 loop_crop_biosolid_1teraction_ManureMethod = function(nutrient, manure_surplus_fills) {
   
-  method = c('Method 1', 'Method 2')
+  #method = c('Method 1', 'Method 2')
+  method = 'Method 1'
   sapply(method, function(x) allocate_crop_biosolid_1teraction(nutrient, x, manure_surplus_fills))
 }
 

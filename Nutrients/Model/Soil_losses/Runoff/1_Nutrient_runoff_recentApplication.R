@@ -1,19 +1,53 @@
 source('Main/Global_functions.R')
 
+# disaggregate pastures --------------------------------------------------------
+
+compute_pastures_FRAC = function(main_param = 'Pastures', param) {
+  
+  temp_grass = get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Areas', subfolderX2 = main_param, pattern = 'Intensive_pasture')
+  perm_grass = get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Areas', subfolderX2 = main_param, pattern = 'Extensive_pasture')
+  
+  yrs <- paste0('X', seq(1987,2017))
+  grass = perm_grass
+  FRAC_grass = perm_grass
+  grass[, yrs] <- sapply(yrs, function(x) round(perm_grass[,x] + temp_grass[,x], 1))
+  
+  if (param == 'Intensive_pasture') {
+    FRAC_grass[, yrs] <- sapply(yrs, function(x) round(temp_grass[,x]/grass[,x], 3))
+  }
+  else {
+    FRAC_grass[, yrs] <- sapply(yrs, function(x) round(perm_grass[,x]/grass[,x], 3))
+  }
+  
+  return(FRAC_grass) 
+}
+
+compute_FRAC_pastures_nutrient_flows = function(nutrient_flow_df, pasture_type) {
+  # disaggregates nutrient flows per pasture type
+  
+  
+  yrs <- paste0('X', seq(1987,2017))
+  FRAC_grass = compute_pastures_FRAC(param = pasture_type)
+  nutrient_flow_df[, yrs] = sapply(yrs, function(x) round(FRAC_grass[,x] * nutrient_flow_df[,x], 2))
+  
+  return(nutrient_flow_df)
+}
 
 
 # GRAZING NET N RETURNED TO SOIL ----------------------------------------------------------------------------------------------- 
 
-compute_net_grazing_soil = function(nutrient) {
-  # returns the total net nutrient amounts to soil from animal grazing
+compute_net_grazing_soil = function(pasture_type, nutrient) {
+  # returns the total net nutrient amounts to soil from animal grazing per pasture type (Intensive_pasture or Extensive_pasture)
   # it is assumed no P losses while for N NH3 emissions must be excluded
   # unit: kg nutrient yr1-
   
   tot_nut_grazing = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Gross_manure', subfolder = nutrient, subfolderX2 = 'Total', subfolderX3 = 'Total', pattern = 'Total')
-  
+  tot_nut_grazing = compute_FRAC_pastures_nutrient_flows(tot_nut_grazing, pasture_type)
+    
   if (nutrient == 'N') {
     
     tot_nh3_grazing = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Gas_N_emissions', subfolder = 'NH3', subfolderX2 = 'Grazing',subfolderX3 = 'Total', subfolderX4 = 'Total', pattern = 'Total_sum')
+    tot_nh3_grazing = compute_FRAC_pastures_nutrient_flows(tot_nh3_grazing, pasture_type)
     
     yrs = paste0('X', seq(1987,2017))
     tot_nut_grazing[, yrs] = sapply(yrs, function(x) round(tot_nut_grazing[, x] - tot_nh3_grazing[, x], 1))
@@ -290,13 +324,16 @@ loop_avg_muni_runoff_field_application_LU = function(spatial_res = '500') {
 # CALCULATE RECENT MEMORY NUTRIENT LOSSES FROM RUNOFF  --------------------------------------------------------------------------------------------
 
 
-compute_recentMemory_runoff_nutrient_grazing = function(nutrient, manure_surplus_fills_nutDemand = F, manure_method = 'Method 1') {
+compute_recentMemory_runoff_nutrient_grazing = function(pasture_type, nutrient, manure_surplus_fills_nutDemand = F, manure_method = 'Method 1') {
   # recent memory runoff losses from grazing 
   # unit: kg nutrient yr-1
   
-  net_nutrient_soil = compute_net_grazing_soil(nutrient)
-  FRAC_rf_grazing = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Runoff', subfolder = 'LU_FRAC_runoff', subfolderX2 = 'Dataframe', subfolderX3 = 'Recent_Application', pattern = 'Grazing')
+
+  net_nutrient_soil = compute_net_grazing_soil(pasture_type, nutrient)
   
+  FRAC_rf_pasture_type = ifelse(pasture_type=='Extensive_pasture','Grazing','IntensivePasture')
+  FRAC_rf_grazing = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Runoff', subfolder = 'LU_FRAC_runoff', subfolderX2 = 'Dataframe', subfolderX3 = 'Recent_Application', pattern = FRAC_rf_pasture_type)
+
   runoff_nutrient_grazing = FRAC_rf_grazing
   
   yrs = paste0('X', seq(1987,2017))
@@ -311,9 +348,29 @@ loop_recentMemory_runoff_nutrient_grazing = function(nutrient, manure_surplus_fi
   
   if (manure_surplus_fills_nutDemand == TRUE) { folder_div = 'With_ManSurplus'} else { folder_div = 'Without_ManSurplus'}
   
-  rf_grazing = compute_recentMemory_runoff_nutrient_grazing(nutrient, manure_surplus_fills_nutDemand, manure_method)
+  past_type = c('Intensive_pasture','Extensive_pasture')
+  
+  yrs <- paste0('X', seq(1987,2017))
+  total <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  total[, yrs] <- sapply(yrs, function(x) total[,x] = 0)
+  
+  for (pasture in past_type) {
+    
+    rf_grazing = compute_recentMemory_runoff_nutrient_grazing(pasture, nutrient, manure_surplus_fills_nutDemand, manure_method)
+    total[, yrs] <- sapply(yrs, function(x) total[,x] +rf_grazing[,x])
+    
+    export_file(module = 'Nutrients', 
+                file = rf_grazing, 
+                filename = pasture, 
+                folder = 'Runoff', 
+                subfolder = 'Recent_memory', 
+                subfolderX2 = nutrient,
+                subfolderX3 = manure_method,
+                subfolderX4 = folder_div, 
+                subfolderX5 = 'Grazing')
+  }
   export_file(module = 'Nutrients', 
-              file = rf_grazing, 
+              file = total, 
               filename = 'Total', 
               folder = 'Runoff', 
               subfolder = 'Recent_memory', 
@@ -493,7 +550,9 @@ compute_total_runoff_nutrient_losses = function(nutrient='N', manure_surplus_fil
   store_df[, yrs] <- sapply(yrs, function(x) store_df[,x] <- 0)
   
   # add grazing runoff losses
-  rf_grazing = compute_recentMemory_runoff_nutrient_grazing(nutrient, manure_surplus_fills_nutDemand, manure_method)
+  rf_grazing = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Runoff', subfolder = 'Recent_memory', 
+                                 subfolderX2 = nutrient, subfolderX3 =manure_method, subfolderX4 = folder_div, 
+                                 subfolderX5 = 'Grazing', pattern = 'Total')
   store_df [, yrs] = sapply(yrs, function(x) round(rf_grazing[,x] + store_df[, x], 1))
   
   fert = c('Manure','Inorganic','Biosolids')
