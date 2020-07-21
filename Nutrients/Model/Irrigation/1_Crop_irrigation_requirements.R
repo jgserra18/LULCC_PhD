@@ -1,9 +1,10 @@
 source('./Main/Global_functions.R')
 source('./Nutrients/Model/Irrigation/Support/1_Populate_2009_irrigated_areas.R')
+source('./Nutrients/Model/Irrigation/Support/4_Populate_crop_irrigated_areas.R')
 
 # set calculation period ---------------------------------------------------------------------------------------------------------------
 
-yrs = paste0('X','2009')
+yrs = paste0('X',seq(1987,2017))
 
 
 
@@ -17,6 +18,7 @@ find_crop_irrigation_method = function(irrigation_volume_df, param) {
   irrigation_volume_df = irrigation_volume_df[crop_row, ]
   return(irrigation_volume_df)
 }
+
 
 create_crop_irrigation_requirements = function(main_param, param) {
   # creates a df template for a given crop with the regional irrigation requirements for all irrig systems
@@ -51,7 +53,7 @@ compute_crop_irrigation_requirement = function(main_param, param, irrig_method) 
   
   
   irrig_requirement = create_crop_irrigation_requirements(main_param, param)[, c('Muni_ID',irrig_method)]
-  crop_irrig_area = get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Irrigation', subfolderX2 = 'Irrigated_areas', subfolderX3 = irrig_method, subfolderX4 = main_param, pattern = param)
+  crop_irrig_area = get_activity_data(module = 'Nutrients',folder = 'Correct_data_Municipality',subfolder = 'Irrigation',subfolderX2 = 'Correct_irrigated_areas_method',subfolderX3 = irrig_method, subfolderX4 = main_param, pattern = param)   
   crop_irrig_vol = crop_irrig_area
   
   if (param == 'Rice' & irrig_method == 'other_gravity') {

@@ -94,9 +94,10 @@ get_irrigation_method_all_crops = function(irrigation_method_id, irrigation_meth
                 folder = 'Activity_data', 
                 subfolder = 'Correct_data_Municipality', 
                 subfolderX2 = 'Irrigation', 
-                subfolderX3 = 'Irrigated_areas',
-                subfolderX4 = irrigation_method_name, 
-                subfolderX5 = main_param, 
+                subfolderX3 = 'Preprocessing_X2009'
+                subfolderX4 = 'Irrigated_areas',
+                subfolderX5 = irrigation_method_name, 
+                subfolderX6 = main_param, 
                 filename = ifelse(param=='Other_industry','Tomato',param), 
                 file = irrig_area_method_muni)
   }
