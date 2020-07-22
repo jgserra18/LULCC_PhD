@@ -1,6 +1,10 @@
+source('./Main/Global_functions.R')
 
+library(sf)
 
 # GW -------------------------------------------------------------------------------------
+
+
 
 select_station_years = function(year, all_stations_df) {
   # subets based on coordinates, station id and the year
@@ -17,13 +21,6 @@ select_station_years = function(year, all_stations_df) {
     return(all_stations_df)
   }
 }
-
-
-annual_stations = select_station_years(1991, all_stations)
-
-if (ncol(annual_stations)==4) {
-  names(annual_stations)[4] = 'Avg_NO3'
-} else { annual_stations[, 'Avg_NO3'] = round(rowMeans(annual_stations[, -seq(1,3)], na.rm=T), 2) }
 
 
 
@@ -45,6 +42,7 @@ compute_annual_mean_NO3 = function(year, all_stations_df) {
   
   return(annual_stations)
 }
+
 
 spatialize_annual_mean_NO3 = function(year, all_stations_df) {
   # returns two things:
@@ -70,7 +68,7 @@ spatialize_annual_mean_NO3 = function(year, all_stations_df) {
   return(list(stations_df = annual_avg_NO3, stations_shp = SPdf))
 }
 
-all_stations  = get_activity_data(module = 'Nutrients', folder = 'Nutrient_params', subfolder = 'N', subfolderX2 = 'Irrigation', subfolderX3 = 'GW_monitoring_station',  subfolderX4 = '1987-2016', pattern = 'GW')
-no3_2000 = spatialize_annual_mean_NO3(2016, all_stations)
+#all_stations  = get_activity_data(module = 'Nutrients', folder = 'Nutrient_params', subfolder = 'N', subfolderX2 = 'Irrigation', subfolderX3 = 'GW_monitoring_station',  subfolderX4 = '1987-2016', pattern = 'GW')
+#no3_2000 = spatialize_annual_mean_NO3(2016, all_stations)
 
 

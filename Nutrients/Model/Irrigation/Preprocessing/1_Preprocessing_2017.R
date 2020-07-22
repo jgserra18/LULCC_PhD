@@ -12,6 +12,7 @@ preprocess_monitoring_stations_X2017 = function(station_df) {
   
   
   file = station_df
+  last_rows = seq(ncol(file)-3,)
   # delete last 3 rows with metadata
   file = file[-last_rows, ]
   # create new df to store correct values
@@ -81,7 +82,6 @@ list_X2017_files = function(stations_source) {
 }
 
 
-
 spatialize_stations_X2017 = function(stations_source) {
   # e.g., spatialize_stations_X2017('GW')
   # returns two things:
@@ -97,6 +97,7 @@ spatialize_stations_X2017 = function(stations_source) {
   stations_info  = get_activity_data(module = 'Nutrients', folder = 'Nutrient_params', subfolder = 'N', subfolderX2 = 'Irrigation', subfolderX3 = paste0(stations_source, '_monitoring_station'), pattern = paste0(stations_source, '_stations_2017'))
   stations_info$stations = gsub('/','.', stations_info$stations)
   stations_info = stations_info[, c('stations','COORD_X','COORD_Y')]
+  names(stations_info)[c(2,3)] = c('x','y')
   
   # join
   stations = plyr::join(gw_X2017, stations_info)
@@ -120,10 +121,6 @@ spatialize_stations_X2017 = function(stations_source) {
   return(list(stations_df = stations, stations_shp = SPdf))
   rm(list=c('gw_X2017','list_file_path','stations_info','SP'))
 }
-
-
-
-
 
 
 

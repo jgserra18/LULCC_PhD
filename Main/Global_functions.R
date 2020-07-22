@@ -239,7 +239,7 @@ list_dir_files <- function(module, main_folder, folder, subfolder, subfolderX2, 
 }
 
 
-list_all_files_folder <- function(module, folder, subfolder, mainfolder, subfolderX2, subfolderX3, subfolderX4, subfolderX5, subfolderX6) {
+list_all_files_folder <- function(module, folder, subfolder, mainfolder, subfolderX2, subfolderX3, subfolderX4, subfolderX5, subfolderX6, full_names = FALSE) {
   # gets the path of a given file within folders/subfolders of activity data,
   # this can also be used to get output data
   
@@ -257,19 +257,19 @@ list_all_files_folder <- function(module, folder, subfolder, mainfolder, subfold
   }
   else if (missing(subfolderX2)==TRUE & missing(subfolderX3)==TRUE & missing(subfolderX4)==TRUE & missing(subfolderX5)==TRUE & missing(subfolderX6)==TRUE) {
     sel_subfolder <- list.files(path = act_data, pattern = subfolder, full.names = TRUE)
-    sel_file <- list.files(path = sel_subfolder)
+    sel_file <- list.files(path = sel_subfolder, full.names = full_names)
   } 
   else if (missing(subfolderX3)==TRUE & missing(subfolderX4)==TRUE & missing(subfolderX5)==TRUE & missing(subfolderX6)==TRUE){
     sel_subfolder <- list.files(path = act_data, pattern = subfolder, full.names = TRUE)
     sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX2, full.names = TRUE)
-    sel_file <- list.files(path = sel_subfolder)
+    sel_file <- list.files(path = sel_subfolder, full.names = full_names)
   }
   else if (missing(subfolderX4)==TRUE & missing(subfolderX5)==TRUE & missing(subfolderX6)==TRUE) {
 
     sel_subfolder <- list.files(path = act_data, pattern = subfolder, full.names = TRUE)
     sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX2, full.names = TRUE)
     sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX3, full.names = TRUE)
-    sel_file <- list.files(path = sel_subfolder)
+    sel_file <- list.files(path = sel_subfolder, full.names = full_names)
   } 
   else if (missing(subfolderX5)==TRUE & missing(subfolderX6)==TRUE) {
 
@@ -277,7 +277,7 @@ list_all_files_folder <- function(module, folder, subfolder, mainfolder, subfold
     sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX2, full.names = TRUE)
     sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX3, full.names = TRUE)
     sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX4, full.names = TRUE)
-    sel_file <- list.files(path = sel_subfolder)
+    sel_file <- list.files(path = sel_subfolder, full.names = full_names)
   }
   else if (missing(subfolderX6)==TRUE) {
 
@@ -286,7 +286,7 @@ list_all_files_folder <- function(module, folder, subfolder, mainfolder, subfold
     sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX3, full.names = TRUE)
     sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX4, full.names = TRUE)
     sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX5, full.names = TRUE)
-    sel_file <- list.files(path = sel_subfolder)
+    sel_file <- list.files(path = sel_subfolder, full.names = full_names)
   }
   else {
     sel_subfolder <- list.files(path = act_data, pattern = subfolder, full.names = TRUE)
@@ -295,7 +295,7 @@ list_all_files_folder <- function(module, folder, subfolder, mainfolder, subfold
     sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX4, full.names = TRUE)
     sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX5, full.names = TRUE)
     sel_subfolder <- list.files(path = sel_subfolder, pattern = subfolderX6, full.names = TRUE)
-    sel_file <- list.files(path = sel_subfolder)
+    sel_file <- list.files(path = sel_subfolder, full.names = full_names)
   }
   
   return(sel_file)
