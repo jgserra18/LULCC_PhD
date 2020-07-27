@@ -12,7 +12,7 @@ preprocess_monitoring_stations_X2017 = function(station_df) {
   
   
   file = station_df
-  last_rows = seq(ncol(file)-3,)
+  last_rows = seq(nrow(file)-3,nrow(file), 1)
   # delete last 3 rows with metadata
   file = file[-last_rows, ]
   # create new df to store correct values
@@ -76,7 +76,7 @@ list_X2017_files = function(stations_source) {
     files = list.files(path = './Nutrients/Activity_data/Nutrient_params/N/Irrigation/GW_monitoring_stations/2017/', pattern = '.csv', full.names = TRUE)
   }
   else {
-    files = list.files(path = './Nutrients/Activity_data/Nutrient_params/N/Irrigation/SW_monitoring_stations//2017/', pattern = '.csv', full.names = TRUE)
+    files = list.files(path = './Nutrients/Activity_data/Nutrient_params/N/Irrigation/SW_monitoring_stations//1986-2017//', pattern = '.csv', full.names = TRUE)
   }
   return(files)
 }

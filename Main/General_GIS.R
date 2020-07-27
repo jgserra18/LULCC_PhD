@@ -60,6 +60,16 @@ resample_to_CLC <- function(module='LULCC', raster_file, mask_CLC, spatial_res, 
 }
 
 
+general_RasterCrop_mainland  = function(r_file, spatial_res) {
+  
+  template_clc = get_activity_data(module = 'LULCC', folder = 'CLC', subfolder = spatial_res, pattern = '1990')
+  r_file = mask(crop(r_file, extent(template_clc)), template_clc)
+  
+  return(r_file)
+  rm(list='template_clc')
+}
+
+
 
 general_RasterCrop_admin <- function(module, r_file, admin, admin_id) {
   

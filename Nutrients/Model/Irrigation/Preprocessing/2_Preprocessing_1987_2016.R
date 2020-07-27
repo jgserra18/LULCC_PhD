@@ -68,7 +68,6 @@ spatialize_annual_mean_NO3 = function(year, all_stations_df) {
   return(list(stations_df = annual_avg_NO3, stations_shp = SPdf))
 }
 
-#all_stations  = get_activity_data(module = 'Nutrients', folder = 'Nutrient_params', subfolder = 'N', subfolderX2 = 'Irrigation', subfolderX3 = 'GW_monitoring_station',  subfolderX4 = '1987-2016', pattern = 'GW')
+all_stations  = get_activity_data(module = 'Nutrients', folder = 'Nutrient_params', subfolder = 'N', subfolderX2 = 'Irrigation', subfolderX3 = 'GW_monitoring_station',  subfolderX4 = '1987-2016', pattern = 'GW')
 #no3_2000 = spatialize_annual_mean_NO3(2016, all_stations)
-
 

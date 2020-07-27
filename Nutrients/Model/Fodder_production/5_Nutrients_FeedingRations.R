@@ -453,23 +453,39 @@ compute_admin_nutrient_roughage_feed_ForagePasturesFlows = function(admin = 'PT'
   rm(list=c('crop_area','yrs'))
 }
 
+// rewrite rations only with main crop products (grass, forage crops)
+// do the fodder allocation and calculate N yield for each crop (kg N ha-1 yr-1)
+// convert yield to dry matter using DM contents (N_yield / DM_content * 1000)
+// define threshold according to the maximum values in statistics portugal
+// forage oat and forage maize for their respective crops; remaining forage crops according to the total forage production
+// for grass, establish max possible yield according to toth et al 2008
 
+// adjust the N intake according to these modifications and store the "surplus" yield
+// this surplus yield will add to the remaining crop residues FRAC in the feeding rations
+// from the new crop yields, estimate residues production 
 
 #ar = read_sf('./LULCC/Activity_data/Admin/Agrarian_region.shp')
 #ar = merge(ar, d, 'Admin_id')
 #tm_shape(ar) + tm_polygons(col='Admin_id', palette = 'Set1')
 
 #require(tmap)
+yrs  = paste0('X',seq(1987,2017))
+d = compute_total_nutrient_roughage_feed_ForagePasturesFlows('Main_crop', 'Fresh_grass')
+s1 = sapply(yrs, function(x) sum(d[, x]))
 
-#d = compute_total_nutrient_roughage_feed_ForagePasturesFlows('Main_crop', 'other_forage')
-#s1 = sapply(yrs, function(x) sum(d[, x]))
+d2 = read.csv('./Nutrients/Activity_data/Correct_data_Municipality/Areas/Pastures/Extensive_pasture.csv')
+s2 = sapply(yrs, function(x) sum(d2[, x]))
 
-#d2 = read.csv('./Nutrients/Activity_data/Correct_data_Municipality/Areas/Forage/other_forage.csv')
-#s2 = sapply(yrs, function(x) sum(d2[, x]))
-#s2
-#maizeNa = (s1/s2)/0.9 * 1000
+yield = d2
+yield[,yrs] = sapply(yrs, function(x) round(d[, x] / d2[, x]/ 0.8 * 1000, 0))
+View(yield)
+maizeNa = (s1/s2)/0.9 * 1000
 
-#df = reshape2::melt(as.data.frame(maizeNa))
-#df[, 'yrs'] = seq(1987,2017)
+df = reshape2::melt(as.data.frame(maizeNa))
+df[, 'yrs'] = seq(1987,2017)
+require(ggplot2)
+ggplot(df, aes(yrs,value/1000)) + geom_line() + scale_y_continuous(limits=c(0,70))
 
-#ggplot(df, aes(yrs,value/1000)) + geom_line() #+ scale_y_continuous(limits=c(0,70))
+df = reshape2::melt(yield[, -c(2,3)], 'Muni_ID')
+ggplot(df, aes(x=variable, y =value)) + geom_boxplot() +
+  scale_y_continuous(limits=c(0,70000))
