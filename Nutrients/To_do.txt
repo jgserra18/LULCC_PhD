@@ -1,6 +1,5 @@
+--> Recalculate manure N application rates ignoring manure surplus (but calculating) and recalculate everything related
+--> Improving Grazing algorithm, particularly the animal order 
+--> Re-check the total flows of crop/residues offtakr
 
---> divide excreted manure onto pasture proportionally by intensive and extensive pastures
---> correct NH3 emissions from N excreted onto pastures 
---> correct runoff in intensive and extensive pastures
---> correct atmospheric deposition
---> correct nutrient balances
+--> Recalculate everything related to lULC (nutrient balances, leaching)
