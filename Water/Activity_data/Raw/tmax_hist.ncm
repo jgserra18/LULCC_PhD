@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<netcdf xmlns="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2">
+	<aggregation type="union">
+		<netcdf>
+		<aggregation dimName="time" type="joinExisting" timeUnitsChange="true">
+		<variableAgg name="tmax"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1958.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1959.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1960.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1961.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1962.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1963.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1964.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1965.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1966.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1967.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1968.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1969.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1970.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1971.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1972.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1973.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1974.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1975.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1976.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1977.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1978.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1979.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1980.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1981.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1982.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1983.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1984.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1985.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1986.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1987.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1988.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1989.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1990.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1991.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1992.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1993.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1994.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1995.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1996.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1997.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1998.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_1999.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_2000.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_2001.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_2002.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_2003.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_2004.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_2005.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_2006.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_2007.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_2008.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_2009.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_2010.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_2011.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_2012.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_2013.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_2014.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_2015.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_2016.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_2017.nc" ncoords="12"/>
+			<netcdf location="G:/O meu disco/LULCC_PhD/Water/Activity_data/Raw/tmax/tmax_2018.nc" ncoords="12"/>
+		</aggregation>
+		</netcdf>
+	</aggregation>
+</netcdf>

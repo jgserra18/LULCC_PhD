@@ -1,0 +1,16 @@
+clc_id,LULCC_label,Modified_LU_kc,LU_kc,src
+1,urban,1,0.25,derived from https://www.sciencedirect.com/science/article/abs/pii/S1040618217308935
+2,forest,1.1,1.02,derived from https://www.sciencedirect.com/science/article/abs/pii/S1040618217308935
+3,wetlands,1,0.21,derived from https://www.sciencedirect.com/science/article/abs/pii/S1040618217308935
+4,heterogeneous,0.9,0.92,derived from https://www.sciencedirect.com/science/article/abs/pii/S1040618217308935
+211,Non_irrigated,0.9,1.14,derived from https://www.sciencedirect.com/science/article/abs/pii/S1040618217308935
+212,Permanently_irrigated,1,1.25,derived from https://www.sciencedirect.com/science/article/abs/pii/S1040618217308935
+213,Rice,1,0.94,derived from https://www.sciencedirect.com/science/article/abs/pii/S1040618217308935
+221,Vineyards,1,0.5,derived from https://www.sciencedirect.com/science/article/abs/pii/S1040618217308935
+222,Fruit_trees,1,0.68,derived from https://www.sciencedirect.com/science/article/abs/pii/S1040618217308935
+223,Olive_groves,1,0.66,derived from https://www.sciencedirect.com/science/article/abs/pii/S1040618217308935
+231,Pastures,0.9,0.7,derived from https://www.sciencedirect.com/science/article/abs/pii/S1040618217308935
+243,Agri_Natural,0.9,0.92,derived from https://www.sciencedirect.com/science/article/abs/pii/S1040618217308935
+244,AgroForestry,0.9,0.92,derived from https://www.sciencedirect.com/science/article/abs/pii/S1040618217308935
+321,Natural_grasslands,1,0.97,derived from https://www.sciencedirect.com/science/article/abs/pii/S1040618217308935
+512,Water_bodies,1,0.64,derived from https://www.sciencedirect.com/science/article/abs/pii/S1040618217308935
