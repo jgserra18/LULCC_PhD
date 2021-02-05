@@ -4,10 +4,7 @@ source('./Nutrients/Model/INE_DB/Standardize_INE_params.R')
 source('./Main/Data_operations.R')
 
 
-
 library(doParallel)
-
-
 
 
 # get irrigable areas per municipality/AR for 1989, 1999 and 2009 --------------------------------
@@ -51,8 +48,6 @@ get_irrigable_municipality_areas_AG_census = function(INE_param_id = '0004391',
               filename = 'Total', 
               file = df)
 }
-
-
 
 
 
@@ -137,21 +132,19 @@ linearly_interpolate_AR = function() {
   }
   df <- df[, -1]
   df = sapply(df, as.numeric)
-  
+  new_df = df[, new_yrs] # df with only years with data
+
   xout <- c(1987,1988,1990,1991,1992,1994,1996,1998,2000,2001,2002,2003, 2004,2006,2008,2010,2011,2012,2014,2015,2017)
-  for (i in 1:nrow(df)) {
+  
+  for (i in 1:nrow(new_df)) {
     
+    AR_aei = data.frame(yrs = as.numeric(new_yrs),
+                    aei = as.numeric(new_df[i,]))
+    lm_model = lm(aei~yrs,AR_aei)
+    pred_vals =  round( predict(lm_model, newdata =  data.frame(yrs =  xout)) , 0)
+    pred_vals <- ifelse(pred_vals<0, 0, round(pred_vals, 0))
     
-    new_df <- approx(x= as.numeric(yrs), y = df[i,], 
-                     xout = xout, rule = 2)
-    
-    inter_years <- new_df[[1]]
-    inter_values <- round(new_df[[2]], 0)
-    ctr <- 0
-    for (j in inter_years) {
-      ctr <- ctr + 1
-      df[i, as.character(j)] <- inter_values[ctr]
-    }
+    df[i, as.character(xout)] = pred_vals
   }
   
   df = as.data.frame(df)
@@ -159,7 +152,6 @@ linearly_interpolate_AR = function() {
   
   df[, 'id'] <- seq(1,7)
   df <- df[, c('id', as.character(seq(1987,2017)))]
-  
   names(df) = c('id', paste0('X',seq(1987,2017)))
   export_file(module = 'Nutrients', 
               folder = 'Activity_data', 
@@ -174,41 +166,18 @@ linearly_interpolate_AR = function() {
 
 # downscales to the municipality scale the irrigable areas ---------------------------------
 
-average_irrigable_AG_census_interpolation_period <- function(muni_df,
-                                                             period_1 = as.character(seq(1987,1992)), #AG1
-                                                             period_2 = as.character(seq(1993,1995)), #AVG1
-                                                             period_3 = as.character(seq(1996,2002)), #AG2
-                                                             period_4 = as.character(seq(2003,2005)), #AVG2
-                                                             period_5 = as.character(seq(2006, 2017)) #AG3
-) {
+average_irrigable_AG_census_interpolation_period <- function(muni_df) {
+  #' @note similar to compute_interpolate_non_AG_census_yrs
+  #' @description linearly interpolates irrigable census AG_census for the whole period
   # TO BE USED ONLY AFTER compute_corrected_INE_param_AG_census
-  # selects the appropriate year for AG_census (AG1,AG2,AG3) or averages the years in-between AG_census (AVG1,AVG2)
+  
   # populates a data.frame with the different new_muni templates according to the year 
+  yrs_in = c(1989,1999,2009)
+  # yrs_out are the remaining one, 1987-2017
+  muni_df = muni_df[, -c(1,2,3)]
+  muni_df = apply_linearExtrapolation(file = muni_df, yrs_in = yrs_in)
   
-  store <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
-  
-  yrs <- as.character(seq(1987,2017))
-  
-  for (i in yrs) {
-    
-    if (i %in% period_1) {
-      store[, paste0('X',i)] <- muni_df[, 'X1989'] 
-    } 
-    else if (i %in% period_2) {
-      store[, paste0('X',i)]<- compute_AVG_AG_census(muni_df, 'AVG1','X1989','X1999')
-    } 
-    else if (i %in% period_3) {
-      store[, paste0('X',i)] <- muni_df[, 'X1999'] 
-    }
-    else if (i %in% period_4) {
-      store[, paste0('X',i)] <- compute_AVG_AG_census(muni_df, 'AVG2','X1999','X2009')
-    }
-    else {
-      store[, paste0('X',i)] <- muni_df[,'X2009']
-    }
-  }
-  
-  return(store)
+  return(muni_df)
 }
 
 

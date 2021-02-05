@@ -32,6 +32,12 @@ compute_forage_BNF <- function(nutrient = 'N',
   }
 }
 
+loop_forage_BNF = function(nutrient = 'N', 
+                           main_param = 'Pastures') {
+  
+  crops = c('Intensive_pasture','Extensive_pasture')
+  sapply(crops, function(x) compute_forage_BNF(nutrient, main_param, param = x))
+}
 
 
 

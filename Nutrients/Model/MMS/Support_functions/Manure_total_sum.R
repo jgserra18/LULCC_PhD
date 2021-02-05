@@ -155,4 +155,5 @@ loop_total_manure_nutrient_flows <- function(nutrient) {
   pathways <- c('Gross_spreading','Housing','Net_spreading','River_discharge','Storage','Total_Nexcretion','Transported_IntraMunicipality')
   sapply(pathways, function(x) compute_total_nutrient_manure_flows(main_folder = 'Gross_manure', nutrient = nutrient, pathway = x))
 }
+loop_total_manure_nutrient_flows('N')
 

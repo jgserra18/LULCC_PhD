@@ -2,9 +2,18 @@ source('./Main/Global_functions.R')
 source('./Nutrients/Model/Irrigation/Support/1_Populate_2009_irrigated_areas.R')
 source('./Nutrients/Model/Irrigation/Support/4_Populate_crop_irrigated_areas.R')
 
+
+
+
+
+
 # set calculation period ---------------------------------------------------------------------------------------------------------------
 
-yrs = paste0('X',seq(1987,2017))
+yrs = paste0('X',seq(1995,2017))
+
+
+
+# STATIC IRRIGATION WITHDRAWAL ----------------------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -18,7 +27,6 @@ find_crop_irrigation_method = function(irrigation_volume_df, param) {
   irrigation_volume_df = irrigation_volume_df[crop_row, ]
   return(irrigation_volume_df)
 }
-
 
 create_crop_irrigation_requirements = function(main_param, param) {
   # creates a df template for a given crop with the regional irrigation requirements for all irrig systems
@@ -88,13 +96,13 @@ compute_all_crop_irrigation_method_requirement = function(irrig_method) {
     export_file(module = 'Nutrients', 
                 folder = 'Irrigation', 
                 subfolder = 'Irrigation_requirements', 
-                subfolderX2 = irrig_method, 
-                subfolderX3 = main_param,
+                subfolderX2 = 'GlobWat',
+                subfolderX3 = irrig_method, 
+                subfolderX4 = main_param,
                 file = irrig_req_method, 
                 filename = param)
   }
 }
-
 
 loop_crop_irrigation_requirements = function() {
   # compute irrigation requirements for all corps and irrigation methods
@@ -142,17 +150,58 @@ compute_total_crop_irrigation_requirements = function() {
     export_file(module = 'Nutrients', 
                 folder = 'Irrigation', 
                 subfolder = 'Irrigation_requirements', 
-                subfolderX2 = 'Total', 
-                subfolderX3 = main_param,
+                subfolderX2 = 'DGADR', 
+                subfolderX3 = 'Total',
+                subfolderX4 = main_param,
                 file = crop_tot_irrig, 
                 filename = param)
   }
   export_file(module = 'Nutrients', 
               folder = 'Irrigation', 
               subfolder = 'Irrigation_requirements', 
-              subfolderX2 = 'Total', 
+              subfolderX2 = 'DGADR', 
               subfolderX3 = 'Total',
+              subfolderX4 = 'Total',
               file = tot_irrig, 
               filename = 'Total')
 }
+
+
+compute_total_irrigation_requirements_per_maincrop = function() {
+  #' @description calculates the total irrigation requirements (IWR) for each main crop
+  #' unit is m3 yr-1
+  
+  irrig_id = get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Irrigation', subfolderX2 = 'Portugal_statistics', pattern = 'Crop_ids')
+  
+  main_params = unique(irrig_id$Main_crop)
+
+  main
+  for (main_param in main_params) {
+    print(main_param)
+    # store main param IWW
+    tot_irrig <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+    tot_irrig[, yrs] = sapply(yrs, function(x) tot_irrig[,x] = 0)
+    
+    crops = subset(irrig_id, Main_crop == main_param)[, 'Crop']
+
+    for (crop in crops) {
+      
+      crop = ifelse(crop == 'Other_industry','Tomato',crop)
+      IWW_crop = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Irrigation', subfolder = 'Irrigation_requirements', subfolderX2 = 'Total', subfolderX3 = main_param, pattern = crop)
+      tot_irrig[, yrs] = sapply(yrs, function(x) round(tot_irrig[,x] + IWW_crop[,x], 1))
+    }
+    export_file(module = 'Nutrients', 
+                folder = 'Irrigation', 
+                subfolder = 'Irrigation_requirements', 
+                subfolderX2 = 'Total', 
+                subfolderX3 = 'Total',
+                file = tot_irrig, 
+                filename = main_param)
+  }
+}
+
+
+
+
+
 

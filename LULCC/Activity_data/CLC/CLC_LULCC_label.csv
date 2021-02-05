@@ -2,6 +2,7 @@ clc_id,label,LULCC_label
 1,urban,urban
 2,forest,forest
 3,wetlands,wetlands
+4,Heterogeneous,heterogeneous
 211,Non-irrigated arable land,Non_irrigated
 212,Permanently irrigated land,Permanently_irrigated
 213,Rice fields,Rice
@@ -9,9 +10,7 @@ clc_id,label,LULCC_label
 222,Fruit trees and berry plantations,Fruit_trees
 223,Olive groves,Olive_groves
 231,Pastures,Pastures
-241,Annual crops associated with permanent crops,Annuals_permanents
-242,Complex cultivation patterns,Complex_patterns
-243,Land principally occupied by agriculture with significant areas of natural vegetation,Agriculture_naturalVeg
-244,Agro-forestry areas,AgroForestry
+243,Agri_Natural,Agri_Natural
+244,AgroForestry,AgroForestry
 321,Natural grasslands,Natural_grasslands
 512,Water bodies,Water_bodies

@@ -30,7 +30,7 @@ get_INE_irrigated_areas = function(INE_param_id, muni_id, irrigation_method_id, 
   url <- gsub('/', '//', url)
   json_df <- jsonlite::fromJSON(url)
   json_df <- json_df[[7]][[1]][[1]][[7]]
-  
+  print(json_df)
   return(json_df)
 }
 
@@ -41,26 +41,15 @@ get_municipality_irrigated_areas_method <- function(INE_param_id,
   # general function to scrape municipality data from Statistics Portugal
   # scrapes data for a given irrigated crop and irrigation method for all municipalities
   
-  cl <- registerDoParallel(cores=4)
-  getDoParWorkers()
   
   df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  df[1:nrow(df), 'X2009'] = sapply(1:nrow(df), function(x) {
+    INE_value <- get_INE_irrigated_areas(INE_param_id = INE_param_id,
+                                         muni_id = as.character(df[x, 'ID']), 
+                                         irrigation_method_id = irrigation_method_id, 
+                                         crop_id = crop_id)
+  })
 
-  store <- foreach(i=1:nrow(df), 
-                   .export = c('get_INE_irrigated_areas', 'get_INE_data', 'get_activity_data'),
-                   .combine = 'rbind',
-                   .packages = 'jsonlite') %dopar% {
-                     
-                       INE_value <- get_INE_irrigated_areas(INE_param_id = INE_param_id,
-                                                            muni_id = as.character(df[i, 'ID']), 
-                                                            irrigation_method_id = irrigation_method_id, 
-                                                            crop_id = crop_id)
-                     data.frame(val = INE_value,
-                                i = i)
-                   }
-  df[, 'X2009'] <- store[, 'val']
-  stopImplicitCluster()
-  
   corr_vals = which(df=='-',arr.ind = T)
   
   for (i in 1:nrow(corr_vals)) {
@@ -78,8 +67,7 @@ get_municipality_irrigated_areas_method <- function(INE_param_id,
 get_irrigation_method_all_crops = function(irrigation_method_id, irrigation_method_name) {
   
   irrig_id = get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Irrigation', subfolderX2 = 'Portugal_statistics', pattern = 'Crop_ids')
-  
-  for (i in 1:nrow(irrig_id)) {
+  sapply(1:nrow(irrig_id), function(i) {
     
     INE_param_id = substr(x = irrig_id[i,1], start = 2, stop = 8)
     main_param = irrig_id[i,2]
@@ -94,15 +82,14 @@ get_irrigation_method_all_crops = function(irrigation_method_id, irrigation_meth
                 folder = 'Activity_data', 
                 subfolder = 'Correct_data_Municipality', 
                 subfolderX2 = 'Irrigation', 
-                subfolderX3 = 'Preprocessing_X2009'
+                subfolderX3 = 'Preprocessing_X2009',
                 subfolderX4 = 'Irrigated_areas',
                 subfolderX5 = irrigation_method_name, 
                 subfolderX6 = main_param, 
                 filename = ifelse(param=='Other_industry','Tomato',param), 
                 file = irrig_area_method_muni)
-  }
+  })
 }
-
 
 
 get_all_irrigation_method_all_crops = function() {

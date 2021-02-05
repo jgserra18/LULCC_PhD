@@ -20,10 +20,10 @@ aggregate_INE_muni_agrarian <- function(AR_id, df_merge, year_sum) {
   # sums the total acreage of a given municipality (or animal population) within a specified agrarian region
   
   disagg_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Spatial_disaggregation')
-  
+  sb_df
   # subset based on the AR_id
-  sb_df <- subset(disagg_df, agrarian_region_id == AR_id)
-  sb_df <- plyr::join(sb_df, df_merge, 'agrarian_region_id')
+  sb_df <- subset(disagg_df, agrarian_region_id == AR_id) 
+  sb_df <- plyr::join(sb_df, df_merge, 'Muni_ID') # previously it was agrarian_region_id
   # compute the Muni_sum within the AR
   AR_sum <- sum(sb_df[, paste0('X', year_sum)])
   
@@ -37,7 +37,7 @@ loop_INE_muni_agrarian <- function(df_merge,
   # loopes the AG_census years while it computes the aggregated Muni --> AR for the same years
   
   df <- create_AR_template()
-
+  i = 1; j = '1987'
   for (i in 1:nrow(df)) {
     
     for (j in yrs) {
@@ -99,11 +99,12 @@ linear_interpolation <- function(muni_df,
   
   for (i in 1:nrow(muni_df)) {
     
-    new_df <- approx(x= yrs, y = muni_df[i,], 
+    new_df <- 
+      approx(x= yrs, y = muni_df[i,], 
                      xout = xout, rule = 2)
     
     inter_years <- new_df[[1]]
-    inter_values <- round(new_df[[2]], 0)
+    inter_values <- round(new_df[[2]], 1)
     
     ctr <- 0
     for (j in inter_years) {
@@ -571,7 +572,11 @@ compute_correct_ALL_params <- function() {
 
 
 
+
+# OLD WAY TO DOWNSCALE-INTERPOLATE KEY DATA FOR THE YEARS OUTSIDE AG_CENSUS --------------------
+
 compute_AVG_AG_census <- function(df, period, AG_yr1, AG_yr2) {
+  
   # function to average the parameters of the AG_census yr
   
   for (i in 1:nrow(df)) {
@@ -580,7 +585,6 @@ compute_AVG_AG_census <- function(df, period, AG_yr1, AG_yr2) {
   }
   return(df[, period])
 }
-
 
 average_AG_census_interpolation_period <- function(INE_param, main_param, param,
                                                    period_1 = as.character(seq(1987,1992)), #AG1
@@ -621,20 +625,66 @@ average_AG_census_interpolation_period <- function(INE_param, main_param, param,
 }
 
 
-compute_annual_interpolated_param_func <- function(INE_param, main_param, param) {
-  # calculates corrected new_muni for a given param 
-  # time rules: expressed in average_AG_census_interpolation_period()
+# NEW WAY TO DOWNSCALE-INTERPOLATE KEY DATA FOR THE YEARS OUTSIDE AG_CENSUS --------------------
+
+
+func_interpolate_non_AG_census_yrs = function(df, yr) {
+  #' @param df a dataframe for a given param (MUNI) with data for the AGcensus years
+  #' @param yr the year as numeric
+  #' @description  function to linearly interpolate data, based on the 3 ag census years
   
+  if ((as.numeric(yr) %in% c(1989,1999,2009))==T) {
+      # pass 
+  }
+  else {
+    for (i in 1:nrow(df)) {
+      
+      intrpl = linear_interpolation(muni_df = df[i, c('X1989','X1999','X2009')], yrs = c(1989,1999,2009), xout = yr)[, 4] # the 4 index xis the prediction
+      df[i, paste0('X',yr)] <- intrpl
+    }
+  }
+  
+  return(df[, paste0('X',yr)])
+}
+
+
+compute_interpolate_non_AG_census_yrs <- function(INE_param, main_param, param) {
+  #' @param INE_param either Areas or Animals
+  #' @param main_param (e.g., Cereals, bovine)
+  #' @param param (e.g., Wheat, Dairy_cows)
+  #' @note TO BE USED ONLY AFTER compute_corrected_INE_param_AG_census
+  #' @description interpolates data for the non-agricultural census yrs
+  #' populates a data.frame with the different new_muni templates according to the year 
+  
+  df <-  get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = INE_param, subfolderX2 = main_param, pattern = param)
+  store <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  
+  yrs <- as.character(seq(1987,2017))
+  
+  for (yr in yrs) {
+    yr = as.numeric(yr)
+    store[, paste0('X',yr)] = func_interpolate_non_AG_census_yrs(df, yr)
+  }
+  
+  return(store)
+  rm(list='df')
+}
+
+
+compute_annual_interpolated_param_func <- function(INE_param, main_param, param) {
+  #' @param INE_param either Areas or Animals
+  #' @param main_param (e.g., Cereals, bovine)
+  #' @param param (e.g., Wheat, Dairy_cows)
+  #' @description  calculates corrected new_muni for a given param 
   
   # 1 - compile new_muni data based on the time-rules established in average_AG_census_interpolation_period
-  AG_muni <- average_AG_census_interpolation_period(INE_param, main_param, param)
+  AG_muni <- compute_interpolate_non_AG_census_yrs(INE_param, main_param, param)
   # 2 - call the AR data for a given param 
   AR <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Agrarian', subfolder = INE_param, subfolderX2 = main_param, pattern = param)
   # 3 - compute the new_muni at the AR level
   AG_AR <- loop_INE_muni_agrarian(df_merge = AG_muni, yrs = as.character(seq(1987,2017)))
   
   calc_yrs <- paste0('X',seq(1987,2017))
-  
   names(AG_AR) <- c('id', paste0('X',seq(1987,2017)))
   
   for (i in calc_yrs) {
@@ -650,6 +700,7 @@ compute_annual_interpolated_param_func <- function(INE_param, main_param, param)
     # 4 - calculate new_muni
     AG_muni[, i] <- round(AG_muni[, i] * disagg_df[, 'FRAC_AR'], 1)
   }
+  
   return(AG_muni)
   rm(list=c('AR','AG_AR','FRAC_AR','disagg_df'))
 }
@@ -682,6 +733,7 @@ linear_interpolation_other_params_func <- function(INE_param, main_param, param)
   return(template)
   rm(list=c('param_interpol','yrs','df','new_yrs','xout'))
 }
+
 
 linear_interpolation_reproduction_animals_func <- function(INE_param, main_param, param) {
   # interpolating function for Sows and Hens

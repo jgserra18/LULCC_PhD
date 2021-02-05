@@ -3,19 +3,24 @@ source('./LULCC/Model/PreProcessing/Organize_ExpVarRasterList.R')
 
 
 require(caTools)
-
+require(doParallel)
+require('ggplot2')
 
 ## LULCC MODELLING EQUATIONS --------------------------------------------------------------------------------------
 
 
 
-x_predict_arg <- function(x_ini, x_end, vector_numbers) {
+x_predict_arg = function(x_ini, x_end, vector_numbers) {
   
   if (missing(vector_numbers)==TRUE) {
-    x_pred <- paste0('ef', seq(x_ini, x_end), collapse = '+')
-  } else {
-    x_pred <- paste0('ef', seq(x_ini, x_end), collapse = '+')
-    x_pred <- paste0(x_pred, '+', paste0('ef',vector_numbers, collapse = '+'))
+    x_pred = paste0('ef', seq(x_ini, x_end), collapse = '+')
+  } 
+  else if (missing(x_ini)==T && missing(x_end)==T) {
+    x_pred = paste0('ef', vector_numbers, collapse = '+')
+  }
+  else {
+    x_pred = paste0('ef', seq(x_ini, x_end), collapse = '+')
+    x_pred = paste0(x_pred, '+', paste0('ef',vector_numbers, collapse = '+'))
   }
   return(x_pred)
 }
@@ -24,7 +29,7 @@ x_predict_arg <- function(x_ini, x_end, vector_numbers) {
 lulcc_x_predictors <- function() {
   
   x_predictor <- data.frame(x=c(
-    x_predict_arg(1,7),
+    x_predict_arg(1,27),
     x_predict_arg(1,27),
     x_predict_arg(2,27),
     x_predict_arg(1,27),
@@ -38,8 +43,7 @@ lulcc_x_predictors <- function() {
     x_predict_arg(1,27),
     x_predict_arg(1,27),
     x_predict_arg(1,27),
-    x_predict_arg(1,27),
-    x_predict_arg(1,27)
+    x_predict_arg(1,27) # including waterbodies mask
     ))
   colnames(x_predictor) <- 'lu_x'
   return(x_predictor)
@@ -120,7 +124,7 @@ export_partition_RNG_index <- function(x, size, admin='PT', admin_id, spatial_re
   # the seeds vhange the data partitions and thus all the model simulations run henceforth
   # IMPORTANT: THIS MUST BE RUN FOR EVERY SUBSET (E.G., TAGUS) AND SPATIAL RESOLUTION
   
-  if (missing(admin)==TRUE && missing(admin_id)==TRUE) {
+  if (missing(admin)==TRUE| missing(admin_id)==TRUE) {
     test_path <- create_setSeed_folder(spatial_res = spatial_res)
   } else {
     test_path <- create_setSeed_folder(admin = admin, admin_id = admin_id, spatial_res = spatial_res)
@@ -146,7 +150,6 @@ export_partition_RNG_index <- function(x, size, admin='PT', admin_id, spatial_re
   }
 }
 
-
 updated_partition <- function(x, size, admin='PT', admin_id, spatial_res, spatial=TRUE, ...) {
   
  # points <- raster::rasterToPoints(x, spatial=TRUE)
@@ -155,7 +158,7 @@ updated_partition <- function(x, size, admin='PT', admin_id, spatial_res, spatia
  # train_ids <- sample.split(points@data[,1] , SplitRatio = size)
  # train_ids <- which(train_ids==TRUE)
   
-  if (missing(admin)==TRUE & missing(admin_id)==TRUE) {
+  if (missing(admin)==TRUE | missing(admin_id)==TRUE) {
     export_partition_RNG_index(x = x, size = size, spatial_res = spatial_res)
   } else {
     export_partition_RNG_index(x = x, size = size, admin = admin, admin_id = admin_id, spatial_res = spatial_res)
@@ -183,11 +186,13 @@ updated_partition <- function(x, size, admin='PT', admin_id, spatial_res, spatia
   return(out)
 }
 
+
+
 create_CLC_partition <- function(st_clc, admin='PT', admin_id, spatial_res) {
   # creates the train and test partitions from the observed CLC_LULCC
   
  # part <- partition(x=st_clc[[1]], size=0.3, spatial=T)
-  if(missing(admin)==TRUE && missing(admin_id)==TRUE) {
+  if(missing(admin)==TRUE | missing(admin_id)==TRUE) {
     part <- updated_partition(x = st_clc[[1]], size = 0.3, spatial_res = spatial_res)
   } else {
     part <- updated_partition(x = st_clc[[1]], size = 0.3, admin = admin, admin_id = admin_id, spatial_res = spatial_res)
@@ -197,39 +202,23 @@ create_CLC_partition <- function(st_clc, admin='PT', admin_id, spatial_res) {
 
 
 
-feed_getPredictiveModelInputData <- function(r_expVar, r_st_clc, admin='PT', admin_id, spatial_res) {
+feed_getPredictiveModelInputData <- function(expVar, st_clc, admin='PT', admin_id, spatial_res, tt=c(0,10,16,22,28)) {
   # feeds  Mould's LULCC getPredictiveModelInputData function the necessary data
   # i.e., obs LULCC, Exploratory Vars and the train partition
   # output: a list where index1 is the partition data and index 2 is the train data
   
-  if (missing(admin)==TRUE && missing(admin_id)==TRUE) {
-    part <- create_CLC_partition(r_st_clc,spatial_res = spatial_res)
-  } else {
-    part <- create_CLC_partition(r_st_clc, admin, admin_id, spatial_res)
-  }
-  train_data <- getPredictiveModelInputData(obs=r_st_clc, ef=r_expVar, cells=part[['train']])
-  
-  return(list(part, train_data))
-}
-
-feed_getPredictiveModelInputData <- function(expVar, st_clc, admin='PT', admin_id, spatial_res) {
-  # feeds  Mould's LULCC getPredictiveModelInputData function the necessary data
-  # i.e., obs LULCC, Exploratory Vars and the train partition
-  # output: a list where index1 is the partition data and index 2 is the train data
-  
-  if (missing(admin)==TRUE && missing(admin_id)==TRUE) {
+  if (missing(admin)==TRUE | missing(admin_id)==TRUE) {
     part <- create_CLC_partition(st_clc,spatial_res = spatial_res)
   } else {
     part <- create_CLC_partition(st_clc, admin, admin_id, spatial_res)
   }
-  train_data <- getPredictiveModelInputData(obs=st_clc, ef=expVar, cells=part[['train']])
+  train_data <- getPredictiveModelInputData(obs=st_clc, ef=expVar, cells=part[['train']], t=tt[1])
   
   return(list(part, train_data))
 }
 
 
-
-set_LULCC_params <- function(admin='PT', admin_id, spatial_res) {
+set_LULCC_params <- function(admin='PT', admin_id, spatial_res='500', tt=c(0,10,16,22,28)) {
   # set and load LULCC params
   # output: list where
   # index 1 - ExpVar
@@ -237,10 +226,17 @@ set_LULCC_params <- function(admin='PT', admin_id, spatial_res) {
   # index 3 - train data
   # index 4 - partition data
   
-  expVar <- feed_ExpVarRasterList(admin, admin_id, spatial_res)
-  st_clc <- feed_ObsLulcRasterStack(admin, admin_id, spatial_res)
-  
-  model_data <- feed_getPredictiveModelInputData(expVar, st_clc, admin, admin_id, spatial_res)
+  if (missing(admin_id)==T) {
+    expVar <- feed_ExpVarRasterList(admin=admin, spatial_res=spatial_res)
+    st_clc <- feed_ObsLulcRasterStack(admin=admin, spatial_res=spatial_res, tt = tt)
+    model_data <- feed_getPredictiveModelInputData(expVar = expVar, st_clc = st_clc, admin=admin,spatial_res = spatial_res, tt =tt)
+  }
+  else {
+    expVar <- feed_ExpVarRasterList(admin, admin_id, spatial_res)
+    st_clc <- feed_ObsLulcRasterStack(admin, admin_id, spatial_res, tt = tt)
+    model_data <- feed_getPredictiveModelInputData(expVar, st_clc, admin, admin_id, spatial_res, tt = tt)
+  }
+
   partition <- model_data[[1]]
   train_data <- model_data[[2]]
   
@@ -284,8 +280,13 @@ set_LULCC_params <- function(admin='PT', admin_id, spatial_res) {
   
   formula <- formula[match(dep, labels)]
 }
-require(glm2)
+
+
 glmModels <- function(formula, family=binomial, model=FALSE, ..., obs, categories=NA, labels=NA) {
+  
+  
+  #cl = makePSOCKcluster(3)
+  #registerDoParallel(cl)
   
   glm.models <- list()
   
@@ -295,6 +296,10 @@ glmModels <- function(formula, family=binomial, model=FALSE, ..., obs, categorie
   }
   formula <- .checkFormula(formula, categories, labels)
   
+ # glm.models = foreach(i=1:length(formula), .combine=list, .multicombine=T, .export=c('train_data','family', 'formula'), .packages=c('lulcc','glm2')) %dopar% {
+ #   glm.models = glm2(formula[[i]], family='binomial', control = list(maxit=100), data=train_data)
+ # }
+  #stopCluster(cl) 
   for (i in 1:length(formula)) {
     form <- formula[[i]]
     glm.models[[i]] <- glm2::glm2(form, family=family, model=model, control = list(maxit=100), ...)
@@ -307,8 +312,29 @@ glmModels <- function(formula, family=binomial, model=FALSE, ..., obs, categorie
 }
 
 
+randomForestModels <- function(formula, ..., obs, categories=NA, labels=NA) {
+  
+  
+  rf.models <- list()
+  
+  if (!missing(obs)) {
+    categories <- obs@categories
+    labels <- obs@labels
+  }
+  formula <- .checkFormula(formula, categories, labels)
 
-
+  
+  
+  for (i in 1:length(formula)) {
+    form <- formula[[i]]
+    rf.models[[i]] <- randomForest::randomForest(form, ...)
+  }
+  
+  out <- new("PredictiveModelList",
+             models=rf.models,
+             categories=categories,
+             labels=labels)
+}
 
 compute_LULCC_models <- function(params, model) {
   # predict LULCC based on the select models (glm, rpart, rf)
@@ -339,7 +365,11 @@ compute_LULCC_models <- function(params, model) {
 
 
 
-compute_LULCC_prediction <- function(param, glm_model) {
+# LULC MODEL PERFORMANCE ASSESSMENT AND VISUALIZATION --------------------------------------------------------------------------
+
+
+
+compute_LULCC_prediction <- function(param, glm_model, tt = c(0,10,16,22,28)) {
   # predicts and quantifies the performance of the model
   # model is the output of compute_LULCC_models
   # output: list where
@@ -347,24 +377,104 @@ compute_LULCC_prediction <- function(param, glm_model) {
   # index 2 - model performance
   
   # how to plot: 
-  # plot(list(pred_model))
+  # plot(list(model_perf))
   
-  test_data <- getPredictiveModelInputData(obs=param[[2]], ef=param[[1]], cells=param[[4]][["test"]])
+  test_data <- getPredictiveModelInputData(obs=param[[2]], ef=param[[1]], cells=param[[4]][["test"]], t = tt[5])
+  test_data[is.na(test_data)] = 0
+  # test_data = na.omit(test_data)
   
   pred_model <- PredictionList(models=glm_model, newdata=test_data)
   model_perf <- PerformanceList(pred=pred_model, measure="rch")
   
   store <- list(pred_model, model_perf)
+  
   return(store)
   rm(list=c('test_data','pred_model','model_perf'))
 }
+
+
+compute_probability_map = function(param, LU_name) {
+  # computes the probability maps for a given LU_name
+  # param is the output of set_LULCC_params
+  
+  test_data = getPredictiveModelInputData(obs=param[[2]], ef=param[[1]], cells=param[[4]][["all"]])
+  probmaps <- predict(object=glm_model,
+                      newdata=test_data,
+                      data.frame=TRUE)
+  points <- rasterToPoints(param[[2]][[1]], spatial=TRUE)
+  probmaps <- SpatialPointsDataFrame(points, probmaps)
+  probmaps = st_as_sf(probmaps)
+  probmaps = st_buffer(probmaps, dist=500)
+  probmaps = fasterize::fasterize(probmaps, param[[2]][[1]], field=LU_name)
+  
+  return(probmaps)
+}
+
+
+ggplot_LULC_prediction = function(LULCC_prediction_output, tt = c(0,10,16,22,28)) {
+  # LULCC_prediction_output is the output from compute_LULCC_prediction()
+  # gets prediction performance data 
+  # stores all into a df for each LU class (incl the AUC; index 2) and a ggplot (index 1)
+
+  data = unlist(LULCC_prediction_output[[2]]@performance) #unpack all data
+  store = data.frame()
+  
+  for (i in 1:length(data)) {
+    
+    df = data.frame(x=data[[i]]@x.values[[1]], y = data[[i]]@y.values[[1]], LU=LULCC_prediction_output[[1]]@labels[i], AUC = LULCC_prediction_output[[2]]@auc[i], t = paste(tt, collapse = ','))
+    store = rbind(store,df)
+  }
+  
+  plot = ggplot(store, aes(x=x,y=y)) + 
+    geom_line(colour='red1') + 
+    geom_abline(intercept = 0, slope = 1, colour='black') + 
+    geom_label(data=store, aes(label=paste0('AUC: ', AUC)), x=0.8, y = 0.25) + 
+    facet_wrap(LU~.,ncol=3) + 
+    theme_test()
+  
+  return(list(AUC_data = store, plot_AUC = plot))
+}
+
+
+ggplot_LULC_prediction_all_timesteps = function(tt = c(0,10,16,22,28)) {
+  
+  store = data.frame()
+  for (i in 1:(length(tt)-1)) {
+    
+    t_0 = tt[i]
+    t_1 = tt[i+1]
+    
+    # get performance params for each LU for each timestep and store them
+    param <- set_LULCC_params(spatial_res = '500', tt = c(t_0, t_1))
+    glm_model <- compute_LULCC_models(params = param, model = 'glm')
+    m = compute_LULCC_prediction(param, glm_model, tt= c(t_0, t_1))
+    df = ggplot_LULC_prediction(LULCC_prediction_output = m, tt = c(t_0,t_1))
+    
+    store = rbind(store,df[[1]])
+    rm(list = c('param','glm_model','m'))
+  }
+  # plot for each timestep (t_o, t_1)
+  plot = ggplot(store, aes(x=x, y=y, colour=factor(t))) + 
+    scale_colour_viridis_d() + 
+    geom_line(size=1) + 
+    geom_abline(intercept = 0, slope = 1, colour='black') + 
+    # geom_label(data=store, aes(label=paste0('AUC: ', AUC)), x=0.8, y = 0.25) + 
+    facet_wrap(LU~.,ncol=3) + 
+    theme_test()
+  
+  return(list(all_data=store, ggplot_plot = plot))
+}
+
+
+
+
 
 
 ##  LULCC HISTORICAL DEMAND -------------------------------------------------------------------------------------------
 
 
 
-compute_LULCC_demand <- function(param) {
+compute_LULCC_demand <- function(param, t = c(0,10,16,22,28)) {
   
   dmd <- approxExtrapDemand(obs=param[[2]], tout=0:28)
   return(dmd)
@@ -393,7 +503,7 @@ get_CLUES_info <- function(param) {
   
   n <- length(param[[2]]@categories)
   clues.rules <- matrix(data=1, nrow=n, ncol=n, byrow=TRUE)
-  clues.params <- list(jitter.f=0.0001,scale.f=0.000005,max.iter=1000,max.diff=5,ave.diff=5)
+  clues.params <- list(jitter.f=0.0001,scale.f=0.01,max.iter=250,max.diff=1,ave.diff=1)
  # default: clues.params <- list(jitter.f=0.0002,scale.f=0.000001,max.iter=1000,max.diff=50,ave.diff=50)
   
   return(list(clues.rules, clues.params))

@@ -23,10 +23,13 @@ compute_grazing_NH3_emissions <- function(main_param, param) {
 }
 
 
-
 loop_grazing_NH3_emissions <- function() {
   
   standard_params <- get_standard_params_list('Animals')
+  
+  yrs <- paste0('X', seq(1987,2017))
+  store = get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  store[, yrs] <- sapply(yrs, function(x) store[,x] <- 0)
   
   for (i in 1:nrow(standard_params)) {
     
@@ -34,6 +37,8 @@ loop_grazing_NH3_emissions <- function() {
     param <- standard_params[i, 'Animals']
     
     graz_NH3 <- compute_grazing_NH3_emissions(main_param = main_param, param = param)
+    store[, yrs] = sapply(yrs, function(x) round(store[,x] + graz_NH3[,x], 1))
+    
     export_file(module = 'Nutrients', 
                 file = graz_NH3, 
                 filename = param, 
@@ -43,6 +48,14 @@ loop_grazing_NH3_emissions <- function() {
                 subfolderX3 = 'Total',
                 subfolderX4 = main_param)
   }
+  export_file(module = 'Nutrients', 
+              file = store, 
+              filename = 'Total_sum', 
+              folder = 'Gas_N_emissions', 
+              subfolder = 'NH3', 
+              subfolderX2 = 'Grazing',
+              subfolderX3 = 'Total',
+              subfolderX4 = 'Total')
 }
 
 

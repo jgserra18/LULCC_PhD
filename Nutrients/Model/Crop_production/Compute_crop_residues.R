@@ -2,13 +2,18 @@ source('./Main/Global_functions.R')
 source('./Nutrients/Model/Crop_production/Compute_crop_nutrient_offtake.R')
 source('./Main/Data_operations.R')
 
+
+
+include_belowground_biomass = FALSE
+
+
 ## BURNT AND REMAINING AREAS------------------------------------------------------------------------ 
 
 
 compute_crop_burnt_areas <- function(main_param, param) {
   # unit: ha burnt yr-1
   
-  if (main_param == 'Pastures' | main_param == 'Industry_crops' | main_param == 'Potato') {
+  if (main_param == 'Pastures' | main_param == 'Industry_crops' | main_param == 'Potato'| main_param == 'Forage') {
     next
   }
   else {
@@ -37,7 +42,7 @@ compute_remain_crop_areas <- function(main_param, param) {
   # unit: ha unburnt yr-1
   
   
-  if (main_param == 'Pastures' | main_param == 'Industry_crops' | main_param == 'Pulses' | main_param == 'Potato') {
+  if (main_param == 'Pastures' | main_param == 'Industry_crops' | main_param == 'Pulses' | main_param == 'Potato' | main_param == 'Forage') {
     
     areas <- get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Areas', subfolderX2 = main_param, pattern = param)
     return(areas)
@@ -84,12 +89,12 @@ compute_crop_DM_yield <- function(main_param, param) {
   }
   else {
     
-    ifelse(param == 'Intensive_pasture', static_yield <- 4000, static_yield <- 2000)
-    yields <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+    FRAC_DM = 0.8
+    yields = get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Crops', subfolderX2 = 'Grass_yield', pattern = 'Pastures_yield')
     
     # calculation --- 
     yrs <- paste0('X', seq(1987,2017))
-    yields[, yrs] <- sapply(yrs, function(x) round ( yields[,x] <- static_yield, 1))
+    yields[, yrs] <- sapply(yrs, function(x) round ( FRAC_DM * yields[,x], 1))
     
     return(yields)
   }
@@ -139,6 +144,8 @@ compute_ratio_R_AG_yield <- function(main_param, param) {
 
 
 
+
+
 ## BELOWGROUND RESIDUES -----------------------------------------------------------------------------------------------
 
 
@@ -153,8 +160,15 @@ compute_ratio_total_AG_biomass_yield <- function(main_param, param) {
   
   # calculation --- 
   yrs <- paste0('X', seq(1987,2017))
-  AG_DM[, yrs] <- sapply(yrs, function(x) round ( (AG_DM[,x] * 1000 + yields[,x] ) / yields[, x], 1))
-  AG_DM <- data_cleaning(AG_DM)
+  
+  if (param == 'Annual_mixtures' | param =='other_forage') {
+    AG_DM[, yrs] <- sapply(yrs, function(x) AG_DM[,x] = 0.3)
+  }
+  else {
+    
+    AG_DM[, yrs] <- sapply(yrs, function(x) round ( (AG_DM[,x] * 1000 + yields[,x] ) / yields[, x], 1))
+    AG_DM <- data_cleaning(AG_DM)
+  }
   
   return(AG_DM)
   rm(list=c('yields'))
@@ -198,7 +212,7 @@ get_residues_nutrient_content <- function(nutrient, param, var) {
     
     var <- paste0('P2O5_', var)
     nutrient_var <- find_crop_variable(df = residues_params, param_col = 'crop', param = param, var = var)
-    nutrient_var <- nutrient_var * 0.4364  / 1000 # convert from kg P ton DM-1 to kg P kg DM-1
+    nutrient_var <- nutrient_var * 0.4364 #  / 1000 # convert from kg P ton DM-1 to kg P kg DM-1
   }
   else {
     
@@ -212,7 +226,7 @@ get_residues_nutrient_content <- function(nutrient, param, var) {
 
 compute_BG_residues_section <- function(main_param, param, nutrient) {
   # computes the belowground section of IPCC (2006) 11.6
-  # unit: kg N haa kg dm-1 yr-1
+  # unit: kg N ha kg dm-1 yr-1
   
   R_BG <- compute_ratio_R_BG_yield(main_param, param)
   areas <- get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Areas', subfolderX2 = main_param, pattern = param)
@@ -243,10 +257,11 @@ select_residue_management_fracs <- function(param, residue_practice) {
 }
 
 
+
 compute_AG_residues_section <- function(main_param, param, residue_practice, nutrient) {
   # computes the aboveground section of IPCC (2006) 11.6
   # already includs
-  # unit: kg N ha kg dm-1 yr-1
+  # unit: kg N ha kg dm-1 ha-1yr-1
   
   R_AG <- compute_ratio_R_AG_yield(main_param, param)
   residue_area <- compute_remain_crop_areas(main_param, param)
@@ -255,11 +270,14 @@ compute_AG_residues_section <- function(main_param, param, residue_practice, nut
   
   # calculation --- 
   yrs <- paste0('X', seq(1987,2017))
-  residue_area[, yrs] <- sapply(yrs, function(x) round(residue_area[,x] * AG_param * R_AG[, x] * FRAC_residue, 1))
+  AG_residues  = residue_area
+  AG_residues[, yrs] <- sapply(yrs, function(x) round(residue_area[,x] * AG_param * R_AG[, x] * FRAC_residue, 3))
   
-  return(residue_area)
+  return(AG_residues)
   rm(list=c('R_AG', 'FRAC_residue', 'AG_param'))
 }
+
+
 
 compute_vegetables_residues_left <- function(main_param = 'Horticulture', param, nutrient, residue_practice = 'Left') {
   # source: Cameira et al 2019
@@ -291,6 +309,7 @@ compute_vegetables_residues_left <- function(main_param = 'Horticulture', param,
   return(residues_vegN)
 }
 
+
 general_funct_crop_residues_nutrient <- function(main_param, param, residue_practice, nutrient) {
   # general function that is able to compute crop residues N, either left or removed from the field
   # general function to be later implemented according to residue practice
@@ -302,21 +321,36 @@ general_funct_crop_residues_nutrient <- function(main_param, param, residue_prac
   residues_params <- get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Crops', subfolderX2 = 'Residues',pattern = 'Residues_FRACrenew')
   FRAC_renew <- find_crop_variable(df = residues_params, param_col = 'crop', param = param, var = 'FRAC_renew')
   
+  if (include_belowground_biomass == TRUE) {
+    
+    AG_section <- compute_AG_residues_section(main_param, param, residue_practice, nutrient)
+    BG_section <- compute_BG_residues_section(main_param, param, nutrient)
+    
+    # calculations -----------------------------------------------------------------
+    yrs <- paste0('X', seq(1987,2017))
+    
+    residues <- crop_yield
+    residues[, yrs] <- sapply(yrs, function(x)
+      round(crop_yield[,x] * FRAC_renew * (AG_section[, x] + BG_section[, x]), 1))
+    residues <- data_cleaning(residues)
+  }
+  else {
+    
+    AG_section <- compute_AG_residues_section(main_param, param, residue_practice, nutrient)
+    # calculations -----------------------------------------------------------------
+    yrs <- paste0('X', seq(1987,2017))
+    
+    residues <- crop_yield
+    residues[, yrs] <- sapply(yrs, function(x)
+      round(crop_yield[,x] * FRAC_renew * (AG_section[, x]), 1))
+    residues <- data_cleaning(residues)
+  }
   
-  AG_section <- compute_AG_residues_section(main_param, param, residue_practice, nutrient)
-  BG_section <- compute_BG_residues_section(main_param, param, nutrient)
-  
-  # calculations -----------------------------------------------------------------
-  yrs <- paste0('X', seq(1987,2017))
 
-  residues <- crop_yield
-  residues[, yrs] <- sapply(yrs, function(x)
-    round(crop_yield[,x] * FRAC_renew * (AG_section[, x] + BG_section[, x]), 1))
-  residues <- data_cleaning(residues)
-  
   return(residues)
   rm(list=c('crop_yield', 'FRAC_renew', 'AG_section', 'BG_section'))
 }
+
 
 compute_crop_residues_left <- function(main_param, param, nutrient, residue_practice = 'Left') {
   
@@ -338,6 +372,9 @@ compute_crop_residues_left <- function(main_param, param, nutrient, residue_prac
               subfolderX3 = main_param)
 }
 
+
+
+
 compute_crop_residues_removed <- function(main_param, param, nutrient, residue_practice = 'Removed') {
   
   CR_removed <- general_funct_crop_residues_nutrient(main_param, param, residue_practice, nutrient)
@@ -357,8 +394,8 @@ compute_crop_residues_nutrient <- function(nutrient) {
   
   standard_params <- get_standard_params_list(main_param = 'Crops')
  # main_crops <- c('Cereals', 'Industry_crops', 'Potato', 'Pulses', 'Pastures')
-  main_crops <- c('Cereals', 'Industry_crops', 'Potato', 'Pulses', 'Horticulture')
-  
+  main_crops <- c('Cereals', 'Industry_crops', 'Potato', 'Pulses', 'Horticulture', 'Forage', 'Pastures')
+ # main_crops <- c('Forage')
   for (i in main_crops) {
     
     crops <- standard_params[which(standard_params$Main_crop==i), 'Crop']
@@ -377,6 +414,7 @@ loop_crop_residues_left_removed <- function() {
   nutrients <- c('N','P')
   sapply(nutrients, function(x) compute_crop_residues_nutrient(x))
 }
+
 
 
 ## CROP RESIDUES BURNT IN SITU-------------------------------------------------------
@@ -509,7 +547,116 @@ compute_all_crop_residues_burnt_N <- function() {
   }
 }
 
-## TOTALS ----------------------------
+
+
+
+
+
+## CARBON MODULE ---------------------------------------------------------------------- 
+
+# implements the methodology described to calculate C efficient inputs in Le Noe et al (2016)
+# How the structure of agro-food systems shapes nitrogen, phosphorus, and carbon fluxes:
+# The generalized representation of agro-food system applied at the regional scale in France
+# http://dx.doi.org/10.1016/j.scitotenv.2017.02.040
+
+
+get_crop_Cparams = function(residue_param, main_param, param, nutrient='C') {
+  # unit: kg C kg N-1
+
+  res_param <- get_activity_data(module = 'Nutrients', folder = 'Nutrient_params', subfolder = nutrient, subfolderX2 = 'Crops',  subfolderX3 = 'Residues', pattern = 'params')
+  param2 = ifelse(residue_param == 'HI', 'HI','Root_shoot_ratio')
+  res_param = subset(res_param, crop == param)[, param2]
+  
+  return(res_param)
+}
+
+
+get_crop_HU_coefficients = function(residues_section, main_param, param, nutrient='C') {
+  # unit: %
+  
+  HU_coeff <- get_activity_data(module = 'Nutrients', folder = 'Nutrient_params', subfolder = nutrient, subfolderX2 = 'Crops',  subfolderX3 = 'Residues', pattern = 'HU')
+  res_param = ifelse(residues_section == 'AG', 'HU_AG','HU_BG')
+  
+  HU_coeff = subset(HU_coeff, crop == param)[, res_param]
+  
+  return(HU_coeff)
+}
+
+compute_Cefficient_residues_section = function(residues_section, main_param, param, nutrient = 'C') {
+  # calculates the C efficient inputs in either above- or belowground biomass in crop residues
+  # these include the annual amount of C mineralized
+  # residues_section = "AG" or "BG"
+  # unit: kg C  yr-1
+  
+  yrs  = paste0('X',seq(1987,2017))
+  
+  # get params
+  HU_coeff = get_crop_HU_coefficients(residues_section, main_param, param, nutrient='C')
+  crop_harvested = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Crop_offtake', subfolder = 'C', subfolderX2 = main_param, pattern = param)
+  RS_ratio = get_crop_Cparams(residue_param = 'Root_shoot_ratio', main_param, param, nutrient)
+  HI = get_crop_Cparams(residue_param = 'HI', main_param, param, nutrient)
+  
+  C_input = crop_harvested
+  
+  if (residues_section == 'AG') {
+    
+    C_input[, yrs] = sapply(yrs, function(x) round((1-HI)/HI*crop_harvested[,x] * HU_coeff, 1))
+  }
+  else {
+    
+    C_input[, yrs] = sapply(yrs, function(x) round( RS_ratio/HI * crop_harvested[,x] * HU_coeff, 1))
+  }
+  
+  return(C_input)
+  rm(list=c('HU_coeff','crop_harvested','RS_ratio','HI'))  
+}
+
+
+compute_total_residues_Cefficient_input = function(main_param, param, nutrient = 'C') {
+  # sum of above and root C efficient inputs
+  # unit: kg C yr-1
+  
+  yrs  = paste0('X',seq(1987,2017))
+  
+  AB_efficient_inp = compute_Cefficient_residues_section(residues_section = 'AB', main_param, param, nutrient)
+  root_efficient_inp = compute_Cefficient_residues_section(residues_section = 'BG', main_param, param, nutrient)
+  
+  total_efficient_inp = root_efficient_inp
+  total_efficient_inp[, yrs] = sapply(yrs, function(x) round(AB_efficient_inp[,x] + root_efficient_inp[,x], 1))
+  
+  return(total_efficient_inp)
+  rm(list=c('AB_efficient_inp','root_efficient_inp'))
+}
+
+loop_residues_Cefficient_input = function(nutrient='C') {
+  
+  standard_params <- get_standard_params_list(main_param = 'Crops')
+  # main_crops <- c('Cereals', 'Industry_crops', 'Potato', 'Pulses', 'Pastures')
+  main_crops <- c('Cereals', 'Industry_crops', 'Potato', 'Pulses', 'Horticulture', 'Forage', 'Pastures')
+  # main_crops <- c('Forage')
+  for (i in main_crops) {
+    
+    crops <- standard_params[which(standard_params$Main_crop==i), 'Crop']
+    
+    for (j in crops) {
+      print(j)
+      eff_Cinp = compute_total_residues_Cefficient_input(i, j, nutrient)
+      export_file(module = 'Nutrients', 
+                  file = eff_Cinp, 
+                  filename = j, 
+                  folder = 'Crop_residues', 
+                  subfolder = 'Left', 
+                  subfolderX2 = 'C',
+                  subfolderX3 = i)
+    }
+  }
+}
+
+
+
+
+
+## TOTALS -----------------------------------------------------------------------------
 
 compute_total_crop_residues <- function(nutrient) {
   # calculate only after the implementation of the "Fodder_production" module
@@ -520,9 +667,7 @@ compute_total_crop_residues <- function(nutrient) {
   
   yrs <- paste0('X', seq(1987,2017))
   
-  ifelse(nutrient == 'N',
-    manag <- c('Burnt','Left','Removed'),
-    manag <- c('Left','Removed'))
+  if (nutrient=='N') { manag = c('Burnt','Left','Removed') } else if (nutrient == 'P') { manag = c('Left','Removed') } else { manag = 'Left'}
   
   for (i in manag) {
     
@@ -540,7 +685,7 @@ compute_total_crop_residues <- function(nutrient) {
       store_main_param <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
       store_main_param[, yrs] <- sapply(yrs, function(x) store_main_param[,x] <- 0)
       
-      if (j == 'Pastures' | j == 'Forage') { next } else {
+     # if (j == 'Pastures') { next } else {
         
         for (z in params) {
           
@@ -557,7 +702,7 @@ compute_total_crop_residues <- function(nutrient) {
                     subfolder =  i, 
                     subfolderX2 = nutrient,
                     subfolderX3 = 'Total')
-      }
+      #}
     }
     # export manag
     export_file(module = 'Nutrients', 
@@ -573,14 +718,86 @@ compute_total_crop_residues <- function(nutrient) {
 
 loop_total_crop_residues <- function() {
   
-  nutrients <- c('N','P')
+  nutrients <- c('N','P','C')
   sapply(nutrients, function(x) compute_total_crop_residues(x))
 }
 
 
 
-## CARBON MODULE ---------------------------------------------------------------------- 
+# AGGREGATE NUTRIENT FLOWS PER REERENCE AREA ------------------------------------------
 
-# 1 - get AB and BG section
-# 2 - get respective humification coefficients
-# 3 - AB_section * CN_ratio * HU_coeff
+compute_total_residues = function(crop_type = 'Fodder', residue_practice='Removed',nutrient='N') {
+  
+  yrs  = paste0('X',seq(1987,2017))
+  store <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  store[, yrs] <- sapply(yrs, function(x) store[,x] <- 0)
+  
+  standard_params <- get_standard_params_list(main_param = 'Crops')
+  
+  if (crop_type == 'Fodder') {
+    
+    main_crops = c('Forage','Pastures')
+    standard_params = subset(standard_params, Main_crop %in% main_crops)
+  }
+  else {
+    
+    main_crops =  c('Cereals','Horticulture','Industry_crops','Potato', 'Pulses')
+    standard_params = subset(standard_params, Main_crop %in% main_crops)
+  }
+  
+  
+  for (i in 1:nrow(standard_params)) {
+    
+    main_param = standard_params[i, 1]
+    param = standard_params[i, 2]
+    res_flows = get_activity_data(module = 'Nutrients',mainfolder = 'Output', folder = 'Crop_residues', subfolder = residue_practice, subfolderX2 = nutrient, subfolderX3 = main_param,  pattern = param) 
+    store[, yrs] = sapply(yrs, function(x) round(store[,x] + res_flows[,x], 1))
+  }
+  return(store)
+}
+
+compute_total_crop_residues_flows_referenceArea = function(crop_type = 'Fodder', 
+                                                           reference_area = 'Cropland',
+                                                           residue_practice='Removed',
+                                                           nutrient = 'N') {
+  yrs  = paste0('X',seq(1987,2017))
+  store <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  store[, yrs] <- sapply(yrs, function(x) store[,x] <- 0)
+  
+  standard_params <- get_standard_params_list(main_param = 'Crops')
+
+  if (crop_type == 'Fodder') {
+    
+    main_crops = if(reference_area == 'Cropland') { c('Forage','Pastures') } else { c('Pastures') }
+    standard_params = subset(standard_params, Main_crop %in% main_crops)
+  }
+  else {
+    
+    main_crops =  c('Cereals','Horticulture','Industry_crops','Potato', 'Pulses')
+    standard_params = subset(standard_params, Main_crop %in% main_crops)
+  }
+  standard_params
+  
+  
+  for (i in 1:nrow(standard_params)) {
+    
+    main_param = standard_params[i, 1]
+    param = standard_params[i, 2]
+    
+    if (crop_type == 'Fodder' & reference_area == 'Cropland' & param == 'Extensive_pasture') { 
+      next
+    }
+    else if (crop_type == 'Fodder' & reference_area =='Grassland' & param == 'Intensive_pasture') {
+      next 
+    }
+    else {
+      print(param)
+      res_flows = get_activity_data(module = 'Nutrients',mainfolder = 'Output', folder = 'Crop_residues', subfolder = residue_practice, subfolderX2 = nutrient, subfolderX3 = main_param,  pattern = param) 
+      store[, yrs] = sapply(yrs, function(x) round(store[,x] + res_flows[,x], 1))
+    }
+  }
+  
+  return(store)
+  rm(list=c('main_param','param','res_flows','main_crops'))
+}
+

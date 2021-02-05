@@ -31,18 +31,21 @@ export_LULC_elasticity <- function(unrestricted, file, admin_reg, admin_id, mode
   rm(list=c('order_path', 'file_name'))
 }
 
-d <- compute_LULCC_prediction(param = param, glm_model = glm_model)
 
-param <- set_LULCC_params(spatial_res = '1000')
+admin='NUTS2'
+admin_id = 15
+spatial_res = '500'
+model_lc = 'glm'
+iter = 1
+t = c(0,10,16,22,28)
+param <- set_LULCC_params(admin = admin, admin_id = admin_id, spatial_res = spatial_res, t = t)
 glm_model <- compute_LULCC_models(params = param, model = 'glm')
 
-predict_eval <- compute_LULCC_prediction(param = param, glm_model = glm_model)
-plot(list(predict_eval[[2]]))
 dmd <- compute_LULCC_demand(param = param)
-rules <- get_LULCC_rules()
-elas <- c(0.43,0.16,0.93,0.62,0.18,0.73,0.21,0.37,0.65,0.56,0.18,0,0.2,0.24,0.43,0.98)
-elas <- c(0.19,0.18,0.19,0.12,0.94,0.18,0.2,0.57,0.07,0.02,0.03,0.29,0.13,0.23,0.92,0.98)
+
+elas <- c(0.95, 0.4, 0.95, 0.10, 0.1, 0.2, 0.8, 0.5, 0.5, 0.5, 0.2, 0.2, 0.5)
 clues_info <- get_CLUES_info(param)
+rules = as.matrix(read.csv('./LULCC/Activity_data/CLC/CLC_allow.csv', header = F))
 
 clues_model <- CluesModel(obs = param[[2]], 
                           ef = param[[1]], 
@@ -50,7 +53,7 @@ clues_model <- CluesModel(obs = param[[2]],
                           time=0:28, 
                           demand=dmd, 
                           elas=elas, 
-                          rules=clues_info[[1]], 
+                         # rules=rules,
                           params=clues_info[[2]])
 clues_model <- allocate(clues_model)
 clues.tabs <- ThreeMapComparison(x=clues_model,factors=2^(1:8),timestep=28)
@@ -58,16 +61,21 @@ clues.fom <- FigureOfMerit(x=clues.tabs)
 clues.fom@overall[[1]]
 plot(clues.fom)
 plot(AgreementBudget(clues.tabs))
-clues_info <- get_CLUES_info(param)
-plot(clues.tabs)
 
+plot(clues_model@output)
+
+
+grid = expand.grid(urban=seq(0.9, 1, 0.1), forest = seq(0.9, 1, 0.1), wetlands = seq(0.9, 1, 0.1), 
+                   heterogeneous = seq(0.1, 0.5, 0.4), Non_irrigated = seq(0.1, 0.5, 0.4), 
+                   Permanently_irrigated = seq(0.1, 0.5, 0.4), Rice = seq(0.1, 0.5, 0.4),
+                   Vineyards = seq(0.2, 0.8, 0.6),  Fruit_trees = seq(0.2, 0.5, 0.3), Olive_groves = seq(0.2, 0.8,0.6), 
+                   Pastures = seq(0.1, 0.5, 0.4), Natural_grasslands = seq(0.1, 0.5, 0.4), Water_bodies = seq(0.8, 1, 0.2))
+nrow(grid)
+View(grid)
 fine_tune_LULC_admin <- function(admin, admin_id, spatial_res, iter, model_lc, param) {
   
-  require(doParallel)
-  require(doRNG)
-  registerDoParallel(cores=2)
-  getDoParWorkers()
-  registerDoRNG(seed = 194842)
+  cl = makePSOCKcluster(3)
+  registerDoParallel(cl)
   
   if (missing(param)==TRUE) {
     if (missing(admin)==TRUE && missing(admin_id)==TRUE) {
@@ -76,6 +84,7 @@ fine_tune_LULC_admin <- function(admin, admin_id, spatial_res, iter, model_lc, p
       param <- set_LULCC_params(admin = admin, admin_id = admin_id, spatial_res = spatial_res)
     } 
   }
+  
   glm_model <- compute_LULCC_models(params = param, model = model_lc)
   dmd <- compute_LULCC_demand(param = param)
   clues_info <- get_CLUES_info(param)
@@ -86,15 +95,15 @@ fine_tune_LULC_admin <- function(admin, admin_id, spatial_res, iter, model_lc, p
                    .export = c('param', 'glm_model', 'dmd', 'clues_info'),
                    .combine = rbind,
                    .packages = c('lulcc', 'raster', 'randomForest')) %dopar% {
-                     
-                     elas <- c(round(runif(15),2), 0.98)
+                     expand.grid(elas)
+                     elas <- c(round(runif(15),2), 1)
                      clues_model <- CluesModel(obs = param[[2]], 
                                                ef = param[[1]], 
                                                models=glm_model, 
                                                time=0:28, 
                                                demand=dmd, 
                                                elas=elas, 
-                                               rules=clues_info[[1]], 
+                                              # rules=clues_info[[1]], 
                                                params=clues_info[[2]])
                      clues_model <- allocate(clues_model)
                      clues.tabs <- ThreeMapComparison(x=clues_model,factors=2^(1:8),timestep=28)

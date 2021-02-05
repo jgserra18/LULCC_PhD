@@ -1,5 +1,5 @@
 source('./Main/Global_functions.R')
-source('./Nutrients/Model/Crop_production/get_fodder_crops_residues.R')
+source('./Nutrients/Model/Crop_production/Compute_crop_residues.R')
 source('./Nutrients/Model/Atmospheric_deposition/Compute_atmospheric_Ndeposition.R')
 source('./Nutrients/Model/BNF/Compute_BNF.R')
 source('./Nutrients/Model/Soil_losses/Runoff/1_Nutrient_runoff_recentApplication.R')
@@ -30,7 +30,6 @@ get_reference_area = function(reference_area) {
 
 
 
-
 export_param_in_list = function(list_with_params, reference_area, is_input = TRUE, nutrient = 'N') {
   # to export IO list with all params
   # convert to kg N-P ref_area-1 yr-1
@@ -38,20 +37,22 @@ export_param_in_list = function(list_with_params, reference_area, is_input = TRU
   yrs = paste0('X',seq(1987,2017))
   ref_area = get_reference_area(reference_area)
   
+  
   IO_folder = ifelse(is_input == TRUE,'Inputs','Output')
   ctr = 0
   for (file in list_with_params) {
     
+    cleaned_file = data_cleaning(file) # remove NaNs, etc
     ctr = ctr + 1
-    file[,yrs] = sapply(yrs, function(x) round(file[,yrs] / ref_area[,yrs], 1))
-    file = data_cleaning(file)
+    cleaned_file[,yrs] = sapply(yrs, function(x) round(cleaned_file[, x] / ref_area[,x], 1))
+    cleaned_file = data_cleaning(cleaned_file)
     export_file(module = 'Nutrients', 
                 folder = 'Nutrient_balances', 
                 subfolder = 'Land_balance', 
                 subfolderX2 = nutrient, 
                 subfolderX3 = reference_area, 
                 subfolderX4 = IO_folder,
-                file = file, 
+                file = cleaned_file, 
                 filename = names(list_with_params)[ctr])
   }
 }
@@ -61,7 +62,6 @@ export_param_in_list = function(list_with_params, reference_area, is_input = TRU
 # CROPLAND -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # input parameters ----------------------------------------------------------------------------------------------------------------------------
-
 
 get_total_BNF = function(reference_area, nutrient = 'N') {
   # Cropland = Pulses + Intensive_pasture
@@ -134,59 +134,96 @@ get_sewage_sludge = function(nutrient = 'N') {
   return(sludge)
 }
 
+get_crop_residues_input = function(reference_area, nutrient = 'N') {
+  # note: the total doesn't include fodder crops !
+  # from "Compute_crop_residues.R"
+  
+  crop_res =  compute_total_crop_residues_flows_referenceArea(crop_type = 'Non_fodder', reference_area = reference_area, residue_practice = 'Left', nutrient = nutrient)
+  return(crop_res)
+}
 
+
+get_fodder_residues_input = function(reference_area, nutrient = 'N') {
+  # note: the total doesn't include fodder crops !
+  # from "Compute_crop_residues.R"
+  
+  crop_res =  compute_total_crop_residues_flows_referenceArea(crop_type = 'Foddder', reference_area = reference_area, residue_practice = 'Left', nutrient = nutrient)
+  return(crop_res)
+}
 
 
 set_total_input_params = function(reference_area, export = 'FALSE', nutrient = 'N') {
   # createa a list with all the input parameters
   # according to nutrients
+  # note: this currently ignores the nutrient inputs from crop residues
+  # export data (i.e., store_params) is in kg N-P ref_area -1 yr-1
+  
   
   gross_man = get_gross_manure(reference_area, nutrient)
   fert = get_synthetic_fertiliser(nutrient)
   sludge = get_sewage_sludge(nutrient)
   
   yrs = paste0('X',seq(1987,2017))
-  tot_input = sludge
+ 
+  # total inputs
+  tot_input <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  tot_input[, yrs] <- sapply(yrs, function(x) tot_input[,x] <- 0)
   
   if (nutrient == 'N') {
     
     dep = get_atmospheric_deposition(reference_area, nutrient)
     bnf = get_total_BNF(reference_area, nutrient)
-    
+      
     if (reference_area == 'Cropland') {
       # sum total inputs
       tot_input[, yrs] = sapply(yrs, function(x) round(gross_man[,x] + fert[,x] + sludge[,x] + dep[,x] + bnf[, x], 0))
+      tot_input = data_cleaning(tot_input)
+      
+      if (export == TRUE) {
+        
+        store_params = list(gross_manure = gross_man, synthetic_fertiliser = fert, sludge = sludge, atmospheric_deposition = dep, bnf = bnf)
+        export_param_in_list(list_with_params = store_params, reference_area, is_input = TRUE, nutrient)
+      }
     }
     else {
       # sum total inputs
       tot_input[, yrs] = sapply(yrs, function(x) round(gross_man[,x] + dep[,x] + bnf[, x], 0))
+      tot_input = data_cleaning(tot_input)
+
+      if (export == TRUE) {
+        
+        store_params = list(gross_manure = gross_man, atmospheric_deposition = dep, bnf = bnf)
+        export_param_in_list(list_with_params = store_params, reference_area, is_input = TRUE, nutrient)
+      }
     }
-    
-    if (export == TRUE) {
-      
-      store_params = list(gross_manure = gross_man, synthetic_fertiliser = fert, sludge = sludge, atmospheric_deposition = dep, bnf = bnf)
-      export_param_in_list(list_with_params = store_params, reference_area, is_input = TRUE, nutrient)
-    }
-    
+
     return(tot_input)
   }
-  # grassland
+  # Phosphors
   else {
-    
     
     if (reference_area == 'Cropland') {
       # sum total inputs
       tot_input[, yrs] = sapply(yrs, function(x) round(gross_man[,x] + fert[,x] + sludge[,x], 0))
+      tot_input = data_cleaning(tot_input)
+      
+      if (export == TRUE) {
+        
+        store_params = list(gross_manure = gross_man, synthetic_fertiliser = fert, sludge = sludge)
+        export_param_in_list(list_with_params = store_params, reference_area, is_input = TRUE, nutrient)
+      }
+      
     }
     else {
       # sum total inputs
       tot_input[, yrs] = sapply(yrs, function(x) round(gross_man[,x], 0))
-    }
-    
-    if (export == TRUE) {
+      tot_input = data_cleaning(tot_input)
       
-      store_params = list(gross_manure = gross_man, synthetic_fertiliser = fert, sludge = sludge)
-      export_param_in_list(list_with_params = store_params, reference_area, is_input = TRUE, nutrient)
+      if (export == TRUE) {
+        
+        store_params = list(gross_manure = gross_man)
+        export_param_in_list(list_with_params = store_params, reference_area, is_input = TRUE, nutrient)
+      }
     }
     return(tot_input)
   }
@@ -194,67 +231,78 @@ set_total_input_params = function(reference_area, export = 'FALSE', nutrient = '
 
 
 
-# output parameters ----------------------------------------------------------------------------------------------------------------------------
+# -output parameters ----------------------------------------------------------------------------------------------------------------------------
 
 get_fodder_residues = function(reference_area, nutrient = 'N') {
   # fodder and non-fodder cereals
-  # from "get_fodder_crop_residues.R"
+  # from "Compute_crop_residues.R"
   
-  fodder_res = allocation_forage_residues_flows_per_referenceArea(reference_area, nutrient)
+  fodder_res = compute_total_crop_residues_flows_referenceArea(crop_type = 'Fodder', reference_area = reference_area, residue_practice = 'Removed', nutrient = nutrient)
+  
   return(fodder_res)
 }
 
 
-
 get_fodder_offtake = function(reference_area, nutrient = 'N') {
-  # from "get_fodder_crop_residues.R"
+  # from "Compute_crop_nutrient_offtake.R"
   
-  fodder_off = allocation_forage_offtake_flows_per_referenceArea(reference_area, nutrient)
+  fodder_off = compute_total_crop_offtake_flows_referenceArea(crop_type = 'Fodder', reference_area = reference_area, nutrient=nutrient)
   return(fodder_off)
 }
 
 
 get_crop_residues = function(reference_area, nutrient = 'N') {
   # note: the total doesn't include fodder crops !
+  # from "Compute_crop_residues.R"
   
-  crop_res = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Crop_residues', subfolder = 'Removed', subfolderX2 = nutrient, subfolderX3 = 'Total', pattern = 'Total')
+  crop_res =  compute_total_crop_residues_flows_referenceArea(crop_type = 'Non_fodder', reference_area = reference_area, residue_practice = 'Removed', nutrient = nutrient)
   return(crop_res)
 }
 
+
 get_crop_offtake = function(reference_area, nutrient = 'N') {
-  # note: the total doesn't include fodder crops !
+  # from "Compute_crop_nutrient_offtake.R"
   
-  crop_off = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Crop_offtake', subfolder = nutrient, subfolderX2 = 'Total', pattern = 'Total')
+  crop_off = compute_total_crop_offtake_flows_referenceArea(crop_type = 'Non_fodder', reference_area = reference_area, nutrient=nutrient)
   return(crop_off)
 }
-
-
 
 set_total_output_params = function(reference_area, export = FALSE, nutrient = 'N') {
   # burnt residues are not included
   
-  crop_res = get_crop_residues(reference_area, nutrient)
-  fodder_res = get_fodder_residues(reference_area, nutrient)
-  fodder_offtake = get_fodder_offtake(reference_area, nutrient)
-  crop_offtake = get_crop_offtake(reference_area, nutrient)
-  
   # sum total outputs
   yrs = paste0('X',seq(1987,2017))
-  tot_out = crop_offtake
-  
+
   if (reference_area == 'Cropland') {
+    
+    crop_res = get_crop_residues(reference_area, nutrient)
+    fodder_res = get_fodder_residues(reference_area, nutrient)
+    fodder_offtake = get_fodder_offtake(reference_area, nutrient)
+    crop_offtake = get_crop_offtake(reference_area, nutrient)
+    
+    tot_out = crop_offtake
     tot_out[, yrs] = sapply(yrs, function(x) round(crop_res[,x] + fodder_res[,x] + fodder_offtake[,x] + crop_offtake[,x], 0))
+    
+    if (export == TRUE) {
+      
+      store_params = list(crop_residues = crop_res, fodder_residues = fodder_res, fodder_offtake = fodder_offtake, crop_offtake = crop_offtake)
+      export_param_in_list(list_with_params = store_params, reference_area, is_input = FALSE, nutrient)
+    }
+    
   }
   else {
-    tot_out[, yrs] = sapply(yrs, function(x) round(fodder_res[,x] + fodder_offtake[,x], 0))
-  }
-  
-
-  
-  if (export == TRUE) {
     
-    store_params = list(crop_residues = crop_res, fodder_residues = fodder_res, fodder_offtake = fodder_offtake, crop_offtake = crop_offtake)
-    export_param_in_list(list_with_params = store_params, reference_area, is_input = FALSE, nutrient)
+    fodder_offtake = get_fodder_offtake(reference_area, nutrient)
+    
+    tot_out = fodder_offtake
+    tot_out[, yrs] = sapply(yrs, function(x) round( fodder_offtake[,x], 0))
+    
+    
+    if (export == TRUE) {
+      
+      store_params = list(fodder_offtake = fodder_offtake)
+      export_param_in_list(list_with_params = store_params, reference_area, is_input = FALSE, nutrient)
+    }
   }
   
   return(tot_out)
@@ -277,7 +325,7 @@ get_manure_discharged = function(nutrient = 'N') {
 
 get_crop_residues_burnt = function(nutrient = 'N') {
   
-  res_burnt =  get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Crop_residues', subfolder = 'Burnt', subfolderX2 = 'N', subfolderX3 = 'Total', pattern = 'Total')
+  res_burnt =  get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Crop_residues', subfolder = 'Burnt', subfolderX2 = 'N', subfolderX3 = 'Total', pattern = 'Total_Burnt')
   return(res_burnt)
 }
 
@@ -503,13 +551,13 @@ set_total_environmental_losses = function(reference_area,
       fert_app = get_synthetic_fertiliser_application_emissions(manure_surplus_fills, manure_method, nutrient)
       man_app = get_manure_application_emissions(manure_surplus_fills, manure_method, nutrient)
       biosolid_app = get_biosolid_application_emissions(manure_surplus_fills, manure_method, nutrient)
-      res_n2o = get_crop_residues_emissions(manure_surplus_fills, manure_method, nutrient)
+     # res_n2o = get_crop_residues_emissions(manure_surplus_fills, manure_method, nutrient)
       runoff = get_runoff_field_application(reference_area, manure_surplus_fills, manure_method, nutrient)
       res_burnt = get_crop_residues_burnt(nutrient)
       grazing = get_total_grazing_emissions(reference_area, manure_surplus_fills, manure_method, nutrient)
       
       tot_loss = housing
-      tot_loss[, yrs] = sapply(yrs, function(x) round(runoff[,x] + res_n2o[,x] + biosolid_app[,x] + man_app[,x] + fert_app[,x] + storage[,x] + housing[,x] + res_burnt[,x] + grazing[,x], 0))
+      tot_loss[, yrs] = sapply(yrs, function(x) round(runoff[,x] +  biosolid_app[,x] + man_app[,x] + fert_app[,x] + storage[,x] + housing[,x] + res_burnt[,x] + grazing[,x], 0))
       
       rm(list=c('storage','housing','fert_app','man_app','biosolid_app','res_n2o','runoff', 'res_burnt'))
     }
@@ -523,3 +571,8 @@ set_total_environmental_losses = function(reference_area,
   }
   return(tot_loss)
 }
+
+
+
+
+

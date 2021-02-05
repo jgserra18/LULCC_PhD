@@ -58,14 +58,14 @@
 404,"1170404","Freixo de Espada à Cinta",0
 1805,"1171805","Lamego",0
 1704,"1171704","Mesão Frio",0
-1807,"1171807","Moimenta da Beira",6e-04
+1807,"1171807","Moimenta da Beira",7e-04
 1812,"1171812","Penedono",0
 1708,"1171708","Peso da Régua",0
 1710,"1171710","Sabrosa",0
 1711,"1171711","Santa Marta de Penaguião",0
 1815,"1171815","São João da Pesqueira",0
-1818,"1171818","Sernancelhe",0.001
-1819,"1171819","Tabuaço",0.0036
+1818,"1171818","Sernancelhe",0.0011
+1819,"1171819","Tabuaço",0.004
 1820,"1171820","Tarouca",0
 409,"1170409","Torre de Moncorvo",0
 410,"1170410","Vila Flor",0
@@ -74,16 +74,16 @@
 401,"1180401","Alfândega da Fé",0
 1702,"1181702","Boticas",0
 402,"1180402","Bragança",0
-1703,"1181703","Chaves",3e-04
+1703,"1181703","Chaves",2e-04
 405,"1180405","Macedo de Cavaleiros",0
 406,"1180406","Miranda do Douro",0
-407,"1180407","Mirandela",0.0019
+407,"1180407","Mirandela",0.0018
 408,"1180408","Mogadouro",0
 1706,"1181706","Montalegre",0
 1707,"1181707","Murça",0
 1712,"1181712","Valpaços",0
 1713,"1181713","Vila Pouca de Aguiar",0
-411,"1180411","Vimioso",0.0103
+411,"1180411","Vimioso",0.0085
 412,"1180412","Vinhais",0
 101,"1610101","Águeda",0
 102,"1610102","Albergaria-a-Velha",0
@@ -97,7 +97,7 @@
 115,"1610115","Ovar",0
 117,"1610117","Sever do Vouga",0
 118,"1610118","Vagos",0
-602,"1620602","Cantanhede",6e-04
+602,"1620602","Cantanhede",5e-04
 603,"1620603","Coimbra",0
 604,"1620604","Condeixa-a-Nova",0
 605,"1620605","Figueira da Foz",0
@@ -118,44 +118,44 @@
 606,"1640606","Góis",0
 607,"1640607","Lousã",0
 609,"1640609","Miranda do Corvo",0
-611,"1640611","Oliveira do Hospital",0.0011
+611,"1640611","Oliveira do Hospital",0.001
 612,"1640612","Pampilhosa da Serra",0
 1013,"1641013","Pedrógão Grande",0
 614,"1640614","Penela",0
-616,"1640616","Tábua",0.0018
+616,"1640616","Tábua",0.0017
 617,"1640617","Vila Nova de Poiares",0
 901,"1650901","Aguiar da Beira",0
 1802,"1651802","Carregal do Sal",0
 1803,"1651803","Castro Daire",0
-1806,"1651806","Mangualde",0.0066
+1806,"1651806","Mangualde",0.0065
 1808,"1651808","Mortágua",0
-1809,"1651809","Nelas",0.0023
+1809,"1651809","Nelas",0.0022
 1810,"1651810","Oliveira de Frades",0
-1811,"1651811","Penalva do Castelo",0.0069
+1811,"1651811","Penalva do Castelo",0.0074
 1814,"1651814","Santa Comba Dão",0
-1816,"1651816","São Pedro do Sul",5e-04
-1817,"1651817","Sátão",0.0041
+1816,"1651816","São Pedro do Sul",6e-04
+1817,"1651817","Sátão",0.0035
 1821,"1651821","Tondela",8e-04
 1822,"1651822","Vila Nova de Paiva",0
-1823,"1651823","Viseu",0.0033
+1823,"1651823","Viseu",0.0034
 1824,"1651824","Vouzela",0
 1413,"1661413","Mação",0
 506,"1660506","Oleiros",0
 508,"1660508","Proença-a-Nova",0
 509,"1660509","Sertã",0
 510,"1660510","Vila de Rei",0
-905,"1670905","Fornos de Algodres",0.0068
-906,"1670906","Gouveia",7e-04
+905,"1670905","Fornos de Algodres",0.0072
+906,"1670906","Gouveia",6e-04
 912,"1670912","Seia",5e-04
 902,"1680902","Almeida",0
 903,"1680903","Celorico da Beira",0
 904,"1680904","Figueira de Castelo Rodrigo",0
-907,"1680907","Guarda",0.0031
+907,"1680907","Guarda",0.0028
 908,"1680908","Manteigas",0
 909,"1680909","Mêda",0
-910,"1680910","Pinhel",0.0021
-911,"1680911","Sabugal",0.0013
-913,"1680913","Trancoso",0.001
+910,"1680910","Pinhel",0.0016
+911,"1680911","Sabugal",0.0012
+913,"1680913","Trancoso",7e-04
 502,"1690502","Castelo Branco",0
 505,"1690505","Idanha-a-Nova",0
 507,"1690507","Penamacor",0
@@ -164,8 +164,8 @@
 503,"16A0503","Covilhã",6e-04
 504,"16A0504","Fundão",4e-04
 1001,"16B1001","Alcobaça",0
-1101,"16B1101","Alenquer",0.0125
-1102,"16B1102","Arruda dos Vinhos",0.0355
+1101,"16B1101","Alenquer",0.0113
+1102,"16B1102","Arruda dos Vinhos",0.0357
 1005,"16B1005","Bombarral",0
 1104,"16B1104","Cadaval",0
 1006,"16B1006","Caldas da Rainha",0
@@ -260,7 +260,7 @@
 1412,"1851412","Golegã",0
 1414,"1851414","Rio Maior",0
 1415,"1851415","Salvaterra de Magos",0
-1416,"1851416","Santarém",0.0028
+1416,"1851416","Santarém",0.0027
 801,"1500801","Albufeira",0
 802,"1500802","Alcoutim",0
 803,"1500803","Aljezur",0
@@ -275,5 +275,5 @@
 812,"1500812","São Brás de Alportel",0
 813,"1500813","Silves",0
 814,"1500814","Tavira",0
-815,"1500815","Vila do Bispo",0.0164
+815,"1500815","Vila do Bispo",0.0169
 816,"1500816","Vila Real de Santo António",0

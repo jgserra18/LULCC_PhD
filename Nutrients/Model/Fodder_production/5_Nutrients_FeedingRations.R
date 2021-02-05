@@ -121,7 +121,6 @@ general_func_nutrient_concentrates = function(main_param, param, management, nut
 }
 
 
-
 loop_nutrient_concentrates_feeding = function(nutrient = 'N') {
   
   main_params = c('Poultry','Pigs','Bovine','Rabbits') 
@@ -169,7 +168,7 @@ loop_nutrient_concentrates_feeding = function(nutrient = 'N') {
 # COMPUTE NUTRIENTS IN ROUGHAGE ration  DAIRY COWS ---------------------------------------------------------------- 
 
 
-compute_nutrient_roughage_individualFeed_Dairy_cows = function(main_param='Bovine', param = 'Dairy_cows', roughage_feed, management, nutrient = 'N') {
+compute_nutrient_roughage_individualFeed_Dairy_cows = function(main_param='Bovine', param = 'Dairy_cows', roughage_feed, management, crop_product = 'Harvest', nutrient = 'N') {
   # computes the nutrient intake of a given roughage feed (e.g., Hay) for a given animal and management
   #  DAIRY COWS
   # unit: kg nutrient yr-1
@@ -179,24 +178,24 @@ compute_nutrient_roughage_individualFeed_Dairy_cows = function(main_param='Bovin
   # Total nutrient itnake of a given livestock subclass
   Nut_intake = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Fodder_production',subfolder = 'Nutrient_intake', subfolderX2 = nutrient, subfolderX3 = management, subfolderX4 = main_param, pattern = param)
   
-  # get roughage feed params, 
+  # get roughage feed params, subset based on roughage feed and crop_product
   roughage_ration = select_animal_roughage_feed_ration(main_param, param)
+  roughage_ration = subset(roughage_ration, Crop_product == crop_product & Roughage == roughage_feed)
   
   # correct roughage feed based on the concentrate fraction
-  FRAC_roughage_feed = roughage_ration[which(roughage_ration[, 4] == roughage_feed), 'FRAC']
+  FRAC_roughage_feed = roughage_ration[, 'FRAC']
   FRAC_concentrate = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Fodder_production',subfolder = 'FRAC_concentrate', subfolderX2 = main_param, pattern = param)
 
   updated_FRAC_roughage_feed = FRAC_concentrate
   sum_FRAC_roughage_feed = sum(roughage_ration[, 'FRAC'])
-  updated_FRAC_roughage_feed[, yrs] = sapply(yrs, function(x) round(FRAC_roughage_feed / (sum_FRAC_roughage_feed + FRAC_concentrate[,x]), 3))
-  updated_FRAC_roughage_feed
+  updated_FRAC_roughage_feed[, yrs] = sapply(yrs, function(x) round(FRAC_roughage_feed / (sum_FRAC_roughage_feed + FRAC_concentrate[,x]), 1))
+  
   # correct nutrient flow of roughage feed
   Nut_intake[, yrs] = sapply(yrs, function(x) round(Nut_intake[,x] * updated_FRAC_roughage_feed[,x] , 23))
   
   return(Nut_intake)
   rm(list=c('Nut_intake','animal_ration','roughage_ration','FRAC_roughage_feed'))
 }
-
 
 
 
@@ -233,7 +232,7 @@ select_animal_roughage_feed_ration = function(main_param, param) {
 
 
 
-compute_nutrient_roughage_individualFeed_nonDairy_animals = function(main_param, param, roughage_feed, management, nutrient = 'N') {
+compute_nutrient_roughage_individualFeed_nonDairy_animals = function(main_param, param, roughage_feed, management, crop_product, nutrient = 'N') {
   # computes the nutrient intake of a given roughage feed (e.g., Hay) for a given animal and management
   # ONLY NON-DAIRY ANIMALS
   # unit: kg nutrient yr-1
@@ -241,10 +240,11 @@ compute_nutrient_roughage_individualFeed_nonDairy_animals = function(main_param,
   # Total nutrient itnake of a given livestock subclass
   Nut_intake = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Fodder_production',subfolder = 'Nutrient_intake', subfolderX2 = nutrient, subfolderX3 = management, subfolderX4 = main_param, pattern = param)
   
-  # get roughage feed params, 
+  # get roughage feed params, subset 
   roughage_ration = select_animal_roughage_feed_ration(main_param, param)
+  roughage_ration = subset(roughage_ration, Crop_product == crop_product & Roughage == roughage_feed)
   
-  FRAC_roughage_feed = roughage_ration[which(roughage_ration[, 4] == roughage_feed), 'FRAC']
+  FRAC_roughage_feed = roughage_ration[, 'FRAC']
 
   yrs = paste0('X',seq(1987,2017))
   Nut_intake[, yrs] = sapply(yrs, function(x) round(Nut_intake[, x] * FRAC_roughage_feed, 1))
@@ -252,7 +252,6 @@ compute_nutrient_roughage_individualFeed_nonDairy_animals = function(main_param,
   return(Nut_intake)
   rm(list=c('Nut_intake','animal_ration','roughage_ration','FRAC_roughage_feed'))
 }
-
 
 
 
@@ -269,10 +268,13 @@ compute_all_nutrient_roughage_feed_nonDairy_animals= function(main_param, param,
     main_param = roughage_ration[i, 1]
     param = roughage_ration[i, 2]
     crop_product = roughage_ration[i, 3]
-    if (crop_product == 'Harvest') { crop_product = 'Main_crop' }
+    if (crop_product == 'Harvest') { crop_products = 'Main_crop' } else { crop_products = 'Residues'}
     roughage_feed = roughage_ration[i, 4]
     
-    Nutrient_roughage_feed = compute_nutrient_roughage_individualFeed_nonDairy_animals(main_param, param, roughage_feed, management, nutrient)
+    Nutrient_roughage_feed = compute_nutrient_roughage_individualFeed_nonDairy_animals(main_param, param, roughage_feed, management, crop_product, nutrient)
+    if (any(is.na(Nutrient_roughage_feed))==T) {
+      print(paste0('NA here', param))
+    }
     
     export_file(module = 'Nutrients', 
                 file = Nutrient_roughage_feed, 
@@ -281,7 +283,7 @@ compute_all_nutrient_roughage_feed_nonDairy_animals= function(main_param, param,
                 subfolder = 'Nutrient_ration', 
                 subfolderX2 = nutrient,
                 subfolderX3 = system,
-                subfolderX4 = crop_product,
+                subfolderX4 = crop_products,
                 subfolderX5 = management,
                 subfolderX6 = main_param)
     
@@ -311,61 +313,68 @@ loop_nutrient_roughage_feed_nonDairy_Animalsl = function(nutrient='N') {
           main_crop = roughage_ration[i, 1]
           crop = roughage_ration[i, 2]
           crop_product = roughage_ration[i, 3]
-          if (crop_product == 'Harvest') { crop_product = 'Main_crop' }
-          roughage_feed = roughage_ration[i, 4]
           
-          # prepare total df (industrial + grazing)
-          yrs = paste0('X',seq(1987,2017))
-          total <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
-          total[, yrs] <- sapply(yrs, function(x) total[,x] = 0)
-          
-          for (system in management) {
+          if (crop_product == 'Harvest') { 
             
-            if (main_param == 'Pigs' & system == 'Industrial') {
-              next 
-            }
-            else {
+            crop_products = 'Main_crop' 
+            
+            roughage_feed = roughage_ration[i, 4]
+            
+            # prepare total df (industrial + grazing)
+            yrs = paste0('X',seq(1987,2017))
+            total <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+            total[, yrs] <- sapply(yrs, function(x) total[,x] = 0)
+            
+            for (system in management) {
               
-              if (param == 'Dairy_cows') {
-                Nutrient_roughage_feed = compute_nutrient_roughage_individualFeed_Dairy_cows(main_param, param, roughage_feed, management, nutrient)
-              } else {
-                Nutrient_roughage_feed = compute_nutrient_roughage_individualFeed_nonDairy_animals(main_param, param, roughage_feed, management, nutrient)
+              if (main_param == 'Pigs' & system == 'Industrial') {
+                next 
               }
-              total[, yrs] <- sapply(yrs, function(x) total[,x] + Nutrient_roughage_feed[,x])
-              
+              else {
+                
+                if (param == 'Dairy_cows') {
+                  Nutrient_roughage_feed = compute_nutrient_roughage_individualFeed_Dairy_cows(main_param, param, roughage_feed, management, crop_product, nutrient)
+                } else {
+                  Nutrient_roughage_feed = compute_nutrient_roughage_individualFeed_nonDairy_animals(main_param, param, roughage_feed, management,crop_product,  nutrient)
+                }
+                total[, yrs] <- sapply(yrs, function(x) total[,x] + Nutrient_roughage_feed[,x])
+                
+                export_file(module = 'Nutrients', 
+                            file = Nutrient_roughage_feed, 
+                            filename = roughage_feed, 
+                            folder = 'Fodder_production', 
+                            subfolder = 'Nutrient_ration', 
+                            subfolderX2 = nutrient,
+                            subfolderX3 = system,
+                            subfolderX4 = crop_products,
+                            subfolderX5 = main_param,
+                            subfolderX6 = param)
+              }
+              # export total nutrient intake for a given roughage feed
               export_file(module = 'Nutrients', 
-                          file = Nutrient_roughage_feed, 
+                          file = total, 
                           filename = roughage_feed, 
                           folder = 'Fodder_production', 
                           subfolder = 'Nutrient_ration', 
                           subfolderX2 = nutrient,
-                          subfolderX3 = system,
-                          subfolderX4 = crop_product,
+                          subfolderX3 = 'Total',
+                          subfolderX4 = crop_products,
                           subfolderX5 = main_param,
                           subfolderX6 = param)
+              
             }
-            # export total nutrient intake for a given roughage feed
-            export_file(module = 'Nutrients', 
-                        file = Nutrient_roughage_feed, 
-                        filename = roughage_feed, 
-                        folder = 'Fodder_production', 
-                        subfolder = 'Nutrient_ration', 
-                        subfolderX2 = nutrient,
-                        subfolderX3 = 'Total',
-                        subfolderX4 = crop_product,
-                        subfolderX5 = main_param,
-                        subfolderX6 = param)
             
+          } 
+          else { 
+            
+            crop_products = 'Residues'
+            next 
+          }
         }
-      }
     }
   }
 }
 
-# --> Annual_mixtures - very high
-# --> oat/maize - a bit high
-# --> forage roots ok
-# --> other_forage old data is weird (areas), results in distortion
 
 compute_total_nutrient_roughage_feed_ForagePasturesFlows = function(crop_product = 'Main_crop', roughage_feed, nutrient = 'N') {
   # calculates the total nutrient flows of a given roughage feed (e.g., Fresh_hay)
@@ -373,44 +382,50 @@ compute_total_nutrient_roughage_feed_ForagePasturesFlows = function(crop_product
   # unit: kg nutrient yr-
   
   
-  main_params = c('Sheep','Pigs','Bovine','Goats','Equides')
-  
-  # prepare total nutrient flows for a given roughage feed
-  yrs = paste0('X',seq(1987,2017))
-  total <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
-  total[, yrs] <- sapply(yrs, function(x) total[,x] = 0)
-  
-  for (main_param in main_params) {
+  if (crop_product != 'Main_crop') {
+    break('Only for main products!!')
+  }
+  else {
     
-    params = get_animal_subclass(main_param, 'totals')
-
-    for (param in params) {
+    main_params = c('Sheep','Pigs','Bovine','Goats','Equides')
+    
+    # prepare total nutrient flows for a given roughage feed
+    yrs = paste0('X',seq(1987,2017))
+    total <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+    total[, yrs] <- sapply(yrs, function(x) total[,x] = 0)
+    
+    for (main_param in main_params) {
       
-      roughage_ration = select_animal_roughage_feed_ration(main_param, param)
-
-      if (length(which(roughage_ration[, 4] == roughage_feed)) == 0) {
-        next 
-      }
-      else {
+      params = get_animal_subclass(main_param, 'totals')
+      
+      for (param in params) {
         
-        file_exists = list_all_files_folder(module = 'Nutrients', mainfolder = 'Output', folder = 'Fodder_production', subfolder = 'Nutrient_ration', subfolderX2 = nutrient, subfolderX3 = 'Total', subfolderX4 = crop_product, subfolderX5 = main_param, subfolderX6 = param)
-        file_exists = gsub('.csv','',file_exists)
-        if (length(which(file_exists==roughage_feed)) == 0) {
+        roughage_ration = select_animal_roughage_feed_ration(main_param, param)
+        
+        if (length(which(roughage_ration[, 4] == roughage_feed)) == 0) {
           next 
         }
         else {
           
-          Nut_roughage = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Fodder_production', subfolder = 'Nutrient_ration', subfolderX2 = nutrient, subfolderX3 = 'Total', subfolderX4 = crop_product, subfolderX5 = main_param, subfolderX6 = param, pattern = roughage_feed)
-          total[, yrs] <- sapply(yrs, function(x) total[,x] + Nut_roughage[,x])
+          file_exists = list_all_files_folder(module = 'Nutrients', mainfolder = 'Output', folder = 'Fodder_production', subfolder = 'Nutrient_ration', subfolderX2 = nutrient, subfolderX3 = 'Total', subfolderX4 = crop_product, subfolderX5 = main_param, subfolderX6 = param)
+          file_exists = gsub('.csv','',file_exists)
+          if (length(which(file_exists==roughage_feed)) == 0) {
+            next 
+          }
+          else {
+            
+            Nut_roughage = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Fodder_production', subfolder = 'Nutrient_ration', subfolderX2 = nutrient, subfolderX3 = 'Total', subfolderX4 = crop_product, subfolderX5 = main_param, subfolderX6 = param, pattern = roughage_feed)
+            total[, yrs] <- sapply(yrs, function(x) total[,x] + Nut_roughage[,x])
+          }
         }
       }
     }
+    
+    return(total)
+    rm(list=c('main_params','yrs','params','Nut_roughage'))
+    
   }
-  
-  return(total)
-  rm(list=c('main_params','yrs','params','Nut_roughage'))
 }
-
 
 
 
@@ -453,39 +468,4 @@ compute_admin_nutrient_roughage_feed_ForagePasturesFlows = function(admin = 'PT'
   rm(list=c('crop_area','yrs'))
 }
 
-// rewrite rations only with main crop products (grass, forage crops)
-// do the fodder allocation and calculate N yield for each crop (kg N ha-1 yr-1)
-// convert yield to dry matter using DM contents (N_yield / DM_content * 1000)
-// define threshold according to the maximum values in statistics portugal
-// forage oat and forage maize for their respective crops; remaining forage crops according to the total forage production
-// for grass, establish max possible yield according to toth et al 2008
 
-// adjust the N intake according to these modifications and store the "surplus" yield
-// this surplus yield will add to the remaining crop residues FRAC in the feeding rations
-// from the new crop yields, estimate residues production 
-
-#ar = read_sf('./LULCC/Activity_data/Admin/Agrarian_region.shp')
-#ar = merge(ar, d, 'Admin_id')
-#tm_shape(ar) + tm_polygons(col='Admin_id', palette = 'Set1')
-
-#require(tmap)
-yrs  = paste0('X',seq(1987,2017))
-d = compute_total_nutrient_roughage_feed_ForagePasturesFlows('Main_crop', 'Fresh_grass')
-s1 = sapply(yrs, function(x) sum(d[, x]))
-
-d2 = read.csv('./Nutrients/Activity_data/Correct_data_Municipality/Areas/Pastures/Extensive_pasture.csv')
-s2 = sapply(yrs, function(x) sum(d2[, x]))
-
-yield = d2
-yield[,yrs] = sapply(yrs, function(x) round(d[, x] / d2[, x]/ 0.8 * 1000, 0))
-View(yield)
-maizeNa = (s1/s2)/0.9 * 1000
-
-df = reshape2::melt(as.data.frame(maizeNa))
-df[, 'yrs'] = seq(1987,2017)
-require(ggplot2)
-ggplot(df, aes(yrs,value/1000)) + geom_line() + scale_y_continuous(limits=c(0,70))
-
-df = reshape2::melt(yield[, -c(2,3)], 'Muni_ID')
-ggplot(df, aes(x=variable, y =value)) + geom_boxplot() +
-  scale_y_continuous(limits=c(0,70000))

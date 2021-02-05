@@ -1,8 +1,8 @@
 agrarian_region_id,agrarian_region,forage_maize,forage_oat,Annual_mixtures,forage_roots,forage_sorghum,other_forage
-Entre Douro e Minho,1,225,100,40,40,150,40
-Trás-os-Montes,2,225,100,40,40,150,40
-Beira Litoral,3,225,100,40,40,150,40
-Beira Interior,4,225,100,40,40,150,40
-Ribatejo e Oeste,5,225,100,40,40,150,40
-Alentejo,6,225,100,40,40,150,40
-Algarve,7,225,100,40,40,150,40
+Entre Douro e Minho,1,225,100,40,160,150,100
+Trás-os-Montes,2,225,100,40,160,150,100
+Beira Litoral,3,225,100,40,160,150,100
+Beira Interior,4,225,100,40,160,150,100
+Ribatejo e Oeste,5,225,100,40,160,150,100
+Alentejo,6,225,100,40,160,150,100
+Algarve,7,225,100,40,160,150,100

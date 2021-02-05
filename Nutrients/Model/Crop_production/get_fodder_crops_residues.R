@@ -30,9 +30,12 @@ compute_FRAC_pastures = function(param, main_param = 'Pastures') {
     FRAC_past[, yrs] = sapply(yrs, function(x) round(perma[,x] / (temp[,x] + perma[,x]), 3))
   }
   
+  FRAC_past = data_cleaning(FRAC_past)
+  
   return(FRAC_past)
   rm(list=c('temp','perma','yrs'))
 }
+
 
 
 disaggregate_grass_hay_perPasture = function(crop_product, roughage_feed, param, nutrient = 'N', main_param = 'Pastures') {

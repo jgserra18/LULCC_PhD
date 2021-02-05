@@ -6,10 +6,16 @@ library(rjson)
 
 ## WEB SCRAPING FUNCTIONS ------------------------------------------------------------------------------------------
 
+
 get_INE_data <- function(INE_param_id, year, muni_id, var_id, other_params) {
-  # gets INE data
-  # other_params specifies whether it is agrarian region data (if missing), Muni data from the Census or muni data from "outside" the census
-  
+  #' @param INE_param_id ID from Statistics Portugal regarding each individual datatable;specifies to the database this (e.g., "0002749")
+  #' @param year year using special signature ("S7A2009")
+  #' @param muni_id Municipality id
+  #' @param var_id Within the datatable, specifies a given crop/animal
+  #' @param other_params other_params specifies whether it is agrarian region data (if missing), Muni data from the Census or muni data from "outside" the census
+  #' @description gets INE data
+  #' @return a dataframe scraped and parsed from INE database
+
   print('Exporting INE DB ...... ')
   # convert to json file
   url <- paste0('https:/www.ine.pt/ine/json_indicador/pindica.jsp?op=2&varcd=', INE_param_id, 
@@ -69,11 +75,11 @@ get_agrarian_region_INE <- function(INE_param_id, var_id,
                                     year = seq(1987,2017), 
                                     muni_id = as.character(seq(1,7)),
                                     other_params) {
-  # EXCEPTIONS: FORAGE, HORTICULTURE, POULTRY, RABBITS
-  
-  # param_modifier regards information that shifts the IDs of the different agrarian regions
-  # this is either because there are no regional data (horticulture) 
-  # or because data was collated from the census
+  #' @note see get_INE_data for param description
+  #' @details EXCEPTIONS: FORAGE, HORTICULTURE, POULTRY, RABBITS
+  #' @description param_modifier regards information that shifts the IDs of the different agrarian regions
+  #' this is either because there are no regional data (horticulture) 
+  #' or because data was collated from the census
   
 
   df <- data.frame()
@@ -114,9 +120,10 @@ forage_horticulture_populate_modifier <- function(var_id,
 
 populate_perma_pastures_DB <- function(muni_id = as.character(seq(11,17))) {
   
-    crop_df <- get_agrarian_region_INE(INE_param_id = '0003485', var_id = 'T', year = as.character(c(1989,1993,1995,1997,1999,2003,2005,2007,2009,2013)), muni_id = muni_id)
-    export_file(module = 'Nutrients',file = crop_df, folder = 'Activity_data', filename = 'Extensive_pasture', subfolder = 'Raw_data_Agrarian', 
-                subfolderX2 = 'Areas', subfolderX3 = 'Pastures')
+      crop_df <- get_agrarian_region_INE(INE_param_id = '0003485', var_id = 'T', year = as.character(c(1989,1993,1995,1997,1999,2003,2005,2007,2009,2013)), muni_id = muni_id)
+    #export_file(module = 'Nutrients',file = crop_df, folder = 'Activity_data', filename = 'Extensive_pasture', subfolder = 'Raw_data_Agrarian', 
+        #        subfolderX2 = 'Areas', subfolderX3 = 'Pastures')
+      return(crop_df)
 }
 
 main_populate_crop_param_DB <- function() {
@@ -160,6 +167,7 @@ main_populate_crop_param_DB <- function() {
 
 
 # This can be incorporated into Crop_ids or other_crop_ids -----------------
+
 get_incomplete_crop_yields <- function(main_param) {
   # gets forage yields from Statistics Portugal
   # Assumptions ------
@@ -348,6 +356,9 @@ interpolate_other_crops_timeseries <- function(param, main_crop, crop) {
     else {
       xout <- c(1987,1988,1990,1991,1992,1994,1996,1998,2000,2001,2002,2004,2006,2008,2010,2011,2012,2014,2015,2017)
     }
+    
+   # new_df = data.frame(y=as.numeric(df[1,]), x = xout)
+    
     
     new_df <- approx(x= as.numeric(yrs), y = df[i,], 
                      xout = xout, rule = 2)

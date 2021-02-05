@@ -2,7 +2,7 @@ source('Main/Global_functions.R')
 
 # disaggregate pastures --------------------------------------------------------
 
-compute_pastures_FRAC = function(main_param = 'Pastures', param) {
+compute_pastures_FRAC = function(main_param = 'Pastures', param, row=NULL, col=NULL) {
   
   temp_grass = get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Areas', subfolderX2 = main_param, pattern = 'Intensive_pasture')
   perm_grass = get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Areas', subfolderX2 = main_param, pattern = 'Extensive_pasture')
@@ -18,21 +18,28 @@ compute_pastures_FRAC = function(main_param = 'Pastures', param) {
   else {
     FRAC_grass[, yrs] <- sapply(yrs, function(x) round(perm_grass[,x]/grass[,x], 3))
   }
+  FRAC_grass = data_cleaning(FRAC_grass)
+  
+  if (length(row)>0) {
+    FRAC_grass = FRAC_grass[row,col]
+  }
   
   return(FRAC_grass) 
 }
 
-compute_FRAC_pastures_nutrient_flows = function(nutrient_flow_df, pasture_type) {
+compute_FRAC_pastures_nutrient_flows = function(nutrient_flow_df, pasture_type, row=NULL,col=NULL) {
   # disaggregates nutrient flows per pasture type
   
   
   yrs <- paste0('X', seq(1987,2017))
-  FRAC_grass = compute_pastures_FRAC(param = pasture_type)
+  FRAC_grass = compute_pastures_FRAC(param = 'Extensive_pasture')
   nutrient_flow_df[, yrs] = sapply(yrs, function(x) round(FRAC_grass[,x] * nutrient_flow_df[,x], 2))
   
+  if (length(row)>0) {
+    nutrient_flow_df = nutrient_flow_df[row,col]
+  }
   return(nutrient_flow_df)
 }
-
 
 # GRAZING NET N RETURNED TO SOIL ----------------------------------------------------------------------------------------------- 
 
@@ -191,12 +198,12 @@ mask_runoff_grazing = function(year, spatial_res = '500') {
   
   FRAC_rf = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'MITERRA_fractions', subfolder = 'FRAC_runoff', subfolderX2 = 'Runoff_fraction', pattern = year)
   
-  LULC_yr = create_mainland_annual_NUTS2_raster_mosaic(spatial_res, year)
+  LULC_yr = get_mainland_annual_LULC(spatial_res, year)
   LULC_yr = resample_to_CLC(module = 'LULCC', raster_file = LULC_yr, mask_CLC = F, spatial_res = 'Native', ngb = TRUE)
 
   grazing_lu = get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'LULCC', subfolderX2 = 'Runoff', subfolderX3 = 'LU_grazing', pattern = 'CLC_grazing')
   grazing_LU_yr = reclassify(LULC_yr, as.matrix(grazing_lu))
-  
+
   FRAC_rf = FRAC_rf * grazing_LU_yr
   FRAC_rf[FRAC_rf==0] = NA
   
@@ -231,9 +238,11 @@ identify_main_crops_LU = function(main_param, param) {
     
     crop_LU = 'OliveGrove'
   }
+  else if (main_param == 'Rice') {
+    crop_LU = 'Rice'
+  }
   return(crop_LU)
 }
-
 
 
 mask_runoff_field_application_LU = function(crop_LU, year, spatial_res = '500') {
@@ -241,11 +250,11 @@ mask_runoff_field_application_LU = function(crop_LU, year, spatial_res = '500') 
   # unit: %input
   
   FRAC_rf = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'MITERRA_fractions', subfolder = 'FRAC_runoff', subfolderX2 = 'Runoff_fraction', pattern = year)
-
+  
   alloc_name = paste0('LU_', crop_LU)
   LU_allocation = get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'LULCC', subfolderX2 = 'Runoff', subfolderX3 = 'LU_allocation', pattern = alloc_name)
 
-  LULC_yr = create_mainland_annual_NUTS2_raster_mosaic(spatial_res, year)
+  LULC_yr = get_mainland_annual_LULC(spatial_res, year)
   LULC_yr = resample_to_CLC(module = 'LULCC', raster_file = LULC_yr, mask_CLC = F, spatial_res = 'Native', ngb = TRUE)
   LULC_yr = reclassify(LULC_yr, as.matrix(LU_allocation))
   
@@ -256,18 +265,25 @@ mask_runoff_field_application_LU = function(crop_LU, year, spatial_res = '500') 
   rm(list=c('crop_LU','LU_allocation','LULC_yr'))
 }
 
-
 compute_avg_muni_runoff_field_application_LU = function(crop_LU, spatial_res = '500') {
-  # computes the avg runoff fraction for a given land use crop allocation
+  #' @param crop_LU is the land use crop aggregation types from identify_main_crops_LU
+  #' @description computes the avg runoff fraction for a given land use crop allocation
+  #' @return average runoff fraction for a given land use crop allocation
+  #' @usage compute_avg_muni_runoff_field_application_LU("Rice")
+  #' @usage compute_avg_muni_runoff_field_application_LU("Vineyards")
   # unit: %input
+  
   
   store_muni = get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
   muni = get_activity_data(module = 'LULCC', folder = 'Admin', pattern = 'Municipality')
   yrs = paste0(seq(1987,2017))
 
+  cl = makePSOCKcluster(3)
+  registerDoParallel(cl)
+
   store <- foreach(i=1:length(yrs),
                    .export = c('get_dir_files', 'resample_to_CLC',
-                               'get_mainfolder_sub', 'identify_read_fileclass', 'create_mainland_annual_NUTS2_raster_mosaic',
+                               'get_mainfolder_sub', 'identify_read_fileclass', 'get_mainland_annual_LULC',
                                 'spatial_res', 'mask_runoff_field_application_LU', 'get_activity_data', 'mask_runoff_grazing'),
                    .combine = 'cbind',
                    .packages = c('exactextractr', 'raster', 'sf')) %dopar% {
@@ -280,27 +296,24 @@ compute_avg_muni_runoff_field_application_LU = function(crop_LU, spatial_res = '
                        FRAC_rf = mask_runoff_field_application_LU(crop_LU, yrs[i])
                      }
                      
-                     d = exactextractr::exact_extract(FRAC_rf, muni, 'mean', include_cell = T)
+                     d = exactextractr::exact_extract(FRAC_rf, muni, 'mean')
                      data.frame(A = d)
                    }
+  stopCluster(cl) 
+  
   names(store) = paste0('X', yrs)
   store_muni[, paste0('X', yrs)] = sapply(paste0('X', yrs), function(x) round(store[, x], 3))
   store_muni = data_cleaning(store_muni)
-  
+
   return(store_muni)
   rm(list=c('muni','store'))
-  doParallel::stopImplicitCluster(cl)
 }
 
-
 loop_avg_muni_runoff_field_application_LU = function(spatial_res = '500') {
-  # calculate
+  #' @description loops the function compute_avg_muni_runoff_field_application_LU for each main land use crop aggregation category
+  #' @return exports these data
   
-  require(doParallel)
-  cl <- makeCluster(3)
-  registerDoParallel(cl)  
-  
-  crop_LU = c('AnnualCrops','FruitTrees','OliveGrove','Vineyards','IntensivePasture', 'Grazing')
+  crop_LU = c('AnnualCrops','FruitTrees','OliveGrove','Vineyards','IntensivePasture', 'Grazing', 'Rice')
 
   for (i in crop_LU) {
     print(i)
@@ -312,13 +325,9 @@ loop_avg_muni_runoff_field_application_LU = function(spatial_res = '500') {
                 subfolder = 'LU_FRAC_runoff', 
                 subfolderX2 = 'Dataframe',
                 subfolderX3 = 'Recent_Application')
+    rm(list='crop_LU_FRAC_rf')
   }
-  .rs.restartR()
-  rm(list='crop_LU_FRAC_rf')
 }
-
-
-
 
 
 # CALCULATE RECENT MEMORY NUTRIENT LOSSES FROM RUNOFF  --------------------------------------------------------------------------------------------
@@ -344,7 +353,7 @@ compute_recentMemory_runoff_nutrient_grazing = function(pasture_type, nutrient, 
 }
 
 
-loop_recentMemory_runoff_nutrient_grazing = function(nutrient, manure_surplus_fills_nutDemand = F, manure_method = 'Method 1') {
+loop_recentMemory_runoff_nutrient_grazing = function(nutrient='N', manure_surplus_fills_nutDemand = F, manure_method = 'Method 1') {
   
   if (manure_surplus_fills_nutDemand == TRUE) { folder_div = 'With_ManSurplus'} else { folder_div = 'Without_ManSurplus'}
   
@@ -353,7 +362,7 @@ loop_recentMemory_runoff_nutrient_grazing = function(nutrient, manure_surplus_fi
   yrs <- paste0('X', seq(1987,2017))
   total <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
   total[, yrs] <- sapply(yrs, function(x) total[,x] = 0)
-  
+  pasture = 'Intensive_pasture'
   for (pasture in past_type) {
     
     rf_grazing = compute_recentMemory_runoff_nutrient_grazing(pasture, nutrient, manure_surplus_fills_nutDemand, manure_method)
@@ -524,9 +533,6 @@ compute_recentMemory_runoff_nutrient_fieldApplication_per_mainParam = function(f
               subfolderX6 = 'Total')
 }
 
-
-
-
 loop_recentMemory_runoff_nutrient_fieldApplication = function(nutrient='N', manure_surplus_fills_nutDemand = F, manure_method = 'Method 1') {
   
   fert = c('Manure','Inorganic','Biosolids')
@@ -535,7 +541,6 @@ loop_recentMemory_runoff_nutrient_fieldApplication = function(nutrient='N', manu
      compute_recentMemory_runoff_nutrient_fieldApplication_per_mainParam(x, nutrient, manure_surplus_fills_nutDemand,  manure_method)
   })
 }
-
 
 
 compute_total_runoff_nutrient_losses = function(nutrient='N', manure_surplus_fills_nutDemand = F, manure_method = 'Method 1') {

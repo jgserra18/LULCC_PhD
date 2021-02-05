@@ -138,7 +138,7 @@ compute_synthetic_fertiliser_N2O_emissions = function(N_source = 'Inorganic_fert
   if (write == TRUE) {
     export_file(module = 'Nutrients', 
                 file = fertN2O, 
-                filename = 'Inorganic_fertiliser', 
+                filename = 'Total', 
                 folder = 'Gas_N_emissions', 
                 subfolder = set_gas_Nloss, 
                 subfolderX2 = 'Inorganic_fertiliser',
@@ -168,7 +168,7 @@ compute_other_Ninputs_N2O_emissions = function(N_source,
   }
   else if (N_source == 'Crop_residues') {
     
-    N_inp = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Crop_residues', subfolder = 'Left', subfolderX2 = 'N', subfolderX3 = 'Total', pattern = 'Total')
+    N_inp = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Crop_residues', subfolder = 'Left', subfolderX2 = 'N', subfolderX3 = 'Total', pattern = 'Total_left')
   }
   else if (N_source == 'Manure') {
     
@@ -184,10 +184,10 @@ compute_other_Ninputs_N2O_emissions = function(N_source,
   if (write == TRUE) {
     export_file(module = 'Nutrients', 
                 file = N2O_inp, 
-                filename = N_source, 
+                filename = 'Total',
                 folder = 'Gas_N_emissions', 
                 subfolder = set_gas_Nloss, 
-                subfolderX2 = N_source,
+                subfolderX2 = paste0(N_source,'_application'),
                 subfolderX3 = manure_method, 
                 subfolderX4 = folder_div,
                 subfolderX5 = 'Total')
@@ -246,7 +246,6 @@ compute_grazing_N2O_emissions = function(N_source = 'Grazing', write = FALSE) {
 }
 
 
-
 compute_total_direct_N2O_emissions = function(write = FALSE,
                                               manure_surplus_fills = FALSE, 
                                               manure_method = 'Method 1', 
@@ -259,12 +258,12 @@ compute_total_direct_N2O_emissions = function(write = FALSE,
   
   grazing = compute_grazing_N2O_emissions(write = write)
   biosolid = compute_other_Ninputs_N2O_emissions('Biosolid', write, manure_surplus_fills, manure_method)
-  res = compute_other_Ninputs_N2O_emissions('Crop_residues', write, manure_surplus_fills, manure_method)
+#  res = compute_other_Ninputs_N2O_emissions('Crop_residues', write, manure_surplus_fills, manure_method)
   man = compute_other_Ninputs_N2O_emissions('Manure', write, manure_surplus_fills, manure_method)
   fert = compute_synthetic_fertiliser_N2O_emissions(write = write, manure_surplus_fills = manure_surplus_fills, manure_method = manure_method)
   
   tot_N2O = fert
-  tot_N2O[, yrs] = sapply(yrs, function(x) fert[,x] + man[, x] + res[,x] + biosolid[,x] + grazing[,x])
+  tot_N2O[, yrs] = sapply(yrs, function(x) fert[,x] + man[, x] + biosolid[,x] + grazing[,x])
   
   
   if (write == TRUE) {

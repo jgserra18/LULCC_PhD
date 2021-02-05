@@ -3,6 +3,37 @@ source('./Main/Global_functions.R')
 
 ## linear extrapolation ---------------------------------- 
 
+apply_linearExtrapolation = function(file, 
+                                     yrs_in = c(1989, 1999, 2009), 
+                                     yrs_out = c(seq(1987,1988), seq(1990,1998), seq(2000,2008), seq(2010,2017))) {
+  #' @param file scraped out, remove IDs param
+  #' @param yrs_out years to apply the model
+  #' @description linearly extrapolatrs data
+  
+  updated_file = file
+  
+  for (i in 1:nrow(file)) {
+    new_data = file[i, ]
+    new_data = data.frame(x=yrs_in,
+                          y=as.numeric(new_data))
+    lm_model = lm(formula = y~x, data = new_data)
+    pred_vals = round( predict(lm_model, newdata =  data.frame(x =  yrs_out)) , 0)
+    pred_vals <- ifelse(pred_vals<0, 0, round(pred_vals, 0))
+    pred_vals = data.frame(yrs = yrs_out,
+                           y = pred_vals)
+    # update file
+    updated_file[i, paste0('X',yrs_out)] = pred_vals$y
+  }
+  
+  # reorder file df
+  updated_file = updated_file[, paste0('X', seq(1987,2017))]
+  store = get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  
+  updated_file = cbind(store, updated_file)
+  return(updated_file)
+}
+
+
 # needs to be corrected
 general_linear_extrapolation_3years <- function(file_df, existing_years, xout=c(seq(1987,1989), seq(1991,1998), seq(2000,2008), seq(2010,2017))) {
   
@@ -141,7 +172,7 @@ general_func_sumIF_admin_df = function(admin, merge_df, merge_col) {
 
 
 
-compute_temporal_sumIF_admin_df = function(admin, merge_df) {
+compute_temporal_sumIF_admin_df = function(admin, merge_df, yrs=NULL) {
   # USE FOR INSTANCE TO SCALE ATMOSPHERIC DEPOSITION
   # to be applied to dfs with temporal data
   
@@ -151,7 +182,7 @@ compute_temporal_sumIF_admin_df = function(admin, merge_df) {
   admin_shp = get_activity_data(module = 'LULCC', folder = 'Admin', pattern = admin)
   store_df = data.frame(Admin_id = unique(admin_shp$Admin_id))
   
-  yrs = paste0('X', seq(1987,2017))
+  if (is.null(yrs)==T) { yrs = paste0('X', seq(1987,2017)) } else { yrs = yrs}
   
   if (admin=='NUTS3') { col_patt = 'nuts3_ID' } else if ( admin=='NUTS2') { col_patt = 'nuts2_ID' } else if (admin=='AR' | admin == 'Agrarian_region') { col_patt = 'agrarian_region_id'}
   
@@ -178,13 +209,14 @@ compute_mainland_total <- function(calc_df) {
   
   df <- data.frame(id = 'mainland')
   
-  yrs <- paste0('X', seq(1987,2017))
+  yrs <- names(calc_df)
+  yrs = yrs[-c(1,2,3)]
+  
   df[, yrs] <- sapply(yrs, function(x) df[, x] <- 0)
   
   df[1, yrs] <- sapply(yrs, function(x) sum(calc_df[,x]))
 
   return(df)
 }
-
 
 

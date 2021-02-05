@@ -614,4 +614,3 @@ compute_total_crop_manure_app_rate = function(nutrient, manure_surplus_fills_nut
     }
   }
 }
-

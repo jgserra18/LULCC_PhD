@@ -27,7 +27,6 @@ select_animal_Nutrient_excretion_coefficient <- function(nutrient, param) {
   return(animal_coef)
 }
 
-
 compute_animal_nutrient_excretion <- function(nutrient, main_param, param) {
   # computes the total nutrient excretion for a given animal
   # unit: kg N yr-1 or kg P yr-1
@@ -48,7 +47,6 @@ compute_animal_nutrient_excretion <- function(nutrient, main_param, param) {
 
 
 ## gross manure of a given nutrient --------------------------------------
-
 compute_gross_manure_nutrient <- function(nutrient) {
   # computes the gross manure of a given nutrient for all animals
   
@@ -58,7 +56,7 @@ compute_gross_manure_nutrient <- function(nutrient) {
     
     main_param <- standard_params[i, 'Main_animals']
     param <- standard_params[i, 'Animals']
-    
+    print(param)
     # compute annual nutrient excretion
     animal_excretion <- compute_animal_nutrient_excretion(nutrient, main_param, param)
     export_file(module = 'Nutrients', 
@@ -71,7 +69,6 @@ compute_gross_manure_nutrient <- function(nutrient) {
   }
   rm(list=c('standard_params','param_col','main_param_col','main_param','param','animal_excretion'))
 }
-
 
 loop_gross_manure_nutrient <- function() {
   
@@ -87,18 +84,46 @@ loop_gross_manure_nutrient <- function() {
 ## ALLOCATE GROSS MANURE ----------------------------------------------------------------------------------------------------------------------
 
 
-general_func_gross_manure_allocation <- function(nutrient, pathway) {
+set_FRAC_pathway = function(pathway, main_param, param, threshold = 800) {
+  #' @param threshold threshold of maximum allowed limite on N excreted onto pastures (kg N ha-1 yr-1) ; from identify_default_surpass_threshold()
+  #' @param main_param  main animal category (Bovine, Pigs, etc)
+  #' @param param animal subcategories/species (e.g., dairy cows, pregnant sows)
+  #' @description gets the correct animal allocation fraction
+  #' @return returns the the correct animal allocation fraction
+  #' @usage set_FRAC_pathway('Grazing','Bovine','Dairy_cows')
+  
+  if (pathway == 'Yards') {
+    FRAC_pathway_animal = get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Animals', subfolderX2 = 'Downscaled_distribution', subfolderX3 = pathway, subfolderX4 = main_param, pattern = param)
+  }
+  else {
+    if ((main_param %in% c('Bovine','Pigs','Poultry','Dairy_cows','Sheep','Equides','Goats','Non_dairy')) == T) {
+       pathway = tolower(pathway)
+       FRAC_pathway_animal = get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Animals', subfolderX2 = 'Grazing_algorithm', subfolderX3 = paste0('Threshold_', threshold), subfolderX4 = paste0('Updated_FRAC_', pathway), subfolderX5 = main_param, pattern = param)
+    }
+    else {
+      FRAC_pathway_animal = get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Animals', subfolderX2 = 'Downscaled_distribution', subfolderX3 = pathway, subfolderX4 = main_param, pattern = param)
+    }
+  }
+  return(FRAC_pathway_animal)
+}
+
+
+# this function is going to be further modified
+# since the FRAC grazing modifier algorithm is quite heavy and long
+# please check whether this function is correctly applied afterwards
+
+general_func_gross_manure_allocation <- function(nutrient, pathway, write = TRUE) {
   # general function to ocmpute gross manure allocation
   
 
   standard_params <- get_standard_params_list(main_param = 'Animals')
-  
+
   for (i in 1:nrow(standard_params)) {
     
     main_param <- standard_params[i, 'Main_animals']
     param <- standard_params[i, 'Animals']
 
-    FRAC_pathway_animal = get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Animals', subfolderX2 = 'Downscaled_distribution', subfolderX3 = pathway, subfolderX4 = main_param, pattern = param)
+    FRAC_pathway_animal = set_FRAC_pathway(pathway, main_param, param)
     
     # get gross man N
     man_nutrient <- compute_animal_nutrient_excretion(nutrient, main_param, param)
@@ -107,17 +132,18 @@ general_func_gross_manure_allocation <- function(nutrient, pathway) {
     yrs <- paste0('X', seq(1987,2017))
     pathway_N[, yrs] <- sapply(yrs, function(x) round(pathway_N[, x] * FRAC_pathway_animal[, x], 1))
     
-    export_file(module = 'Nutrients', 
-                file = pathway_N, 
-                filename = param, 
-                folder = 'Gross_manure', 
-                subfolder = nutrient, 
-                subfolderX2 = pathway, 
-                subfolderX3 = 'Total',
-                subfolderX4 = main_param)
+    if (write == T) {
+      export_file(module = 'Nutrients', 
+                  file = pathway_N, 
+                  filename = param, 
+                  folder = 'Gross_manure', 
+                  subfolder = nutrient, 
+                  subfolderX2 = pathway, 
+                  subfolderX3 = 'Total',
+                  subfolderX4 = main_param)
+    }
   }
 }
-
 
 loop_manure_allocation_pathway <- function() {
   
@@ -132,6 +158,7 @@ loop_manure_allocation_pathway <- function() {
     }
   }
 }
+
 
 
 ## DISAGGREGATE GROSS MANURE PER MANURE TYPE  ----------------------------------------------------------------------------------------------------------------------
@@ -196,7 +223,6 @@ loop_disaggregate_gross_manure_type <- function() {
     }
   }
 }
-
 
 
 ## CARBON IMPLEMENTATION ------------------------------------------------------------
@@ -341,6 +367,8 @@ loop_gross_manure_Cexcretion <- function() {
 ## TOTALS BY ANIMAL CATEGORY AND TOTALS -------------------------------------------------------
 
 compute_total_nutrient_flows_main_param_pathway <- function(nutrient, pathway, manure_type) {
+  #' @usage compute_total_nutrient_flows_main_param_pathway('N','Grazing','Total')
+  #'  @usage compute_total_nutrient_flows_main_param_pathway('N','Housing','Solid')
   
   standard_params <- get_standard_params_list(main_param = 'Animals')
   yrs <- paste0('X', seq(1987,2017))
@@ -365,7 +393,7 @@ compute_total_nutrient_flows_main_param_pathway <- function(nutrient, pathway, m
       # calculate total sum for a given main_param
 
       man_N <- get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'Gross_manure', subfolder = nutrient, subfolderX2 = pathway, subfolderX3 =manure_type, subfolderX4 = i, pattern = j)
-      store_param[, yrs] <- sapply(yrs, function(x) store_param[,x] <- man_N[, x] + store_param[,x])
+      store_param[, yrs] <- sapply(yrs, function(x) man_N[, x] + store_param[,x])
     }
     # export sum of param within main_param
     export_file(module = 'Nutrients', 

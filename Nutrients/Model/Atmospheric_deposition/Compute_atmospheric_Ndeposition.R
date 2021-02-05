@@ -56,7 +56,6 @@ set_atmN_scaling_params = function(manure_surplus_fills_nutDemand = F, manure_me
 }
 
 
-
 scale_atmospheric_Ndeposition = function(year, atmn_params, manure_surplus_fills_nutDemand = F, manure_method = 'Method 1', nutrient = 'N') {
   # scales atmospheric deposition from EMEP (2000-2017) using the year 2000 as baseline
   # scaling is done as the ratio of tot NH3 emisisons for a year before 2000 and the yar 2000
@@ -139,7 +138,7 @@ compute_ALL_atmospheric_deposition = function(manure_surplus_fills_nutDemand = F
 # compute deposition on UAA -------------------------------
 
 
-compute_avg_atmN = function(reference_area = 'Cropland', manure_method = 'Method 1', manure_surplus_fills_nutDemand=F) {
+compute_avg_atmN = function(manure_method = 'Method 1', manure_surplus_fills_nutDemand=F) {
   # calculates avg deposition rate at the municipality scale for 1987-2017
   # ref area: Cropland or Grassland
   # unit: kg N ha-1 yr-1 @ municipality
@@ -154,7 +153,7 @@ compute_avg_atmN = function(reference_area = 'Cropland', manure_method = 'Method
   
   for (yr in yrs) {
     
-    ref_area = compute_annual_LULC_cropland(yr, '500', reference_area)
+    ref_area = compute_annual_LULC_UAA(yr, '500')
     
     atmN = get_activity_data(module = 'Nutrients', mainfolder = 'Output', subfolder = 'Atmospheric_deposition', subfolderX2 = 'N', subfolderX3 = 'Method 1', subfolderX4 = 'Without_ManSurplus', pattern = yr)
     atmN = aggregate(atmN, 5)
@@ -184,8 +183,12 @@ compute_total_atmN_muni = function(reference_area = 'Cropland', manure_method = 
   
   yrs = paste0('X',seq(1987,2017))
   
-  if (reference_area== 'Cropland') { ref_area = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Reference_areas', subfolder = 'Arable_land', pattern = 'Arable_land') }
-      else { ref_area = get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Areas', subfolderX2 = 'Pastures', pattern = 'Extensive_pasture') }
+  if (reference_area== 'Cropland') { 
+    ref_area = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Reference_areas', subfolder = 'Arable_land', pattern = 'Arable_land') 
+  }
+  else { 
+    ref_area = get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Areas', subfolderX2 = 'Pastures', pattern = 'Extensive_pasture') 
+  }
 
   avg_atmN_muni = get_activity_data(module = 'Nutrients', mainfolder = 'Output', subfolder = 'Atmospheric_deposition', subfolderX2 = 'N', subfolderX3 = 'Method 1', subfolderX4 = 'Without_ManSurplus', pattern = 'Average_atmN_municipality')
   
@@ -193,4 +196,5 @@ compute_total_atmN_muni = function(reference_area = 'Cropland', manure_method = 
 
   return(avg_atmN_muni)
 }
+
 

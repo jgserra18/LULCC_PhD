@@ -305,8 +305,6 @@ loop_all_fert_prod_NH3 = function(nutrient = 'N', manure_surplus_fills_nutDemand
 
 
 
-
-
 compute_total_crop_fert_prod_NH3 = function(nutrient = 'N', manure_surplus_fills_nutDemand = F, manure_method = 'Method 1') {
   
   if (manure_surplus_fills_nutDemand == TRUE) { folder_div = 'With_ManSurplus'} else { folder_div = 'Without_ManSurplus'}
@@ -407,4 +405,3 @@ compute_total_crop_fert_prod_NH3_per_mainParam = function(nutrient = 'N', manure
               subfolderX5 = 'Total', 
               subfolderX6 = 'Total')
 }
-

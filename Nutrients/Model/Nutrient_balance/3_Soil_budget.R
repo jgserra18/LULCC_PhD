@@ -1,5 +1,6 @@
 source('./Nutrients/Model/Nutrient_balance/2_Land_budget.R')
 
+
 compute_soil_surface_budget = function(reference_area, per_area = FALSE, nutrient = 'N') {
   # computes the SSNB
   # unit: kg N-P yr-1 or kg N-P ha-1 yr-1
@@ -24,7 +25,6 @@ compute_soil_surface_budget = function(reference_area, per_area = FALSE, nutrien
   rm(list=c('input_params','output_params'))
 }
 
-
 export_ssnb_data = function(reference_area, nutrient = 'N') {
   
   
@@ -39,4 +39,5 @@ export_ssnb_data = function(reference_area, nutrient = 'N') {
               filename = 'soil_surface_balance')
   
 }
-
+#export_ssnb_data('Cropland')
+#export_ssnb_data('Grassland')

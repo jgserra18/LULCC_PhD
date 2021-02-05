@@ -4,15 +4,15 @@ source('./Nutrients/Model/GIS_computations/LULCC_agriculture/Build_CroplandGrass
 
 
 
-
 # compute adjusment factors for statistical reference area vs land use reference area ------------------------
 
 compute_reference_area_adjustment_factor = function(reference_area) {
-  # this function serves two main purposes:
-  # 1 - calculates the total area (in hectare) for each municipality regarding the land-use based reference area
-  # 2 - calculates adjustment factors between LU_ref_area and Statistical_ref_area
-  # adjustment factors are used to adjust nutrient balance derived data
-  # unit: %
+  #' @param reference_area Either Grassland or Cropland
+  #' @description # this function serves two main purposes:
+  #' 1 - calculates the total area (in hectare) for each municipality regarding the land-use based reference area
+  #' 2 - calculates adjustment factors between LU_ref_area and Statistical_ref_area
+  #' @note adjustment factors are used to adjust nutrient balance derived data
+  #' @return exports the correct   
   
   ref = ifelse(reference_area == 'Cropland','Arable_land','Grassland')
   # get statistical data on reference areas
@@ -34,7 +34,7 @@ compute_reference_area_adjustment_factor = function(reference_area) {
   for (yr in yrs) {
     # compute total land-use based area for the reference area (in hectares)
     r_ref_area =  compute_annual_LULC_cropland(year = yr, spatial_res = '500',LULC = reference_area)
-    muni[, yr] = exactextractr::exact_extract(r_ref_area, muni, 'sum') * 5
+    muni[, yr] = exactextractr::exact_extract(r_ref_area, muni, 'sum') * 25
   }
   
   # store the total land-use based reference area
@@ -63,16 +63,19 @@ compute_reference_area_adjustment_factor = function(reference_area) {
 
 ## SSNB ---------------------------------------------------------------------------
 
+
 rasterize_nutrient_balances = function(reference_area, nutrient_balance, nutrient = 'N') {
-  # creates spatially explicit nutrient balances at the municipality scale according to the LULCC output for crop- or grassland
-  # done for the period 1987-2017
-  # nutrient balnce = "Soil_balance" or "Land_balance"
-  # unit: kg N-P ha-1 yr-1
+  #' @param reference_area Either Grassland or Cropland
+  #' @param nutrient_balance either soil_balance or land_balance
+  #' @param nutrient only for N
+  #' @description creates spatially explicit nutrient balances at the municipality scale according to the LULCC output for crop- or grassland
+  #' done for the period 1987-2017
+  #' @return exports spatially explicit nutrient balances per reference area (kg N ha-1 yr-1)
   
   yrs = paste0('X',seq(1987,2017))
   file_name = ifelse(nutrient_balance == 'Soil_balance','soil_surface_balance','land_balance')
   
-  nut_balance = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Nutrient_balances', subfolder = nutrient_balance, subfolderX2 = nutrient, subfolderX3 = reference_area, subfolderX4 = 'Total', pattern = 'soil_surface_balance')
+  nut_balance = get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'Nutrient_balances', subfolder = nutrient_balance, subfolderX2 = nutrient, subfolderX3 = reference_area, subfolderX4 = 'Total', pattern = 'balance')
   names(nut_balance)[1] = 'Admin_id'
   
   for (yr in yrs) {
@@ -83,9 +86,8 @@ rasterize_nutrient_balances = function(reference_area, nutrient_balance, nutrien
     # get rasterized reference area based on the LULCC module and resample it to 100x100 (native)
     r_ref_area =  compute_annual_LULC_cropland(year = yr, spatial_res = '500',LULC = reference_area)
     r_ref_area = resample_to_CLC(module = 'LULCC', raster_file = r_ref_area, mask_CLC = TRUE, spatial_res = 'Native', ngb = TRUE)
-
+    
     r_nut_balance = r_nut_balance * r_ref_area
-
     export_file(module = 'Nutrients', 
                 folder = 'Nutrient_balances', 
                 subfolder = nutrient_balance, 
@@ -97,3 +99,7 @@ rasterize_nutrient_balances = function(reference_area, nutrient_balance, nutrien
   }
   rm(list=c('nut_balance','r_nut_balance','r_ref_area'))
 }
+rasterize_nutrient_balances('Cropland','Land_balance')
+rasterize_nutrient_balances('Grassland','Land_balance')
+rasterize_nutrient_balances('Cropland','Soil_balance')
+rasterize_nutrient_balances('Grassland','Soil_balance')

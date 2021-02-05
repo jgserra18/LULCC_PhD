@@ -1,7 +1,5 @@
 source('./Main/General_GIS.R')
 
-
-
 create_mainland_annual_NUTS2_raster_mosaic <- function(spatial_res, year) {
   # CURRENTLY ONLY AVAILABLE FOR 500m
   # creates a raster mosaic based on the annual LULC map for each NUTS2 region
@@ -32,12 +30,26 @@ create_mainland_annual_NUTS2_raster_mosaic <- function(spatial_res, year) {
 }
 
 
+get_mainland_annual_LULC = function(spatial_res = '500', year) {
+  
+  year = ifelse(as.numeric(year)<1990,'1990',year)
+  file_yr =  get_dir_files(module = 'LULCC', folder = 'Output', param_pattern = 'LULC', subfolder = 'PT', subfolderX2 = spatial_res, file_pattern = year)
+  file_yr = raster(file_yr)
+  return(file_yr)
+}
+
+
 compute_annual_LULC_cropland = function(year, spatial_res = '500', LULC) {
   # computes the annual cropland at a default spatial resolution of 500m
   
   year = gsub('X','', year)
   
-  yr_clc = create_mainland_annual_NUTS2_raster_mosaic(spatial_res, year)
+  if (as.numeric(year)<1990) {
+    year = '1990'
+  }
+  
+  #yr_clc = create_mainland_annual_NUTS2_raster_mosaic(spatial_res, year)
+  yr_clc = get_mainland_annual_LULC(spatial_res, year)
   clc_cropland = get_activity_data(module = 'LULCC', folder = 'CLC', pattern = 'CLC_CroplandGrassland')
   
   if (missing(LULC)==TRUE | LULC == 'Cropland') {
@@ -51,9 +63,28 @@ compute_annual_LULC_cropland = function(year, spatial_res = '500', LULC) {
   
   clc_cropland = clc_cropland[, -4]
   yr_cropland = reclassify(yr_clc, rcl = as.matrix(clc_cropland))
+  yr_cropland[yr_cropland>0] = 1
   
   return(yr_cropland)
   rm(list=c('year','yr_clc','clc_cropland'))
 }
 
 
+
+compute_annual_LULC_UAA = function(year, spatial_res = '500') {
+  # computes the annual cropland at a default spatial resolution of 500m
+  
+  year = gsub('X','', year)
+  
+  yr_clc = create_mainland_annual_NUTS2_raster_mosaic(spatial_res, year)
+  clc_cropland = get_activity_data(module = 'LULCC', folder = 'CLC', pattern = 'CLC_CroplandGrassland')
+  
+  clc_cropland[which(clc_cropland$category_id ==1 | clc_cropland$category_id==2), 'category_id'] = 1
+
+
+  clc_cropland = clc_cropland[, -4]
+  yr_cropland = reclassify(yr_clc, rcl = as.matrix(clc_cropland))
+  
+  return(yr_cropland)
+  rm(list=c('year','yr_clc','clc_cropland'))
+}

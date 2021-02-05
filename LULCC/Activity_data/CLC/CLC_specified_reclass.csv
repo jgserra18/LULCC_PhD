@@ -1,5 +1,6 @@
 recl_from,recl_to,category_id,category
 1,142,1,urban
+240,242,4,heterogeneous
 310,320,2,forest
 321,335,2,forest
 410,423,3,wetlands

@@ -71,7 +71,6 @@ compute_crop_fertiliser_nutrient_demand = function(nutrient, main_param, param, 
   return(crop_fert)
 }
 
-
 compute_total_unadjusted_fertiliser_nutrient_demand = function(nutrient, manure_surplus_fills = FALSE, manure_method = 'Method 1') {
     # computes the total nutrient demand from inorganic fertilisers to satisfy demand
     # default: method I manure approach
@@ -172,7 +171,6 @@ compute_adjusted_fertiliser_crop_app_rates = function(nutrient, main_param, para
   rm(list=c('FAN','yr_FAN'))
 }
 
-
 loop_adjusted_fertiliser_crop_app_rates = function(nutrient, manure_surplus_fills=FALSE, manure_method = 'Method 1') {
   
   if (manure_surplus_fills == TRUE) { folder_div = 'With_ManSurplus'} else { folder_div = 'Without_ManSurplus'}
@@ -240,9 +238,7 @@ compute_municipality_total_corrected_fertiliser = function(nutrient, manure_surp
   yrs = paste0('X',seq(1987,2017))
   main_fert = get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
   main_fert[, yrs] = sapply(yrs, function(x) main_fert[,x] = 0)
-  
-  
-  
+
   for (i in 1:nrow(standard_params)) {
     
     main_param = standard_params[i, 'Main_crop']
@@ -272,6 +268,7 @@ compute_municipality_total_corrected_fertiliser = function(nutrient, manure_surp
       main_fert[, yrs] = sapply(yrs, function(x) round(main_fert[, x] + crop_fert_rate[, x], 0))
     }
   }
+
   export_file(module = 'Nutrients', 
               file = main_fert, 
               filename = 'Adjusted_fert_mainland', 

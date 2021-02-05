@@ -1,4 +1,4 @@
-source('./Nutrients/Model/Irrigation/Support/4_Populate_crop_irrigated_areas.R')
+source('./Nutrients/Model/Irrigation/Support/1_Populate_2009_irrigated_areas.R')
 
 
 #* crop irrigated areas per irrigation method are interpolated for other years (Pseudocode):
@@ -23,7 +23,7 @@ yrs = paste0('X',seq(1987,2017))
 
 disaggregate_AR_FRAC_irrigation = function(var, main_param, param, irrig_method) {
   
-  if (var == 'Area' & missing(irrig_method)==TRUE) {
+  if (var == 'Areas' & missing(irrig_method)==TRUE) {
     AR_FRAC = get_activity_data(module = 'Nutrients',folder = 'Correct_data_Municipality',subfolder = 'Irrigation',subfolderX2 = 'Postprocessing_X2009',subfolderX3 = 'AR_Fraction_crop_areas',subfolderX4 = main_param, pattern = param)   
   }
   else if (var == 'Methods' & missing(irrig_method)==FALSE){
@@ -48,10 +48,10 @@ disaggregate_AR_FRAC_irrigation = function(var, main_param, param, irrig_method)
 
 compute_interpolated_total_crop_irrig_areas = function(main_param, param, tot_irrigated_areas_df) {
   # itnerpolates total crop irrigated areas for all years using 2009 %crop-fraction vs total irrigated area
+  # TIA_crop = FRAC_TIA_crop * TIA
   # these are not corrected, however
   # unit: hectares
-  
-  
+
   FRAC_area_muni = get_activity_data(module = 'Nutrients',folder = 'Correct_data_Municipality',subfolder = 'Irrigation',subfolderX2 = 'Postprocessing_X2009',subfolderX3 = 'Muni_Fraction_crop_areas',subfolderX4 = main_param, pattern = param)   
   
   total_irrig_crop = tot_irrigated_areas_df
@@ -94,12 +94,6 @@ correct_interpolated_total_crop_irrig_areas = function(main_param, param, tot_ir
           
           print(paste0('Swaping ', crop_irrig_area[r,c], 'for ', total_crop_area[r,c]))
           crop_irrig_area[r,c] = total_crop_area[r,c]
-
-        }
-        else if (param == 'Rice' & (total_crop_area[r,c] >0 & crop_irrig_area[r,c] ==0 )) {
-          print('Correcting rice.')
-          AR_FRAC_irrig_crop = disaggregate_AR_FRAC_irrigation('Areas',main_param,param)
-          crop_irrig_area[r,c] = AR_FRAC_irrig_crop[r, 'X2009'] * total_crop_area[r,c]
         }
       }
     }
@@ -110,7 +104,8 @@ correct_interpolated_total_crop_irrig_areas = function(main_param, param, tot_ir
 }
 
 
-loop_correct_interpolated_total_crop_irrig_areas = function() {
+loop_correct_interpolated_total_crop_irrig_areas = function(correct_data=T) {
+  #' @param correct_data correct the data to the total crop areas; boolean
   # unit: hectares
   
   irrig_id = get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Irrigation', subfolderX2 = 'Portugal_statistics', pattern = 'Crop_ids')
@@ -122,16 +117,30 @@ loop_correct_interpolated_total_crop_irrig_areas = function() {
     param = irrig_id[i, 'Crop']
     param = ifelse(param == 'Other_industry','Tomato',param)
     
-    tot_crop_irrig = correct_interpolated_total_crop_irrig_areas(main_param, param, total_irrigated_areas)
-    export_file(module = 'Nutrients', 
-                folder = 'Activity_data', 
-                subfolder = 'Correct_data_Municipality', 
-                subfolderX2 = 'Irrigation', 
-                subfolderX3 = 'Crop_irrigated_areas',
-                subfolderX4 = 'Total',
-                subfolderX5 = main_param, 
-                filename = param, 
-                file = tot_crop_irrig)
+    if (correct_data == T) { 
+      tot_crop_irrig = correct_interpolated_total_crop_irrig_areas(main_param, param, total_irrigated_areas) 
+      export_file(module = 'Nutrients', 
+                  folder = 'Activity_data', 
+                  subfolder = 'Correct_data_Municipality', 
+                  subfolderX2 = 'Irrigation', 
+                  subfolderX3 = 'Crop_irrigated_areas',
+                  subfolderX4 = 'Total',
+                  subfolderX5 = main_param, 
+                  filename = param, 
+                  file = tot_crop_irrig)
+    }
+    else { 
+      tot_crop_irrig = compute_interpolated_total_crop_irrig_areas(main_param, param, total_irrigated_areas) 
+      export_file(module = 'Nutrients', 
+                  folder = 'Activity_data', 
+                  subfolder = 'Correct_data_Municipality', 
+                  subfolderX2 = 'Irrigation', 
+                  subfolderX3 = 'IncorrectCrop_irrigated_areas',
+                  subfolderX4 = 'Total',
+                  subfolderX5 = main_param, 
+                  filename = param, 
+                  file = tot_crop_irrig)
+    }
   }
 }
 
@@ -139,10 +148,13 @@ loop_correct_interpolated_total_crop_irrig_areas = function() {
 # 3 - disaggregated total crop irrigated areas per the different methods ----------------------------------------------
 
 
-compute_crop_irrigated_area_per_method = function(main_param, param, irrig_method) {
+compute_crop_irrigated_area_per_method = function(main_param, param, irrig_method, correct_data=T) {
   # disaggregates the total crop irrigated areas 
-   
-  total_crop_irrig  = get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Irrigation', subfolderX2 = 'Crop_irrigated_areas', subfolderX3 = 'Total', subfolderX4 = main_param, pattern = param)
+  #' @param correct_data correct the data to the total crop areas; boolean
+  
+  search_TIAcrop = ifelse(correct_data==T, 'Crop_irrigated_areas','IncorrectCrop_irrigated_areas')
+  
+  total_crop_irrig  = get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Irrigation', subfolderX2 = search_TIAcrop, subfolderX3 = 'Total', subfolderX4 = main_param, pattern = param)
   FRAC_crop_irrig_method = get_activity_data(module = 'Nutrients',folder = 'Correct_data_Municipality',subfolder = 'Irrigation',subfolderX2 = 'Postprocessing_X2009',subfolderX3 = 'Muni_Fraction_crop_methods', subfolderX4 = irrig_method, subfolderX5 = main_param, pattern = param)   
   
   crop_irrig_method = total_crop_irrig 
@@ -164,7 +176,8 @@ swap_crop_irrigated_area_per_method_X2009 = function(main_param, param, irrig_me
 }
 
 
-loop_crop_irrigated_area_per_method = function() {
+loop_crop_irrigated_area_per_method = function(correct_data=T) {
+  #' @param correct_data correct the data to the total crop areas; boolean
   
   
   irrig_methods = set_irrigation_methods_INE_codes()[, -2]
@@ -178,14 +191,15 @@ loop_crop_irrigated_area_per_method = function() {
     
     for (method in irrig_methods) {
       
-      crop_irrig_method = compute_crop_irrigated_area_per_method(main_param, param, method)
+      crop_irrig_method = compute_crop_irrigated_area_per_method(main_param, param, method, correct_data)
       crop_irrig_method  = swap_crop_irrigated_area_per_method_X2009(main_param, param, method, crop_irrig_method)
       
+      search_TIAcrop = ifelse(correct_data==T, 'Correct_irrigated_areas_method','Incorrect_irrigated_areas_method')
       export_file(module = 'Nutrients', 
                   folder = 'Activity_data', 
                   subfolder = 'Correct_data_Municipality', 
                   subfolderX2 = 'Irrigation', 
-                  subfolderX3 = 'Correct_irrigated_areas_method',
+                  subfolderX3 = search_TIAcrop,
                   subfolderX4 = method,
                   subfolderX5 = main_param, 
                   filename = param, 
@@ -196,7 +210,8 @@ loop_crop_irrigated_area_per_method = function() {
 }
 
 
-compute_total_adjusted_irrigated_area = function() {
+compute_total_adjusted_irrigated_area = function(correct_data=T) {
+  #' @param correct_data correct the data to the total crop areas; boolean
   # computes the new total irrigated areas per irrigation method and their total
   # unit: hectares
   
@@ -207,6 +222,7 @@ compute_total_adjusted_irrigated_area = function() {
   
   irrig_methods = set_irrigation_methods_INE_codes()[, -2]
   irrig_id = get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Irrigation', subfolderX2 = 'Portugal_statistics', pattern = 'Crop_ids')
+  search_TIAcrop = ifelse(correct_data==T, 'Correct_irrigated_areas_method','Incorrect_irrigated_areas_method')
   
   for (method in irrig_methods) {
     
@@ -219,7 +235,7 @@ compute_total_adjusted_irrigated_area = function() {
       param = irrig_id[i, 'Crop']
       param = ifelse(param == 'Other_industry','Tomato',param)
       
-      crop_irrig_method = get_activity_data(module = 'Nutrients',folder = 'Correct_data_Municipality',subfolder = 'Irrigation',subfolderX2 = 'Correct_irrigated_areas_method',subfolderX3 = method, subfolderX4 = main_param, pattern = param)   
+      crop_irrig_method = get_activity_data(module = 'Nutrients',folder = 'Correct_data_Municipality',subfolder = 'Irrigation',subfolderX2 =search_TIAcrop,subfolderX3 = method, subfolderX4 = main_param, pattern = param)   
       
       # add to tot_method and tot_irrig
       tot_irrig[, yrs] = sapply(yrs, function(x) tot_irrig[,x] + crop_irrig_method[,x])
@@ -229,7 +245,7 @@ compute_total_adjusted_irrigated_area = function() {
                 folder = 'Activity_data', 
                 subfolder = 'Correct_data_Municipality', 
                 subfolderX2 = 'Irrigation', 
-                subfolderX3 = 'Correct_irrigated_areas_method',
+                subfolderX3 = search_TIAcrop,
                 subfolderX4 = 'Total',
                 subfolderX5 = 'Total', 
                 filename = method, 
@@ -239,7 +255,7 @@ compute_total_adjusted_irrigated_area = function() {
               folder = 'Activity_data', 
               subfolder = 'Correct_data_Municipality', 
               subfolderX2 = 'Irrigation', 
-              subfolderX3 = 'Correct_irrigated_areas_method',
+              subfolderX3 = search_TIAcrop,
               subfolderX4 = 'Total',
               subfolderX5 = 'Total', 
               filename = 'Total', 

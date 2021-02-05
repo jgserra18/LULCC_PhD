@@ -44,7 +44,7 @@ loop_param_checker <- function(fun) {
     
     main_param <- standard_params[i, 'Main_animals']
     param <- standard_params[i, 'Animals']
-    
+    print(param)
     check <- fun(main_param, param)
     check_if_conditions(check, param)
   }
@@ -151,7 +151,6 @@ loop_param_checker(Nflow_check4)
 
 source('./Nutrients/Model/MMS/Housing/Housing.R')
 source('./Nutrients/Model/MMS/Storage/Storage.R')
-
 
 Nflow_check5 <- function(main_param, param) {
   

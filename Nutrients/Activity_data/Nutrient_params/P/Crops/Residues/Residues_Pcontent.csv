@@ -1,34 +1,40 @@
 Main_crop,crop,P2O5_AG,P2O5_BG,source
-Cereals,Barley,2,6.22,CdBP18
-Cereals,Rainfed_maize,3.5,3.32,CdBP18
-Cereals,Irrigated_maize,3.5,3.32,CdBP18
-Cereals,Oat,3,4.29,CdBP18
-Cereals,Rice,4.5,4.60,CdBP18
-Cereals,Rye,2.5,3.24,CdBP18
-Cereals,Triticale,2.5,2.65,CdBP18
-Cereals,Wheat,2,3.16,CdBP18
-Citrus,Lemon,1.4,NA,CdPB18; assumed
-Citrus,Orange,1.4,NA,CdPB18; assumed
-Citrus,Other_citrus,1.4,NA,CdPB18; assumed
-Citrus,Tangerine,1.4,NA,CdPB18; assumed
-Dried_fruits,Almond,1.4,NA,CdPB18; nuuts
-Dried_fruits,Chestnut,1.4,NA,CdPB18; nuuts
-Dried_fruits,Locust,1.4,NA,CdPB18; nuuts
-Dried_fruits,Nuuts,1.4,NA,CdPB18; nuuts
-Dried_fruits,Other_dried_nuts,1.4,NA,CdPB18; nuuts
-Fresh_fruits,Apple,1.4,NA,CdPB18; Pear
-Fresh_fruits,Cherry,1.4,NA,CdPB18; Pear
-Fresh_fruits,other_fresh,1.4,NA,CdPB18; Pear
-Fresh_fruits,Peach,1.4,NA,CdPB18; Pear
-Fresh_fruits,Pear,1.4,NA,CdPB18; Pear
-Industry_crops,Sunflower,2.5,1.94,CdBP18
-Industry_crops,Tomato,2,0.95,Assumed
-Olive_grove,Olive_grove,1.1,NA,CdBP18
-Potato,Irrigated_potato,0.5,0.49,CdBP18
-Potato,Rainfed_potato,0.5,0.49,CdBP18
-Vineyard,Vineyard,1.2,NA,CdBP18; Pea
-Pulses,Beans,7.5,0.60,CdBP18; Pea
-Pulses,Chickpea,7.5,7.50,CdBP18; Pea
-Pulses,Other_dried_pulses,7.5,7.50,CdBP18; Pea
-Pastures,Intensive_pasture,3.6,2.30,Le Noe 2016
-Pastures,Extensive_pasture,4,3.20,Le Noe 2016
+Cereals,Barley,0.002,0.00622,CdBP18
+Cereals,Rainfed_maize,0.0035,0.00332,CdBP18
+Cereals,Irrigated_maize,0.0035,0.00332,CdBP18
+Cereals,Oat,0.003,0.00429,CdBP18
+Cereals,Rice,0.0045,0.0046,CdBP18
+Cereals,Rye,0.0025,0.00324,CdBP18
+Cereals,Triticale,0.0025,0.00265,CdBP18
+Cereals,Wheat,0.002,0.00316,CdBP18
+Citrus,Lemon,0.0014,NA,CdPB18; assumed
+Citrus,Orange,0.0014,NA,CdPB18; assumed
+Citrus,Other_citrus,0.0014,NA,CdPB18; assumed
+Citrus,Tangerine,0.0014,NA,CdPB18; assumed
+Dried_fruits,Almond,0.0014,NA,CdPB18; nuuts
+Dried_fruits,Chestnut,0.0014,NA,CdPB18; nuuts
+Dried_fruits,Locust,0.0014,NA,CdPB18; nuuts
+Dried_fruits,Nuuts,0.0014,NA,CdPB18; nuuts
+Dried_fruits,Other_dried_nuts,0.0014,NA,CdPB18; nuuts
+Fresh_fruits,Apple,0.0014,NA,CdPB18; Pear
+Fresh_fruits,Cherry,0.0014,NA,CdPB18; Pear
+Fresh_fruits,other_fresh,0.0014,NA,CdPB18; Pear
+Fresh_fruits,Peach,0.0014,NA,CdPB18; Pear
+Fresh_fruits,Pear,0.0014,NA,CdPB18; Pear
+Industry_crops,Sunflower,0.0025,0.00194,CdBP18
+Industry_crops,Tomato,0.002,0.00095,Assumed
+Olive_grove,Olive_grove,0.0011,NA,CdBP18
+Potato,Irrigated_potato,0.0005,0.00049,CdBP18
+Potato,Rainfed_potato,0.0005,0.00049,CdBP18
+Vineyard,Vineyard,0.0012,NA,CdBP18; Pea
+Pulses,Beans,0.044444444,0.0006,CdBP18; Pea
+Pulses,Chickpea,0.0075,0.0075,CdBP18; Pea
+Pulses,Other_dried_pulses,0.0075,0.0075,CdBP18; Pea
+Pastures,Intensive_pasture,0.0036,0.0023,Le Noe 2016
+Pastures,Extensive_pasture,0.004,0.0032,Le Noe 2016
+Forage,forage_maize,0.003,0.005,
+Forage,forage_oat,0.003,0.005,
+Forage,Annual_mixtures,0.003,0.005,
+Forage,other_forage,0.003,0.005,
+Forage,forage_sorghum,0.003,0.005,
+Forage,forage_roots,0.003,0.005,

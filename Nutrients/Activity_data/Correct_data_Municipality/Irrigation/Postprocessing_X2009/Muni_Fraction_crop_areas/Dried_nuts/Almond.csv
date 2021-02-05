@@ -52,36 +52,36 @@
 109,"1160109","Santa Maria da Feira",0
 116,"1160116","São João da Madeira",0
 119,"1160119","Vale de Cambra",0
-1701,"1171701","Alijó",0.0363
+1701,"1171701","Alijó",0.0306
 1801,"1171801","Armamar",0
-403,"1170403","Carrazeda de Ansiães",0.0078
-404,"1170404","Freixo de Espada à Cinta",0.0358
+403,"1170403","Carrazeda de Ansiães",0.0076
+404,"1170404","Freixo de Espada à Cinta",0.0357
 1805,"1171805","Lamego",0
 1704,"1171704","Mesão Frio",0
 1807,"1171807","Moimenta da Beira",0
-1812,"1171812","Penedono",0.0132
+1812,"1171812","Penedono",0.014
 1708,"1171708","Peso da Régua",0
 1710,"1171710","Sabrosa",0
 1711,"1171711","Santa Marta de Penaguião",0
-1815,"1171815","São João da Pesqueira",0.2735
+1815,"1171815","São João da Pesqueira",0.2654
 1818,"1171818","Sernancelhe",0
 1819,"1171819","Tabuaço",0
 1820,"1171820","Tarouca",0
-409,"1170409","Torre de Moncorvo",0.1348
-410,"1170410","Vila Flor",0.0097
-914,"1170914","Vila Nova de Foz Côa",0.0071
-1714,"1171714","Vila Real",0.0012
-401,"1180401","Alfândega da Fé",0.0486
+409,"1170409","Torre de Moncorvo",0.1352
+410,"1170410","Vila Flor",0.0096
+914,"1170914","Vila Nova de Foz Côa",0.0072
+1714,"1171714","Vila Real",0.0015
+401,"1180401","Alfândega da Fé",0.0485
 1702,"1181702","Boticas",0
 402,"1180402","Bragança",0
 1703,"1181703","Chaves",5e-04
 405,"1180405","Macedo de Cavaleiros",0
 406,"1180406","Miranda do Douro",0
-407,"1180407","Mirandela",0.0855
-408,"1180408","Mogadouro",0.0398
+407,"1180407","Mirandela",0.083
+408,"1180408","Mogadouro",0.0415
 1706,"1181706","Montalegre",0
 1707,"1181707","Murça",0
-1712,"1181712","Valpaços",0.0026
+1712,"1181712","Valpaços",0.0023
 1713,"1181713","Vila Pouca de Aguiar",0
 411,"1180411","Vimioso",0
 412,"1180412","Vinhais",0
@@ -122,7 +122,7 @@
 612,"1640612","Pampilhosa da Serra",0
 1013,"1641013","Pedrógão Grande",0
 614,"1640614","Penela",0
-616,"1640616","Tábua",0.0018
+616,"1640616","Tábua",0.0017
 617,"1640617","Vila Nova de Poiares",0
 901,"1650901","Aguiar da Beira",0
 1802,"1651802","Carregal do Sal",0
@@ -148,12 +148,12 @@
 906,"1670906","Gouveia",0
 912,"1670912","Seia",0
 902,"1680902","Almeida",0
-903,"1680903","Celorico da Beira",6e-04
-904,"1680904","Figueira de Castelo Rodrigo",0.0153
+903,"1680903","Celorico da Beira",5e-04
+904,"1680904","Figueira de Castelo Rodrigo",0.0154
 907,"1680907","Guarda",3e-04
 908,"1680908","Manteigas",0
-909,"1680909","Mêda",0.0065
-910,"1680910","Pinhel",0.0043
+909,"1680909","Mêda",0.0057
+910,"1680910","Pinhel",0.0033
 911,"1680911","Sabugal",0
 913,"1680913","Trancoso",0
 502,"1690502","Castelo Branco",0.003
@@ -179,10 +179,10 @@
 1402,"16C1402","Alcanena",0
 1408,"16C1408","Constância",0
 1410,"16C1410","Entroncamento",0
-1411,"16C1411","Ferreira do Zêzere",0.0045
+1411,"16C1411","Ferreira do Zêzere",0.0044
 1421,"16C1421","Ourém",0
 1417,"16C1417","Sardoal",0
-1418,"16C1418","Tomar",0.001
+1418,"16C1418","Tomar",0.0011
 1419,"16C1419","Torres Novas",0
 1420,"16C1420","Vila Nova da Barquinha",0
 1115,"1711115","Amadora",0
@@ -223,7 +223,7 @@
 1212,"1821212","Nisa",0
 1213,"1821213","Ponte de Sor",0
 1214,"1821214","Portalegre",0
-701,"1830701","Alandroal",0.0096
+701,"1830701","Alandroal",0.0095
 702,"1830702","Arraiolos",0
 703,"1830703","Borba",0
 704,"1830704","Estremoz",0
@@ -237,7 +237,7 @@
 712,"1830712","Vendas Novas",0
 713,"1830713","Viana do Alentejo",0
 714,"1830714","Vila Viçosa",0
-201,"1840201","Aljustrel",0.0698
+201,"1840201","Aljustrel",0.0695
 202,"1840202","Almodôvar",0
 203,"1840203","Alvito",0
 204,"1840204","Barrancos",0
@@ -247,7 +247,7 @@
 208,"1840208","Ferreira do Alentejo",0
 209,"1840209","Mértola",0.0745
 210,"1840210","Moura",0.001
-212,"1840212","Ourique",0.0184
+212,"1840212","Ourique",0.0178
 213,"1840213","Serpa",0
 214,"1840214","Vidigueira",0
 1403,"1851403","Almeirim",0
@@ -265,8 +265,8 @@
 802,"1500802","Alcoutim",0
 803,"1500803","Aljezur",0
 804,"1500804","Castro Marim",0
-805,"1500805","Faro",0.0031
-806,"1500806","Lagoa",0.0049
+805,"1500805","Faro",0.003
+806,"1500806","Lagoa",0.005
 807,"1500807","Lagos",0
 808,"1500808","Loulé",0
 809,"1500809","Monchique",0

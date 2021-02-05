@@ -165,7 +165,6 @@ compute_biosolid_crop_application_rate = function(nutrient, main_param, param, m
 }
 
 
-
 allocate_crop_biosolid_1teraction = function(nutrient, manure_method, manure_surplus_fills) {
   #* 1 --> Allocates biosolid nutrient content for the different crops and years
   #* 2 --> Iterates the biosolid surplus (if it exists) following application and stores it into a dataframe
@@ -211,7 +210,6 @@ allocate_crop_biosolid_1teraction = function(nutrient, manure_method, manure_sur
               subfolderX3 = manure_method, 
               subfolderX4 = folder_div)
 }
-
 
 
 loop_crop_biosolid_1teraction_ManureMethod = function(nutrient, manure_surplus_fills) {

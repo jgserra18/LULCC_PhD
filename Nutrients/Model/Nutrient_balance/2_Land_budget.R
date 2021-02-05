@@ -6,13 +6,15 @@ source('./Nutrients/Model/Nutrient_balance/1_Prepare_parameters.R')
 
 # COMPUTE LAND BUDGET -----------------------------------
 
-
-compute_land_nutrient_budget = function(reference_area, per_area = FALSE, nutrient = 'N') {
-  # computes the land balance
-  # unit: kg N-P yr-1 or kg N-P ha-1 yr-1
+compute_land_nutrient_budget = function(reference_area, per_area = FALSE, nutrient = 'N', export = 'TRUE') {
+  #' @param reference_area either Cropland or Grassland
+  #' @param per_area per kg nutrient ref_ha-1 yr-1 or simply kg nutrient yr-1
+  #' @param nutrient either N or P
+  #' @description calculates the land nutrient balance 
+  #' @return returns the land nutrient balance at a given unit
   
-  input_params = set_total_input_params(reference_area, nutrient)
-  output_params = set_total_output_params(reference_area, nutrient)
+  input_params = set_total_input_params(reference_area, export = export, nutrient)
+  output_params = set_total_output_params(reference_area,export = export, nutrient)
   
   land_balance = output_params 
   yrs = paste0('X',seq(1987,2017))
@@ -31,17 +33,17 @@ compute_land_nutrient_budget = function(reference_area, per_area = FALSE, nutrie
 }
 
 
-export_land_budget_data = function(reference_area, nutrient = 'N') {
+export_land_budget_data = function(reference_area, nutrient = 'N', export = 'TRUE') {
   
   
   yrs = paste0('X',seq(1987,2017))
   ref_area = get_reference_area(reference_area)
   # compute IO params per area
-  input_params = set_total_input_params(reference_area, nutrient)
+  input_params = set_total_input_params(reference_area, export, nutrient)
   input_params[, yrs] = sapply(yrs, function(x) round(input_params[,x] / ref_area[, x], 0))
   input_params = data_cleaning(input_params)
   
-  output_params = set_total_output_params(reference_area, nutrient)
+  output_params = set_total_output_params(reference_area,export, nutrient)
   output_params[, yrs] = sapply(yrs, function(x) round(output_params[,x] / ref_area[, x], 0))
   output_params = data_cleaning(output_params)
   
@@ -64,5 +66,7 @@ export_land_budget_data = function(reference_area, nutrient = 'N') {
   }
 }
 
+#export_land_budget_data('Cropland','N')
+#export_land_budget_data('Grassland','N')
 
 

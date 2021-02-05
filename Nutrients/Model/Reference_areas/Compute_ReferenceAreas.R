@@ -45,7 +45,7 @@ loop_municipality_UAA <- function() {
     muni_store[, paste0('X',yrs[i])] <- uaa[, 'uaa']
     
   }
-  export_file(module = 'Nutrients', file = muni_store, filename = 'UAA', folder = 'Reference_areas', subfolderX2 = 'UAA')
+  export_file(module = 'Nutrients', file = muni_store, filename = 'UAA', folder = 'Reference_areas', subfolder = 'UAA')
 }
 
 

@@ -7,9 +7,7 @@ library(sf)
 library(raster)
 
 
-
 ## GENERAL PURPOSE ---------------------------------------------------------------------------
-
 
 identify_read_fileclass <- function(file_path) {
   # read file path and reads the file accordingly
@@ -86,8 +84,14 @@ get_mainfolder_sub <- function(module, main_folder, pattern) {
   
   if (missing(pattern)==TRUE) {
     return(sel_folder)
-  } else {
+  } 
+  else {
     pattern_path <- list.files(path = sel_folder, pattern = pattern, full.names = TRUE)
+    
+    if (length(pattern_path)==0) {
+      create_new_directory(path = sel_folder, new_dir = pattern)
+    }
+    
     return(pattern_path)
   }
 }
@@ -361,12 +365,13 @@ create_activityData_folders <- function(module, folder, subfolder, subfolderX2, 
   
   if (missing(subfolderX3)==TRUE) {
     file_path <- file.path(file_path, subfolderX2)
+    dir.create(path = file_path, showWarnings = FALSE, recursive = TRUE)
   } 
   else {
     file_path <- file.path(file_path, subfolderX2, subfolderX3)
+    dir.create(path = file_path, showWarnings = FALSE, recursive = TRUE)
   }
 
-  dir.create(path = file_path, showWarnings = FALSE, recursive = TRUE)
   return(file_path)
 }
 
@@ -376,10 +381,11 @@ create_activityData_folders <- function(module, folder, subfolder, subfolderX2, 
 export_file <- function(module, file, folder, filename, subfolder, subfolderX2, subfolderX3, subfolderX4, subfolderX5, subfolderX6) {
   ## NOTE: CURRENTLY ONLY APPLIED TO RASTERS, STACKS/BRICKS AND DATAFRAMES
   
+  print(paste0('Preparing to export ', filename))
   ifelse(folder=='Activity_data',
     file_path <- create_activityData_folders(module, folder, subfolder, subfolderX2), 
     file_path <- create_output_folders(module, folder, subfolder, subfolderX2) )
-  
+
     if (missing(subfolderX3)==FALSE & missing(subfolderX4)==TRUE & missing(subfolderX5)==TRUE & missing(subfolderX6)==TRUE) {
       
       file_path <- file.path(file_path, subfolderX3)
@@ -387,7 +393,7 @@ export_file <- function(module, file, folder, filename, subfolder, subfolderX2, 
     }
     else if (missing(subfolderX3)==TRUE & missing(subfolderX4)==TRUE & missing(subfolderX5)==TRUE & missing(subfolderX6)==TRUE) {
 
-      print('Awkward') 
+      
     }
     else if (missing(subfolderX3)==FALSE & missing(subfolderX4)==FALSE & missing(subfolderX5)==TRUE & missing(subfolderX6)==TRUE) {
 
@@ -439,8 +445,10 @@ export_file <- function(module, file, folder, filename, subfolder, subfolderX2, 
     write.csv(x = file, file = file_path, row.names = FALSE)
   }
   else if (class(file)=='RasterStack') {
-    
-    file_path <- paste0(file_path, '.grd')
+
+    file_path = ifelse(grepl('.tif',filename)==TRUE,
+      paste0(file_path,'.tif'),
+      paste0(file_path,'.gri'))
     tifoptions=c('COMPRESS=DEFLATE', 'PREDICTOR=2', 'ZLEVEL=6')
     writeRaster(file, file_path, options=tifoptions, overwrite = TRUE)
   }

@@ -17,6 +17,7 @@ compute_manure_discharge_rivers <- function(nutrient, main_param, param, manure_
   return(man_discharge)
 }
 
+
 loop_manure_discharge_rivers <- function(nutrient) {
   
   standard_params <- get_standard_params_list(main_param = 'Animals')

@@ -203,7 +203,6 @@ compute_manure_spreading_net_N <- function(N_flow, main_param, param, manure_typ
 }
 
 
-
 compute_all_manure_spreading_net_N <- function() {
   # computes total N returned to the soil following NH3 application
   # Activity data for N2O, NOx and runoff emissions ---------------------

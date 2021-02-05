@@ -16,3 +16,9 @@ Pulses,Chickpea,1
 Pulses,Other_dried_pulses,1
 Pastures,Intensive_pasture,0.6
 Pastures,Extensive_pasture,0.133333333
+Forage,forage_maize,1
+Forage,forage_oat,1
+Forage,forage_sorghum,1
+Forage,Annual_mixtures,1
+Forage,other_forage,1
+Forage,forage_roots,1

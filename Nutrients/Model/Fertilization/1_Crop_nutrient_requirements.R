@@ -14,7 +14,6 @@ get_fertiliser_modifier <- function(nutrient, main_param, param) {
   return(fert_modifier)
 }
 
-
 ## YIELD DIFFERENCES ---------------------------------------------------------------------------------- 
 
 get_spatially_disaggagregated_reference_yields <- function(main_param, param) {
@@ -34,10 +33,10 @@ get_spatially_disaggagregated_reference_yields <- function(main_param, param) {
 
 
 compute_yield_difference <- function(main_param, param) {
-  # unit: tonnes DM ha-1 yr-1
+  # unit: tonnes FM ha-1 yr-1
   
-  FRAC_DM <- get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Crops', subfolderX2 = 'Offtake', pattern = 'DM_content')
-  FRAC_DM <- find_crop_variable(df = FRAC_DM, param_col = 'crop', param = param, var = 'DM_frac')
+ # FRAC_DM <- get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Crops', subfolderX2 = 'Offtake', pattern = 'DM_content')
+ # FRAC_DM <- find_crop_variable(df = FRAC_DM, param_col = 'crop', param = param, var = 'DM_frac')
   
   crop_yield <- get_spatially_disaggagregated_yields(main_param, param)
   ref_yield <- get_spatially_disaggagregated_reference_yields(main_param, param)[1, param]
@@ -131,11 +130,10 @@ compute_crop_fertiliser_rate <- function(nutrient, main_param, param) {
 
 
 
-
 loop_crop_fertiliser_rates <- function(nutrient) {
   
   standard_params <- get_standard_params_list('Crops')
-  
+  standard_params
   for (i in 1:nrow(standard_params)) {
     
     main_param <- standard_params[i, 'Main_crop']
@@ -146,7 +144,6 @@ loop_crop_fertiliser_rates <- function(nutrient) {
     }
     else {
       
-      print(param)
       crop_fert_rate <- compute_crop_fertiliser_rate(nutrient, main_param, param)
       export_file(module = 'Nutrients', 
                   folder = 'Activity_data',
@@ -165,7 +162,7 @@ loop_crop_fertiliser_rates <- function(nutrient) {
 
 # CROP NUTRIENT REQUIREMENTS -----------------------------------------------------
 
-compute_crop_nutrient_requirements <- function(nutrient) {
+compute_crop_nutrient_requirements <- function(nutrient, crop_area = NULL) {
   # computes total nutrient requirements for each crop
   # unit: kg nutrient yr-1
   

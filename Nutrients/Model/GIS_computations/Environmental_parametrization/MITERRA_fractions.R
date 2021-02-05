@@ -5,7 +5,7 @@ source('./LULCC/Model/LULC/Ordered_Model.R')
 
 compute_annual_precipitation_surplus <- function(spatial_res) {
   
-  yrs <- paste0('X', seq(1979,2017))
+  yrs <- seq(1987,2018)
   
   for (i in yrs) {
     
@@ -29,7 +29,7 @@ compute_annual_precipitation_surplus <- function(spatial_res) {
 
 compute_annual_runoff_prec_surplus <- function(spatial_res) {
   
-  yrs <- paste0('X', seq(1979,2017))
+  yrs <- seq(1987,2018)
   
   for (i in yrs) {
     
@@ -104,7 +104,7 @@ compute_runoff_DepthToRock <- function() {
 
 compute_runoff_LandUse <- function() {
   
-  yrs <- seq(1979,2017)
+  yrs <- seq(1987,2018)
   
   for (i in yrs) {
     
@@ -116,23 +116,16 @@ compute_runoff_LandUse <- function() {
       
       lulc_yr <- create_mainland_annual_NUTS2_raster_mosaic(spatial_res = '500', year = as.character(i))
     }
-      lulc_yr <- reclassify(lulc_yr, rcl = c(0,142, 1,
-                                 142,223, 1,
-                                 223, 231, 0.25,
-                                 231, 243, 1,
-                                 243, 244, 0.25,
-                                 244, 321, 1,
-                                 321,322, 0.25,
-                                 322, +Inf, 1))
-      export_file(module = 'Nutrients', 
-                  file = lulc_yr, 
-                  filename = paste0('LULC_',i), 
-                  folder = 'MITERRA_fractions',
-                  subfolder = 'FRAC_runoff',
-                  subfolderX2 = 'Land_use')
+    clu_recl = get_activity_data(module = 'LULCC', subfolder = 'CLC', pattern = 'CroplandGrassland')[, -4]
+    lulc_yr <- reclassify(lulc_yr, rcl = as.matrix(clu_recl))
+    export_file(module = 'Nutrients', 
+                file = lulc_yr, 
+                filename = paste0('LULC_',i), 
+                folder = 'MITERRA_fractions',
+                subfolder = 'FRAC_runoff',
+                subfolderX2 = 'Land_use')
   }
 }
-
 
 
 compute_MITERRA_runoff_fraction <- function() {
@@ -142,14 +135,14 @@ compute_MITERRA_runoff_fraction <- function() {
   
   RF_depth_rock <- get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'MITERRA_fractions', subfolder = 'FRAC_runoff', subfolderX2 = 'Static', pattern = 'Depth_rock')
   RF_depth_rock <- resample_to_CLC(module = 'LULCC', raster_file = RF_depth_rock, mask_CLC = F, spatial_res = 'Native')
-  
-  yrs <- paste0(seq(1999,2017)) 
+
+  yrs <- paste0(seq(1987,2018)) 
   
   for (i in yrs) {
     
     RF_prec <- get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'MITERRA_fractions', subfolder = 'FRAC_runoff', subfolderX2 = 'Surplus_precipitation', subfolderX3 = '1x1', pattern = i)
     RF_prec <- resample_to_CLC(module = 'LULCC', raster_file = RF_prec, mask_CLC = F, spatial_res = 'Native')
-      
+
     RF_LU <- get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'MITERRA_fractions', subfolder = 'FRAC_runoff', subfolderX2 = 'Land_use', pattern = i)
     RF_LU <- resample_to_CLC(module = 'LULCC', raster_file = RF_LU,mask_CLC = F,spatial_res = 'Native', ngb = T)
     
@@ -188,7 +181,7 @@ compute_leaching_DepthRoots <- function() {
 
 compute_annual_leaching_temperature <- function(spatial_res) {
   
-  yrs <- paste0('X', seq(1979,2017))
+  yrs <- paste0('X', seq(1987,2018))
   
   for (i in yrs) {
     
@@ -246,7 +239,7 @@ compute_leaching_soil_texture <- function() {
 compute_leaching_precipitation_surplus <- function(spatial_res) {
   # computes leaching fraction regarding precipitation surplus according to soil texture
   
-  yrs <- paste0('X', seq(1979,2017))
+  yrs <- seq(1987,2018)
   
   rcl_soil_tex <- get_activity_data(module = 'Nutrients', mainfolder = 'Output',  folder = 'MITERRA_fractions', subfolder = 'FRAC_leaching',  pattern = 'SoilTexture')
   
@@ -292,10 +285,10 @@ compute_leaching_precipitation_surplus <- function(spatial_res) {
   rm(list=c('rcl_soil_tex', 'prec_surplus', 'clay_frac', 'other_frac'))
 }
 
-
+compute_leaching_LandUse()
 compute_leaching_LandUse <- function() {
   
-  yrs <- seq(1979,2017)
+  yrs <- seq(1987,2018)
   
   for (i in yrs) {
     
@@ -307,14 +300,9 @@ compute_leaching_LandUse <- function() {
       
       lulc_yr <- create_mainland_annual_NUTS2_raster_mosaic(spatial_res = '500', year = as.character(i))
     }
-    lulc_yr <- reclassify(lulc_yr, rcl = c(0,142, 1,
-                                           142,223, 1,
-                                           223, 231, 0.36,
-                                           231, 243, 1,
-                                           243, 244, 0.36,
-                                           244, 321, 1,
-                                           321,322, 0.36,
-                                           322, +Inf, 1))
+    clu_recl = get_activity_data(module = 'LULCC', subfolder = 'CLC', pattern = 'CroplandGrassland')[, -4]
+    lulc_yr <- reclassify(lulc_yr, rcl = as.matrix(clu_recl))
+    
     export_file(module = 'Nutrients', 
                 file = lulc_yr, 
                 filename = paste0('LULC_',i), 
@@ -324,7 +312,7 @@ compute_leaching_LandUse <- function() {
   }
 }
 
-
+compute_MITERRA_leaching_fraction()
 compute_MITERRA_leaching_fraction <- function() {
   
   Lf_root <- get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'MITERRA_fractions', subfolder = 'FRAC_leaching', subfolderX2 = 'Static', pattern = 'Depth_roots')
@@ -333,7 +321,7 @@ compute_MITERRA_leaching_fraction <- function() {
   Lf_soil_text <- get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'MITERRA_fractions', subfolder = 'FRAC_leaching', subfolderX2 = 'Static', pattern = 'SoilTexture')
   Lf_SOC <- get_activity_data(module = 'Nutrients', mainfolder = 'Output', folder = 'MITERRA_fractions', subfolder = 'FRAC_leaching', subfolderX2 = 'Static', pattern = 'SOC')
 
-  yrs <- paste0(seq(1979,1998)) 
+  yrs <- paste0(seq(1987, 2017)) 
   
   for (i in yrs) {
     

@@ -11,7 +11,7 @@ source('./Nutrients/Model/Irrigation/Support/1_Populate_2009_irrigated_areas.R')
 # 4 - get share of irrigated areas in irrigable areas and calculate total irrigated areas per AR
 # 5 - Downscale 
 
-
+yrs = paste0('X',seq(1987,2017))
 
 # 1- correct the total irrigated areas of maize and potato based on the "Correct_data_Municipality"; adjust the acreage of the different irrigation methods accordingly
 
@@ -39,14 +39,13 @@ correct_irrigated_maize_potato_X2009 = function(main_param = 'Cereals', param = 
   # ONLY: Irrigated_maize and Irrigated_potato
   # corrects the area of the irrigated areas using different methods according to the area of Irrigated_maize and Irrigated_potato
   
-  
   census_pattern = ifelse(param == 'Maize','Irrigated_maize','Irrigated_potato')
   # compute total adjustment factor
   AG_census_tot_irrig = get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Areas', subfolderX2 = main_param, pattern = census_pattern)
   X2009_tot_irrig = compute_total_irrig_area_X2009(main_param, param)
   
   adj_factor = X2009_tot_irrig
-  adj_factor[,'X2009'] = round(X2009_tot_irrig[,'X2009'] / AG_census_tot_irrig[,'X2009'], 2)
+  adj_factor[,'X2009'] = round(AG_census_tot_irrig[,'X2009'] / X2009_tot_irrig[,'X2009'], 2)
   adj_factor = data_cleaning(adj_factor)
   
   methods=c('furrows','other_gravity','sprinkler','gun','pivot','drip','microsprink')
@@ -96,6 +95,8 @@ set_FRAC_irrigated_in_irrigable = function() {
     id = which(main$yrs == yr)
     main[id, 'FRAC_irrigated'] = df[ctr, 2]
   }
+ # new_df = linear_interpolation()
+  
   new_df <- approx(x= as.numeric(main$yrs), y = main[,2], 
                    xout = xout, rule = 2)
   
@@ -113,7 +114,6 @@ set_FRAC_irrigated_in_irrigable = function() {
 }
 
 
-
 compute_total_irrigated_areas = function() {
   # computes the total irrigated areas per municipality as:
   # irrig_areas = irrigable_areas * FRAC_irrigated
@@ -123,15 +123,11 @@ compute_total_irrigated_areas = function() {
   irrigable_areas_muni =  get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Irrigation', subfolderX2 = 'Irrigable_areas', subfolderX3 = 'Municipality', pattern = 'Total')
   total_irrig_areas = irrigable_areas_muni
   
-  yrs = paste0('X',seq(1987,2017))
   total_irrig_areas[, yrs] = sapply(yrs, function(x) round(irrigable_areas_muni[, x] * FRAC_irrigated[,x]/100, 1))
   
   return(total_irrig_areas)
   rm(list=c('FRAC_irrigated','irrigable_areas_muni'))
 }
-
-
-
 
 # compute total irrigated areas in 2009 --------------------------------------------------------------
 
@@ -169,37 +165,66 @@ compute_total_X2009_irrigated_areas = function() {
 
 #* Estimated areas are corrected based on 2009 ajdustment factor
 
-adjustment_factor = function() {
-  # computes an adjustment factor for 2009
+adjustment_factor_2009 = function() {
+  #' @description  computes an adjustment factor for 2009
+  #' @resolution municipality 
   
   modelled = compute_total_irrigated_areas()[, c('Muni_ID','X2009')]
-  statistics = compute_total_X2009_irrigated_areas()
-  
+  statistics = compute_total_X2009_irrigated_areas() 
+
   adj_factor = statistics
-  adj_factor[, 'X2009'] = round(modelled[,'X2009'] / statistics[, 'X2009'], 2)
-  
+  adj_factor[, 'X2009'] = round(statistics[,'X2009'] / modelled[, 'X2009'], 2)
   adj_factor = data_cleaning(adj_factor)
   names(adj_factor)[4] = 'Adj_factor'
   
   return(adj_factor)
 }
 
+adjustment_factor_otherAgYrs = function(ag_yr) {
+  #' @param ag_yr X1989, X1999
+  #' @description  computes an adjustment factor 
+  #' @resolution agrarian region
 
-# important function ----------------
-compute_adjusted_irrigated_areas = function() {
-  # computes the adjusted irrigated areas, calibrated according to 2009 data
-  # unit: hectares
+ 
+  modelled = compute_total_irrigated_areas()
+  modelled = compute_temporal_sumIF_admin_df('Agrarian_region', modelled)[, c('Admin_id',ag_yr)]
   
-  adj_factor = adjustment_factor()
-  irrig_areas = compute_total_irrigated_areas()
+  statistics = get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Irrigation', subfolderX2 = 'Portugal_statistics', pattern = 'PT_TIA')[, c('Admin_name','Admin_id',ag_yr)]
   
-  yrs = paste0('X',seq(1987,2017))
-  irrig_areas[, yrs] = sapply(yrs, function(x) round(adj_factor[, 'Adj_factor'] * irrig_areas[, x], 1))
+  # compute adj factor
+  modelled[, ag_yr] = round(statistics[,ag_yr] / modelled[, ag_yr], 2)
+  names(adj_factor)[2] = 'Adj_factor'
   
-  return(irrig_areas)
+  return(modelled)
 }
 
 
+
+
+
+# important function ----------------
+
+compute_adjusted_irrigated_areas = function() {
+  #' @description corrects the total irrigated areas for 2009 and 1999based on the adjustment factor
+  #' @description note that this is not enough to calibrate the modelled areas
+  #' @unit hectares
+  
+  
+  
+  adj_factor99 = adjustment_factor_otherAgYrs('X1999') #Ag region
+  adj_factor09 = adjustment_factor_2009() # muni
+  names(adj_factor99)[1] = 'agrarian_region_id'
+  
+  disagg_df <- get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Spatial_disaggregation')
+  AR_adj99 <- plyr::join(x = disagg_df, y = adj_factor99, by = 'agrarian_region_id')
+  AR_adj99 = AR_adj99[, c('Muni_ID','X1999')]
+  
+  irrig_areas = compute_total_irrigated_areas()
+  irrig_areas[, 'X2009'] = round(irrig_areas[,'X2009'] * adj_factor09$Adj_factor, 1)
+  irrig_areas[, 'X1999'] = round(irrig_areas[,'X2009'] * AR_adj99$X1999, 1)
+
+  return(irrig_areas)
+}
 
 # compute the fraction of irrigated areas and also different methods for 2009 at the municipality level ---------------------------------------
 
@@ -229,14 +254,13 @@ compute_total_crop_area_X2009 = function(main_param, param) {
   tot_irrig[, yrs] = sapply(yrs, function(x) tot_irrig[,x] = 0)
   
   for (method in irrig_methods) {
-    
+    print(method)
     irrig_area = get_activity_data(module = 'Nutrients', folder = 'Correct_data_Municipality', subfolder = 'Irrigation', subfolderX2 = 'Preprocessing_X2009', subfolderX3 = 'Irrigated_areas', subfolderX4 = method, subfolderX5 = main_param, pattern = param)
     tot_irrig[, yrs] = tot_irrig[, yrs] + irrig_area[, yrs]
   }
   
   return(tot_irrig)
 }
-
 
 compute_FRAC_crop_area_X2009 = function(main_param, param, total_area_X2009_df) {
   # computes the area fraction of a given crop compared to the total irrigated area in 2009
@@ -246,18 +270,17 @@ compute_FRAC_crop_area_X2009 = function(main_param, param, total_area_X2009_df) 
   
   # fraction 
   FRAC_crop_irrig = tot_irrig
-  FRAC_crop_irrig[, yrs] = round(tot_irrig[, yrs] / total_area_X2009_df[, yrs], 4)
+  FRAC_crop_irrig[, 'X2009'] = round(tot_irrig[, 'X2009'] / total_area_X2009_df[, 'X2009'], 4)
   
   return(FRAC_crop_irrig)
 }
 
-
-
 loop_X2009_FRAC_irrigated_areas_per_crop = function() {
   # computes for all crops the fraction of a irrigated crop area compared to the total irrigated area
-  
-  total_area_X2009 = compute_total_X2009_irrigated_areas()
-
+  #' @unit %TIA
+  #' 
+  total_area_X2009 = compute_total_X2009_irrigated_areas() # these must be the unadjusted ones, so the fractions match to 1
+  irrig_methods = set_irrigation_methods_INE_codes()[, -2]
   irrig_id = get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Irrigation', subfolderX2 = 'Portugal_statistics', pattern = 'Crop_ids')
   
   for (i in 1:nrow(irrig_id)) {
@@ -284,13 +307,13 @@ loop_X2009_FRAC_irrigated_areas_per_crop = function() {
 }
 
 
-
 loop_X2009_FRAC_irrigated_methods_per_crop = function() {
   # computes for all crops the fraction of a irrigated crop area for a given irrigation method compared to the total crop irrigated area
-  
+  #' @unit %TIA_crop
 
   irrig_id = get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Irrigation', subfolderX2 = 'Portugal_statistics', pattern = 'Crop_ids')
-  
+  irrig_methods = set_irrigation_methods_INE_codes()[, -2]
+
   for (i in 1:nrow(irrig_id)) {
     
     main_param = irrig_id[i, 'Main_crop']
@@ -316,6 +339,27 @@ loop_X2009_FRAC_irrigated_methods_per_crop = function() {
     }
   }
 }
+
+check_X2009_FRAC_irrigated_areas_per_crop = function() {
+  
+  FRAC_df = get_activity_data(module = 'Nutrients', folder = 'Raw_data_Municipality', pattern = 'Muni_INE') 
+  FRAC_df[, 'frac'] = 0
+  
+  frac_files = list.files(path = './Nutrients/Activity_data/Correct_data_Municipality/Irrigation/Postprocessing_X2009/Muni_Fraction_crop_methods/', recursive = T, full.names = T)
+
+  for (i in seq_along(frac_files)) {
+    file = read.csv(frac_files[i])
+    FRAC_df[, 'frac'] = FRAC_df[, 'frac'] + file[,'X2009']
+  }
+  FRAC_df[, 'frac'] = round(FRAC_df[, 'frac'], 2)
+
+  if (length(which(FRAC_df$frac>1))>0) { stop('Check the calculations, FRAC > 1.')}
+  return(FRAC_df)
+}
+
+
+
+
 
 
 # compute the fraction of irrigated areas and also different methods for 2009 at the agrarian region level ---------------------------------------
@@ -368,21 +412,21 @@ compute_FRAC_crop_area_X2009_AR = function(main_param, param, total_area_X2009_d
   
   # fraction 
   FRAC_crop_irrig = tot_irrig
-  FRAC_crop_irrig[, yrs] = round(tot_irrig[, yrs] / total_area_X2009_df[, yrs], 4)
+  FRAC_crop_irrig[, 'X2009'] = round(tot_irrig[, 'X2009'] / total_area_X2009_df[, 'X2009'], 4)
   
   return(FRAC_crop_irrig)
 }
 
 
-
 loop_X2009_FRAC_irrigated_areas_per_crop_AR = function() {
   # computes for all crops the fraction of a irrigated crop area compared to the total irrigated area
+  #' @unit %TIA
   
   total_area_X2009 = compute_total_X2009_irrigated_areas()
   total_area_X2009 = compute_temporal_sumIF_admin_df(admin = 'Agrarian_region', merge_df = total_area_X2009)
+  irrig_methods = set_irrigation_methods_INE_codes()[, -2]
   
   irrig_id = get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Irrigation', subfolderX2 = 'Portugal_statistics', pattern = 'Crop_ids')
-  
   for (i in 1:nrow(irrig_id)) {
     
     main_param = irrig_id[i, 'Main_crop']
@@ -406,13 +450,12 @@ loop_X2009_FRAC_irrigated_areas_per_crop_AR = function() {
   }
 }
 
-
-
 loop_X2009_FRAC_irrigated_methods_per_crop_AR = function() {
   # computes for all crops the fraction of a irrigated crop area for a given irrigation method compared to the total crop irrigated area
-  
+  #' @unit %TIA_crop
   
   irrig_id = get_activity_data(module = 'Nutrients', folder = 'General_params', subfolder = 'Irrigation', subfolderX2 = 'Portugal_statistics', pattern = 'Crop_ids')
+  irrig_methods = set_irrigation_methods_INE_codes()[, -2]
   
   for (i in 1:nrow(irrig_id)) {
     

@@ -32,11 +32,11 @@ Vineyard,Vineyard,1,"CdBPA, 2018",
 Pulses,Beans,30,"CdBPA, 2018",
 Pulses,Chickpea,30,"CdBPA, 2018",
 Pulses,Other_dried_pulses,30,"CdBPA, 2018",
-Pastures,Intensive_pasture,4.38,"CdBPA, 2018",
-Pastures,Extensive_pasture,,"CdBPA, 2018",
+Pastures,Intensive_pasture,25,GLEAMS_model,
+Pastures,Extensive_pasture,17,GLEAMS_model,
 Forage,forage_roots,16.3,"CdBPA, 2018",sorghum
 Forage,Annual_mixtures,16.3,"CdBPA, 2018",sorghum
 Forage,forage_sorghum,16.3,"CdBPA, 2018",
 Forage,forage_oat,9,"CdBPA, 2018",
-Forage,forage_maize,2.45,"CdBPA, 2018",
+Forage,forage_maize,14,"CdBPA, 2018",
 Forage,other_forage,16.3,"CdBPA, 2018",sorghum

@@ -101,10 +101,6 @@ loop_update_crop_manure_spreading_NH3_emission_ManType = function(manure_surplus
   sapply(man_type, function(x) loop_update_crop_manure_spreading_NH3_emission(x, manure_surplus_fills_nutDemand, manure_method))
 }
 
-
-
-
-
 compute_total_manure_spreading_NH3 = function(manure_surplus_fills_nutDemand = F, manure_method = 'Method 1', nutrient = 'N') {
   
   if (manure_surplus_fills_nutDemand == TRUE) { folder_div = 'With_ManSurplus'} else { folder_div = 'Without_ManSurplus'}

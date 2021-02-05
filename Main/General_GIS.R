@@ -3,7 +3,7 @@ source('./Main/Global_functions.R')
 
 
 
-fasterize_admin_statistical <- function(module, admin_res, file, name_id, name_field, spatial_res) {
+fasterize_admin_statistical <- function(module, admin_res, file, name_id, name_field, spatial_res, r_tmp=NULL) {
   # fasterizes a given column of a specified file based on administrative boundaries
   # NUTS3, Parish, Municipality
   
@@ -20,10 +20,10 @@ fasterize_admin_statistical <- function(module, admin_res, file, name_id, name_f
 }
 
 
-fasterize__100m <- function(module, shp_file, col_field) {
+fasterize__100m <- function(module, shp_file, col_field, res = 100) {
   
   ext1 <- get_activity_data(module, folder = 'Admin', pattern = 'Municipality')
-  r_template <- raster(ext=extent(ext1), crs=crs(ext1), res = 100)
+  r_template <- raster(ext=extent(ext1), crs=crs(ext1), res = res)
   r_fasterize <- fasterize::fasterize(sf = shp_file, raster = r_template, field = col_field)
   
   return(r_fasterize)
